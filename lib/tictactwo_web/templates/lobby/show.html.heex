@@ -1,0 +1,40 @@
+<%= if @loading do %>
+<h2>Loading...</h2>
+<% else %>
+<h2><%= @current_user.username %> You are in lobby</h2>
+
+<h3>Current Online users: <%= map_size(@users) %></h3>
+
+<ul>
+	<%= for {user_id, user_data} <- @users do %> <%= if user_id == @current_user.id do %>
+	<li>
+		<p><%= user_data.username %> (You)</p>
+	</li>
+
+	<% else %>
+
+	<li>
+		<p><%= user_data.username %></p>
+		<button phx-click="challenge-user" phx-value-userid={user_id}>
+			<%= if user_data.status == :challenge_sent do %>
+				Challenge sent
+			<% else %>
+			 	Challenge!
+			<% end %>
+		</button>
+	</li>
+	<% end %> <% end %>
+</ul>
+
+<h3>
+	Challenges
+</h3>
+<ul>
+	<%= for challenge <- @challenges do %>
+		<p>Challenge received from:
+			<%= challenge.username %>
+		</p>
+		<button phx-click="accept_challenge">Accept</button>
+	<% end %>
+</ul>
+<% end %>
