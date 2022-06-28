@@ -1,1 +1,11 @@
 <h1 class="text-3xl font-bold underline">In the room <%= @roomid %></h1>
+
+<div class="">
+	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">
+		<%= for cell <- @cells do %>
+		<div class="border-2">
+			<button><%= cell %></button>
+		</div>
+		<% end %>
+	</div>
+</div>
