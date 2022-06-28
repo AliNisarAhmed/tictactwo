@@ -34,7 +34,7 @@
 		<p>Challenge received from:
 			<%= challenge.username %>
 		</p>
-		<button phx-click="accept_challenge">Accept</button>
+		<button phx-click="accept-challenge" phx-value-challenger={challenge.id}>Accept</button>
 	<% end %>
 </ul>
 <% end %>

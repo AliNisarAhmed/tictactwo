@@ -19,6 +19,7 @@ defmodule TictactwoWeb.Router do
 
     get "/", PageController, :index
     get "/lobby", LobbyController, :show
+    get "/rooms/:roomid", RoomController, :show
   end
 
   # Other scopes may use custom stacks.

@@ -1,6 +1,8 @@
 defmodule TictactwoWeb.LobbyControllerLive do
   use TictactwoWeb, :live_view
 
+  @type status() :: :challenge_sent | nil
+
   alias Tictactwo.Presence
 
   @lobby_topic "rooms:lobby"
@@ -17,6 +19,32 @@ defmodule TictactwoWeb.LobbyControllerLive do
        challenges: []
      )}
   end
+
+  def handle_event("challenge-user", %{"userid" => userid}, socket) do
+    users =
+      socket.assigns.users
+      |> Map.update!(userid, fn prev ->
+        prev
+        |> Map.update!(:status, &toggle_status/1)
+      end)
+
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> userid, "challenge-received", %{
+      userid: userid,
+      challenger: socket.assigns.current_user
+    })
+
+    {:noreply, assign(socket, users: users)}
+  end
+
+  def handle_event("accept-challenge", %{"challenger" => challenger}, socket) do
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> challenger, "challenge-accepted", %{
+      userid: socket.assigns.current_user.id
+    })
+
+    {:noreply, socket}
+  end
+
+  # -------- Handle Info -----------
 
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(@lobby_topic)
@@ -47,30 +75,38 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, users: users)}
   end
 
-  def handle_info(%{event: "challenge_received", payload: payload}, socket) do
+  def handle_info(%{event: "challenge-received", payload: payload}, socket) do
     {:noreply, assign(socket, challenges: [payload.challenger | socket.assigns.challenges])}
+  end
+
+  def handle_info(%{event: "challenge-accepted", payload: %{userid: userid}}, socket) do
+    # Create a room
+    roomid = "abcdefghijk"
+
+    # redirect owner to the room
+
+    socket = push_redirect(socket, to: "/rooms/#{roomid}")
+
+    # send the other player an event to join the room
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> userid, "room-created", %{
+      roomid: roomid
+    })
+
+    {:noreply, socket}
+  end
+
+    def handle_info(%{event: "room-created", payload: %{roomid: roomid}}, socket) do
+
+    socket = push_redirect(socket, to: "/rooms/#{roomid}")
+
+    {:noreply, socket}
   end
 
   def render(assigns) do
     TictactwoWeb.LobbyView.render("show.html", assigns)
   end
 
-  def handle_event("challenge-user", %{"userid" => userid}, socket) do
-    users =
-      socket.assigns.users
-      |> Map.update!(userid, fn prev ->
-        prev
-        |> Map.update!(:status, &toggle_status/1)
-      end)
-
-    TictactwoWeb.Endpoint.broadcast(@events_topic <> userid, "challenge_received", %{
-      userid: userid,
-      challenger: socket.assigns.current_user
-    })
-
-    {:noreply, assign(socket, users: users)}
-  end
-
+  @spec toggle_status(status()) :: status()
   defp toggle_status(:challenge_sent), do: nil
   defp toggle_status(_), do: :challenge_sent
 end
