@@ -5,11 +5,17 @@ defmodule TictactwoWeb.RoomController do
   alias TictactwoWeb.RoomControllerLive
 
   def show(conn, params) do
+    IO.inspect(conn, label: "CONN")
+    IO.inspect(params, label: "PARAMS")
+    current_user = get_session(conn, "current_user")
+    # TODO: fetch game from database
+
     LiveView.Controller.live_render(
       conn,
       RoomControllerLive,
       session: %{
-        "roomid" => params["roomid"]
+        "roomid" => params["roomid"],
+        "current_user" => current_user
       }
     )
   end
