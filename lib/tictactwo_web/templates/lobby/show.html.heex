@@ -6,24 +6,28 @@
 <h3>Current Online users: <%= map_size(@users) %></h3>
 
 <ul>
-	<%= for {user_id, user_data} <- @users do %> <%= if user_id == @current_user.id do %>
-	<li>
-		<p><%= user_data.username %> (You)</p>
-	</li>
+	<%= for {user_id, user_data} <- @users do %>
+		<%= if user_id == @current_user.id do %>
+			<li>
+				<p><%= user_data.username %> (You)</p>
+			</li>
 
-	<% else %>
-
-	<li>
-		<p><%= user_data.username %></p>
-		<button phx-click="challenge-user" phx-value-userid={user_id}>
-			<%= if user_data.status == :challenge_sent do %>
-				Challenge sent
 			<% else %>
-			 	Challenge!
-			<% end %>
-		</button>
-	</li>
-	<% end %> <% end %>
+
+			<li>
+				<p><%= user_data.username %></p>
+				<button phx-click="challenge-user"
+						phx-value-userid={user_id}
+						class="px-4 py-2 bg-green-500 text-white-500">
+					<%= if user_data.status == :challenge_sent do %>
+						Challenge sent
+					<% else %>
+						Challenge!
+					<% end %>
+				</button>
+			</li>
+		<% end %>
+	<% end %>
 </ul>
 
 <h3>
@@ -34,7 +38,9 @@
 		<p>Challenge received from:
 			<%= challenge.username %>
 		</p>
-		<button phx-click="accept-challenge" phx-value-challenger={challenge.id}>Accept</button>
+		<button phx-click="accept-challenge"
+				phx-value-challenger={challenge.id}
+				class="px-4 py-2 bg-green-500 text-white-500">Accept</button>
 	<% end %>
 </ul>
 <% end %>
