@@ -20,4 +20,9 @@ defmodule TictactwoWeb.RoomView do
       "bg-#{color |> to_string()}-300"
     end
   end
+
+  defp not_selected_gobblers(gobblers) do
+    gobblers
+    |> Enum.filter(&(&1.status == :not_selected))
+  end
 end
