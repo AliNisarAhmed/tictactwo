@@ -1,26 +1,57 @@
 <h1 class="text-3xl font-bold underline">In the room <%= @roomid %></h1>
 
+<h2 class={"text-#{@game[@current_user.username]}-500"}>Welcome <%= @current_user.username %></h2>
+
+<div>
+	<%= if my_turn?(@current_user, @game, @player_turn) do %>
+		It's your turn
+	<% else %>
+	  	Waiting for your opponent to play their move
+	<% end %>
+</div>
+
 <div class="">
 	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">
-		<%= for cell <- @cells do %>
-		<div class="border-2">
-			<button><%= cell %></button>
-		</div>
+		<%= for row <- @cells do %>
+			<%= for col <- row do %>
+				<div class="border-2">
+					<button><%= show_coords(col.coords) %></button>
+				</div>
+			<% end %>
 		<% end %>
 	</div>
 
 	<h3>Blue gobblers</h3>
-	<%= for blue_gobbler <- @blue_gobblers do %>
-	<button class="p-4 bg-blue-500"><%= blue_gobbler %></button>
+	<%= for blue_gobbler <- @blue.gobblers do %>
+		<button
+			class={"w-20 h-10 p-4 b-2 #{bg_color(@player_turn, :blue)}"}
+			disabled={not my_turn?(@current_user, @game, @player_turn) || @player_turn == :orange}
+			phx-click="select-gobbler"
+			phx-value-gobbler={blue_gobbler}
+		>
+			<%= blue_gobbler %>
+		</button>
 	<% end %>
 
 	<h3>Orange gobblers</h3>
-	<%= for orange_gobbler <- @orange_gobblers do %>
+	<%= for orange_gobbler <- @orange.gobblers do %>
 		<button
-			class="p-4 bg-orange-500"
-			disabled={@player_turn != :blue}
+			class={"w-20 h-10 p-4 b-2 #{bg_color(@player_turn, :orange)}"}
+			disabled={not my_turn?(@current_user, @game, @player_turn) || @player_turn == :blue}
+			phx-click="select-gobbler"
+			phx-value-gobbler={orange_gobbler}
 		>
 			<%= orange_gobbler %>
+		</button>
+	<% end %>
+</div>
+
+<div>
+	<%= if @selected_gobbler do %>
+		<button class={gobbler_class(@player_turn, @player_turn)}
+				phx-click="deselect-gobbler"
+				phx-value-gobbler={@selected_gobbler}>
+			<%= @selected_gobbler %>
 		</button>
 	<% end %>
 </div>
