@@ -35,4 +35,34 @@ defmodule TictactwoWeb.RoomView do
     |> to_string()
     |> then(fn color -> "bg-#{color}-500" end)
   end
+
+  def can_select?(gobblers, player) do
+    gobblers
+    |> List.first()
+    |> then(fn
+      {^player, _name} -> true
+      _ -> false
+    end)
+  end
+
+  defp first_gobbler_name(gobblers) do
+    gobblers
+    |> List.first()
+    |> then(fn
+      {_, name} -> name
+      _ -> " "
+    end)
+  end
+
+  defp first_gobbler_selected?(gobblers, selected_gobbler, player_turn) do
+    gobblers
+    |> List.first()
+    |> then(fn
+      {^player_turn, name} when name == selected_gobbler.name ->
+        true
+
+      _ ->
+        false
+    end)
+  end
 end
