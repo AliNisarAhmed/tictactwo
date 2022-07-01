@@ -65,9 +65,8 @@ defmodule TictactwoWeb.RoomControllerLive do
       )
 
     socket =
-      update(socket, socket.assigns.player_turn, fn m ->
-        Map.update!(m, :gobblers, &set_gobbler_status(&1, payload.gobbler))
-      end)
+      socket
+      |> update_gobbler_status(payload.gobbler)
 
     {:noreply, socket}
   end
@@ -103,7 +102,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("select-gobbler", %{"gobbler" => gobbler, "row" => row, "col" => col}, socket) do
-    IO.inspect("GOBBLER SELECTED WHICH IS ALREADY PLAYED")
     gobbler = String.to_atom(gobbler)
     row = String.to_integer(row)
     col = String.to_integer(col)
@@ -114,16 +112,8 @@ defmodule TictactwoWeb.RoomControllerLive do
     }
 
     updated_cells =
-      socket.assigns.cells
-      |> Enum.map(fn cell ->
-        case cell.coords do
-          {^row, ^col} ->
-            Map.update!(cell, :gobblers, fn [_first | rest] -> rest end)
-
-          _ ->
-            cell
-        end
-      end)
+      socket
+      |> pop_first_gobbler({row, col})
 
     socket =
       assign(socket,
@@ -132,15 +122,12 @@ defmodule TictactwoWeb.RoomControllerLive do
       )
 
     socket =
-      update(socket, socket.assigns.player_turn, fn m ->
-        Map.update!(m, :gobblers, &set_gobbler_status(&1, gobbler))
-      end)
+      socket
+      |> update_gobbler_status(gobbler)
 
     TictactwoWeb.Endpoint.broadcast(opponent_topic(socket), "gobbler-selected", %{
       gobbler: selected_gobbler
     })
-
-    IO.inspect(socket.assigns, label: "SELECT GOBBLER ALREADY PLAYED")
 
     {:noreply, socket}
   end
@@ -159,9 +146,8 @@ defmodule TictactwoWeb.RoomControllerLive do
       )
 
     socket =
-      update(socket, socket.assigns.player_turn, fn m ->
-        Map.update!(m, :gobblers, &set_gobbler_status(&1, gobbler))
-      end)
+      socket
+      |> update_gobbler_status(gobbler)
 
     TictactwoWeb.Endpoint.broadcast(opponent_topic(socket), "gobbler-selected", %{
       gobbler: selected_gobbler
@@ -178,33 +164,22 @@ defmodule TictactwoWeb.RoomControllerLive do
     case selected_gobbler.played? do
       {row, col} ->
         updated_cells =
-          socket.assigns.cells
-          |> Enum.map(fn cell ->
-            case cell.coords do
-              {^row, ^col} ->
-                Map.update!(cell, :gobblers, fn existing -> [selected_gobbler.name, player] end)
-
-              _ ->
-                cell
-            end
-          end)
+          socket
+          |> push_first_gobbler({row, col}, {player, selected_gobbler.name})
 
         socket =
           assign(socket,
             selected_gobbler: nil,
-            cells: updated_cells |> IO.inspect(label: "updated_cells")
+            cells: updated_cells
           )
 
         socket =
-          update(socket, socket.assigns.player_turn, fn m ->
-            Map.update!(m, :gobblers, &set_gobbler_status(&1, gobbler, :not_selected))
-          end)
+          socket
+          |> update_gobbler_status(gobbler, :not_selected)
 
         TictactwoWeb.Endpoint.broadcast(opponent_topic(socket), "gobbler-deselected", %{
           gobbler: gobbler
         })
-
-        IO.inspect(socket.assigns, label: "DE SELECT GOBBLER PLAYED")
 
         {:noreply, socket}
 
@@ -212,9 +187,8 @@ defmodule TictactwoWeb.RoomControllerLive do
         socket = assign(socket, selected_gobbler: nil)
 
         socket =
-          update(socket, socket.assigns.player_turn, fn m ->
-            Map.update!(m, :gobblers, &set_gobbler_status(&1, gobbler, :not_selected))
-          end)
+          socket
+          |> update_gobbler_status(gobbler, :not_selected)
 
         TictactwoWeb.Endpoint.broadcast(opponent_topic(socket), "gobbler-deselected", %{
           gobbler: gobbler
@@ -232,18 +206,8 @@ defmodule TictactwoWeb.RoomControllerLive do
     selected_gobbler = socket.assigns.selected_gobbler
 
     updated_cells =
-      socket.assigns.cells
-      |> Enum.map(fn cell ->
-        case cell.coords do
-          {^row, ^col} ->
-            Map.update!(cell, :gobblers, fn existing ->
-              [{player, selected_gobbler.name} | existing]
-            end)
-
-          _ ->
-            cell
-        end
-      end)
+      socket
+      |> push_first_gobbler({row, col}, {player, selected_gobbler.name})
 
     updated_gobblers =
       socket.assigns[player]
@@ -266,6 +230,36 @@ defmodule TictactwoWeb.RoomControllerLive do
     })
 
     {:noreply, socket}
+  end
+
+  # ----------------------------------------------------------------------
+  # -------------------- SOCKET FUNCTIONS --------------------------------
+  # ----------------------------------------------------------------------
+  defp update_gobbler_status(socket, gobbler_name, status \\ :selected) do
+    socket
+    |> update(socket.assigns.player_turn, fn m ->
+      Map.update!(m, :gobblers, &set_gobbler_status(&1, gobbler_name, status))
+    end)
+  end
+
+  def pop_first_gobbler(socket, {row, col}) do
+    socket.assigns.cells
+    |> Enum.map(fn cell ->
+      case cell.coords do
+        {^row, ^col} -> Map.update!(cell, :gobblers, fn [_first | rest] -> rest end)
+        _ -> cell
+      end
+    end)
+  end
+
+  def push_first_gobbler(socket, {row, col}, {_player, _gobbler_name} = gobbler) do
+    socket.assigns.cells
+    |> Enum.map(fn cell ->
+      case cell.coords do
+        {^row, ^col} -> Map.update!(cell, :gobblers, fn existing -> [gobbler | existing] end)
+        _ -> cell
+      end
+    end)
   end
 
   # ----------------------------------------------------------------------
