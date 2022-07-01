@@ -12,12 +12,19 @@
 
 <div class="">
 	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">
-		<%= for row <- @cells do %>
-			<%= for col <- row do %>
-				<div class="border-2">
-					<button disabled={!@selected_gobbler}><%= show_coords(col.coords) %></button>
-				</div>
-			<% end %>
+		<%= for cell <- @cells do %>
+			<div class="border-2 w-full h-full">
+				<button disabled={!@selected_gobbler}
+						phx-click="play-gobbler"
+						phx-value-row={elem(cell.coords, 0)}
+						phx-value-col={elem(cell.coords, 1)}
+						class="w-full h-full"
+				>
+				 	<span class={"#{played_gobbler_color(cell.gobblers)}"}>
+						<%= played_gobbler_text(cell.gobblers) %>
+					 </span>
+				</button>
+			</div>
 		<% end %>
 	</div>
 

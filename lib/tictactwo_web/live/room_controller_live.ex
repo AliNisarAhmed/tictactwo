@@ -6,8 +6,8 @@ defmodule TictactwoWeb.RoomControllerLive do
           status: gobbler_status()
         }
   @type cell() :: %{
-          occupied_by: player() | nil,
-          pieces: [gobbler()] | nil
+          coords: coords(),
+          gobblers: [{player(), gobbler()}]
         }
   @type row :: pos_integer()
   @type col :: pos_integer()
@@ -76,6 +76,21 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  def handle_info(%{event: "gobbler-played", payload: payload}, socket) do
+    player = socket.assigns.player_turn
+
+    socket =
+      socket
+      |> assign(player, payload.gobblers)
+      |> assign(
+        cells: payload.cells,
+        selected_gobbler: nil,
+        player_turn: toggle_player_turn(player)
+      )
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
@@ -116,24 +131,66 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  def handle_event("play-gobbler", %{"row" => row, "col" => col}, socket) do
+    row = String.to_integer(row)
+    col = String.to_integer(col)
+
+    player = socket.assigns.player_turn
+    selected_gobbler = socket.assigns.selected_gobbler
+
+    updated_cells =
+      socket.assigns.cells
+      |> Enum.map(fn cell ->
+        case cell.coords do
+          {^row, ^col} ->
+            Map.update!(cell, :gobblers, fn existing ->
+              [{player, selected_gobbler} | existing]
+            end)
+
+          _ ->
+            cell
+        end
+      end)
+
+    updated_gobblers =
+      socket.assigns[player]
+      |> Map.update!(:gobblers, &set_gobbler_status(&1, selected_gobbler, :played))
+
+    new_player = toggle_player_turn(player)
+
+    socket =
+      socket
+      |> assign(player, updated_gobblers)
+      |> assign(
+        cells: updated_cells,
+        player_turn: new_player,
+        selected_gobbler: nil
+      )
+
+    TictactwoWeb.Endpoint.broadcast(opponent_topic(socket), "gobbler-played", %{
+      cells: updated_cells,
+      gobblers: updated_gobblers
+    })
+
+    {:noreply, socket}
+  end
+
+  # ----------------------------------------------------------------------
   defp gobblers() do
     [:xl, :large, :medium, :small, :xs, :premie]
     |> Enum.map(&%{name: &1, status: :not_selected})
   end
 
   defp gen_empty_cell(row, col) do
-    %{
-      coords: {row, col},
-      gobblers: []
-    }
+    %{coords: {row, col}, gobblers: []}
   end
 
   defp gen_empty_cells() do
-    for row <- 0..2 do
-      for col <- 0..2 do
+    Enum.flat_map(0..2, fn row ->
+      Enum.map(0..2, fn col ->
         gen_empty_cell(row, col)
-      end
-    end
+      end)
+    end)
   end
 
   defp topic(socket) do
@@ -152,6 +209,9 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   defp toggle_color("blue"), do: "orange"
   defp toggle_color("orange"), do: "blue"
+
+  defp toggle_player_turn(:blue), do: :orange
+  defp toggle_player_turn(:orange), do: :blue
 
   defp set_gobbler_status(gobblers, gobbler, status \\ :selected) do
     for g <- gobblers do
