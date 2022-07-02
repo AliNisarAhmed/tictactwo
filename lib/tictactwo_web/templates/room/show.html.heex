@@ -3,7 +3,7 @@
 <h2 class={"text-#{@game[@current_user.username]}-500"}>Welcome <%= @current_user.username %></h2>
 
 <div>
-	<%= if my_turn?(@current_user, @game, @player_turn) do %>
+	<%= if my_turn?(@current_user, @game_struct) do %>
 		It's your turn
 	<% else %>
 	  	Waiting for your opponent to play their move
@@ -12,10 +12,10 @@
 
 <div class="">
 	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">
-		<%= for cell <- @cells do %>
+		<%= for cell <- @game_struct.cells do %>
 			<div class="border-2 w-full h-full">
-				<%= if is_nil(@selected_gobbler) do %>
-					<%= if can_select?(cell.gobblers, @player_turn) do %>
+				<%= if is_nil(@game_struct.selected_gobbler) do %>
+					<%= if can_select?(cell.gobblers, @game_struct.player_turn) do %>
 						<button phx-click="select-gobbler"
 								phx-value-gobbler={first_gobbler_name(cell.gobblers)}
 								phx-value-row={elem(cell.coords, 0)}
@@ -62,7 +62,7 @@
 			class={"w-20 h-10 p-4 b-2 bg-blue-500"}
 			disabled={
 				not is_nil(@selected_gobbler) ||
-				not my_turn?(@current_user, @game, @player_turn) ||
+				not my_turn?(@current_user, @game_struct) ||
 				@player_turn == :orange
 			}
 			phx-click="select-gobbler"
@@ -78,7 +78,7 @@
 			class="w-20 h-10 p-4 b-2 bg-orange-500"
 			disabled={
 				not is_nil(@selected_gobbler) ||
-				not my_turn?(@current_user, @game, @player_turn) ||
+				not my_turn?(@current_user, @game_struct) ||
 				@player_turn == :blue
 			}
 			phx-click="select-gobbler"

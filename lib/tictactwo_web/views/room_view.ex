@@ -1,8 +1,8 @@
 defmodule TictactwoWeb.RoomView do
   use TictactwoWeb, :view
 
-  defp my_turn?(current_user, game, player_turn) do
-    game[current_user.username] == to_string(player_turn)
+  defp my_turn?(current_user, game) do
+    current_user.username == game[game.player_turn].username
   end
 
   defp gobbler_class(player_turn, color) do

@@ -25,6 +25,8 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   use TictactwoWeb, :live_view
 
+  alias Tictactwo.Games
+
   def mount(_params, session, socket) do
     send(self(), :after_join)
 
@@ -35,19 +37,18 @@ defmodule TictactwoWeb.RoomControllerLive do
         current_user: session["current_user"],
         game: %{
           "fletcher2033" => "blue",
-          "lacy_crist" => "orange"
+          "marlee1921" => "orange"
         },
         cells: gen_empty_cells(),
         player_turn: :blue,
         selected_gobbler: nil,
         blue: %{
-          gobblers: gobblers(),
-          played: []
+          gobblers: new_gobblers()
         },
         orange: %{
-          gobblers: gobblers(),
-          played: []
-        }
+          gobblers: new_gobblers()
+        },
+        game_struct: Games.new_game()
       )
 
     {:ok, assign(socket, roomid: session["roomid"])}
@@ -263,22 +264,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # ----------------------------------------------------------------------
-  defp gobblers() do
-    [:xl, :large, :medium, :small, :xs, :premie]
-    |> Enum.map(&%{name: &1, status: :not_selected})
-  end
-
-  defp gen_empty_cell(row, col) do
-    %{coords: {row, col}, gobblers: []}
-  end
-
-  defp gen_empty_cells() do
-    Enum.flat_map(0..2, fn row ->
-      Enum.map(0..2, fn col ->
-        gen_empty_cell(row, col)
-      end)
-    end)
-  end
 
   defp topic(socket) do
     @room_topic <>
@@ -307,5 +292,22 @@ defmodule TictactwoWeb.RoomControllerLive do
         false -> g
       end
     end
+  end
+
+  defp new_gobblers() do
+    [:xl, :large, :medium, :small, :xs, :premie]
+    |> Enum.map(&%{name: &1, status: :not_selected})
+  end
+
+  defp gen_empty_cell(row, col) do
+    %{coords: {row, col}, gobblers: []}
+  end
+
+  defp gen_empty_cells() do
+    Enum.flat_map(0..2, fn row ->
+      Enum.map(0..2, fn col ->
+        gen_empty_cell(row, col)
+      end)
+    end)
   end
 end
