@@ -5,16 +5,8 @@ defmodule TictactwoWeb.RoomView do
     current_user.username == game[game.player_turn].username
   end
 
-  defp gobbler_class(player_turn, color) do
-    "w-20 h-10 py-2 px-4 #{bg_color(player_turn, color)}"
-  end
-
-  defp bg_color(player_turn, color) do
-    if player_turn == color do
-      "bg-#{color |> to_string()}-500"
-    else
-      "bg-#{color |> to_string()}-300"
-    end
+  defp gobbler_class(color) do
+    "w-20 h-10 py-2 px-4 bg-#{color |> to_string()}-500"
   end
 
   defp not_selected_gobblers(gobblers) do
@@ -65,4 +57,17 @@ defmodule TictactwoWeb.RoomView do
         false
     end)
   end
+
+  defp get_current_user_color(current_user, game) do
+    if my_turn?(current_user, game) do
+      game.player_turn |> to_string
+    else
+      game.player_turn
+      |> toggle_player_turn()
+      |> to_string()
+    end
+  end
+
+  defp toggle_player_turn(:blue), do: :orange
+  defp toggle_player_turn(:orange), do: :blue
 end
