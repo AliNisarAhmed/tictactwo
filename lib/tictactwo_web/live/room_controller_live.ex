@@ -13,7 +13,7 @@ defmodule TictactwoWeb.RoomControllerLive do
       |> assign(
         roomid: session["roomid"],
         current_user: session["current_user"],
-        game_struct: Games.new_game()
+        game: Games.new_game()
       )
 
     {:ok, assign(socket, roomid: session["roomid"])}
@@ -85,17 +85,16 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
-    gobbler_name = socket.assigns.game_struct.selected_gobbler.name
+    gobbler_name = socket.assigns.game.selected_gobbler.name
     row = String.to_integer(row)
     col = String.to_integer(col)
 
     socket =
       socket
-      |> push_first_gobbler({ row, col })
+      |> push_first_gobbler({row, col})
       |> update_gobbler_status(gobbler_name, :played)
       |> set_selected_gobbler(nil)
       |> toggle_player_turn()
-
 
     {:noreply, socket}
   end
@@ -146,32 +145,32 @@ defmodule TictactwoWeb.RoomControllerLive do
   # ----------------------------------------------------------------------
   defp remove_selected_gobbler_from_cells(socket, coords) do
     socket
-    |> update(:game_struct, &Games.pop_first_gobbler(&1, coords))
+    |> update(:game, &Games.pop_first_gobbler(&1, coords))
   end
 
   defp set_selected_gobbler(socket, selected_gobbler) do
     socket
-    |> update(:game_struct, &Games.set_selected_gobbler(&1, selected_gobbler))
+    |> update(:game, &Games.set_selected_gobbler(&1, selected_gobbler))
   end
 
   defp update_gobbler_status(socket, gobbler_name, status) do
     socket
-    |> update(:game_struct, &Games.update_gobbler_status(&1, gobbler_name, status))
+    |> update(:game, &Games.update_gobbler_status(&1, gobbler_name, status))
   end
 
   defp deselect_gobbler(socket) do
     socket
-    |> update(:game_struct, &Games.deselect_gobbler(&1))
+    |> update(:game, &Games.deselect_gobbler(&1))
   end
 
-  defp push_first_gobbler(socket, coords ) do
+  defp push_first_gobbler(socket, coords) do
     socket
-    |> update(:game_struct, &Games.push_gobbler(&1, coords))
+    |> update(:game, &Games.push_gobbler(&1, coords))
   end
 
   defp toggle_player_turn(socket) do
     socket
-    |> update(:game_struct, &Games.toggle_player_turn/1)
+    |> update(:game, &Games.toggle_player_turn/1)
   end
 
   # ----------------------------------------------------------------------
@@ -180,9 +179,6 @@ defmodule TictactwoWeb.RoomControllerLive do
     @room_topic <> "#{socket.assigns.roomid}"
   end
 
-  defp toggle_color("blue"), do: "orange"
-  defp toggle_color("orange"), do: "blue"
-
   defp set_gobbler_status(gobblers, gobbler, status) do
     for g <- gobblers do
       case g.name == gobbler do
@@ -190,25 +186,5 @@ defmodule TictactwoWeb.RoomControllerLive do
         false -> g
       end
     end
-  end
-
-  def pop_first_gobbler(socket, {row, col}) do
-    socket.assigns.cells
-    |> Enum.map(fn cell ->
-      case cell.coords do
-        {^row, ^col} -> Map.update!(cell, :gobblers, fn [_first | rest] -> rest end)
-        _ -> cell
-      end
-    end)
-  end
-
-  def push_first_gobbler(socket, {row, col}, {_player, _gobbler_name} = gobbler) do
-    socket.assigns.cells
-    |> Enum.map(fn cell ->
-      case cell.coords do
-        {^row, ^col} -> Map.update!(cell, :gobblers, fn existing -> [gobbler | existing] end)
-        _ -> cell
-      end
-    end)
   end
 end
