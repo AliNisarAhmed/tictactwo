@@ -1,27 +1,24 @@
 defmodule Tictactwo.Games do
   use Tictactwo.Types
 
+  alias Tictactwo.Gobblers
+
   @spec new_game(player()) :: game()
   def new_game(player_turn \\ :blue) do
     %{
+      status: :in_play,
       blue: %{
         username: "fletcher2033",
-        gobblers: new_gobblers()
+        gobblers: Gobblers.new_gobblers()
       },
       orange: %{
-        username: "cortez_jenkins",
-        gobblers: new_gobblers()
+        username: "otho.jaskolski",
+        gobblers: Gobblers.new_gobblers()
       },
       cells: gen_empty_cells(),
       player_turn: player_turn,
       selected_gobbler: nil
     }
-  end
-
-  @spec new_gobblers() :: [gobbler()]
-  defp new_gobblers() do
-    [:xl, :large, :medium, :small, :xs, :premie]
-    |> Enum.map(&%{name: &1, status: :not_selected})
   end
 
   @spec gen_empty_cell(row :: pos_integer(), col :: pos_integer()) :: cell()
@@ -92,7 +89,6 @@ defmodule Tictactwo.Games do
         %{player | gobblers: set_gobbler_status(player.gobblers, gobbler_name, status)}
       end
     )
-    |> IO.inspect(label: "UPDATE GOBBLER STATUS")
   end
 
   @spec deselect_gobbler(game :: game()) :: game()
@@ -138,6 +134,97 @@ defmodule Tictactwo.Games do
   def toggle_player_turn(game) do
     game
     |> Map.update!(:player_turn, &toggle_player/1)
+  end
+
+  @spec game_status(game :: game()) :: game_status()
+  def game_status(game) do
+    with :in_play <- check_rows(game.cells),
+         :in_play <- check_cols(game.cells),
+         :in_play <- check_falling_diag(game.cells) do
+      check_rising_diag(game.cells)
+    else
+      v -> v
+    end
+  end
+
+  @spec check_rising_diag(cells :: cells()) :: game_status()
+  defp check_rising_diag(cells) do
+    diag =
+      cells
+      |> Enum.filter(fn
+        %{coords: {2, 0}} -> true
+        %{coords: {0, 2}} -> true
+        %{coords: {2, 2}} -> true
+        _ -> false
+      end)
+
+    check_win(diag)
+  end
+
+  @spec check_falling_diag(cells :: cells()) :: game_status()
+  defp check_falling_diag(cells) do
+    diag =
+      cells
+      |> Enum.filter(fn %{coords: {row, col}} -> row == col end)
+
+    check_win(diag)
+  end
+
+  @spec check_rows(cells :: cells()) :: game_status()
+  defp check_rows(cells) do
+    first_row =
+      cells
+      |> Enum.filter(fn %{coords: {row, _col}} -> row == 0 end)
+
+    second_row =
+      cells
+      |> Enum.filter(fn %{coords: {row, _col}} -> row == 1 end)
+
+    third_row =
+      cells
+      |> Enum.filter(fn %{coords: {row, _col}} -> row == 2 end)
+
+    with :in_play <- check_win(first_row),
+         :in_play <- check_win(second_row) do
+      check_win(third_row)
+    else
+      v -> v
+    end
+  end
+
+  @spec check_cols(cells :: cells()) :: game_status()
+  defp check_cols(cells) do
+    first_col =
+      cells
+      |> Enum.filter(fn %{coords: {_row, col}} -> col == 0 end)
+
+    second_col =
+      cells
+      |> Enum.filter(fn %{coords: {_row, col}} -> col == 1 end)
+
+    third_col =
+      cells
+      |> Enum.filter(fn %{coords: {_row, col}} -> col == 2 end)
+
+    with :in_play <- check_win(first_col),
+         :in_play <- check_win(second_col) do
+      check_win(third_col)
+    else
+      v -> v
+    end
+  end
+
+  @spec check_win(cells :: cells) :: game_status()
+  defp check_win(cells) do
+    cells
+    |> Enum.map(fn cell -> cell.gobblers |> List.first({" ", " "}) end)
+    |> then(fn
+      [{p, _}, {p, _}, {p, _}] ->
+        {:won, p}
+
+      _ ->
+        :in_play
+    end)
   end
 
   @spec toggle_player(player()) :: player()

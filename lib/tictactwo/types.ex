@@ -1,6 +1,7 @@
 defmodule Tictactwo.Types do
   defmacro __using__(_opts) do
     quote do
+      @type game_status() :: {:won, player()} | :in_play
       @type player() :: :blue | :orange
       @type gobbler_name() :: :xl | :large | :medium | :small | :xs | :premie
       @type gobbler() :: %{
@@ -23,6 +24,7 @@ defmodule Tictactwo.Types do
                   played?: coords() | nil
                 }
       @type game :: %{
+              status: game_status(),
               player_turn: player(),
               blue: %{
                 username: String.t(),
