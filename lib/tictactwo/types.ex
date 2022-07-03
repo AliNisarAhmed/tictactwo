@@ -7,6 +7,7 @@ defmodule Tictactwo.Types do
               name: gobbler_name(),
               status: gobbler_status()
             }
+      @type cells :: [cell()]
       @type cell() :: %{
               coords: coords(),
               gobblers: [{player(), gobbler_name()}]
