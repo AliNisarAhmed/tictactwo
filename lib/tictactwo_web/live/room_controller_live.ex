@@ -85,16 +85,12 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
-    gobbler_name = socket.assigns.game.selected_gobbler.name
     row = String.to_integer(row)
     col = String.to_integer(col)
 
     socket =
       socket
-      |> push_first_gobbler({row, col})
-      |> update_gobbler_status(gobbler_name, :played)
-      |> set_selected_gobbler(nil)
-      |> toggle_player_turn()
+      |> update(:game, &(Games.play_gobbler(&1, {row, col})))
 
     {:noreply, socket}
   end

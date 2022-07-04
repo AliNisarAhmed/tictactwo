@@ -1,7 +1,7 @@
 defmodule TictactwoWeb.RoomView do
   use TictactwoWeb, :view
 
-  alias Tictactwo.Gobblers
+  alias Tictactwo.Games
 
   defp my_turn?(current_user, game) do
     current_user.username == game[game.player_turn].username
@@ -74,24 +74,10 @@ defmodule TictactwoWeb.RoomView do
   defp toggle_player_turn(:orange), do: :blue
 
   defp set_cursor(game, gobblers) do
-    case move_allowed?(game, gobblers) do
+    case Games.move_allowed?(game, gobblers) do
       true -> "cursor-pointer"
       false -> "cursor-not-allowed"
     end
   end
 
-  defp move_allowed?(game, gobblers) do
-    gobblers
-    |> List.first()
-    |> then(fn
-      {_, name} ->
-        case Gobblers.compare(game.selected_gobbler.name, name) do
-          :lt -> false
-          _ -> true
-        end
-
-      _ ->
-        true
-    end)
-  end
 end

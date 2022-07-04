@@ -58,7 +58,7 @@
 							phx-value-row={elem(cell.coords, 0)}
 							phx-value-col={elem(cell.coords, 1)}
 							class={"w-full h-full #{set_cursor(@game, cell.gobblers)}"}
-							disabled={not move_allowed?(@game, cell.gobblers)}
+							disabled={not Games.move_allowed?(@game, cell.gobblers)}
 					>
 							<span class={"#{played_gobbler_color(cell.gobblers)}"}>
 								<%= played_gobbler_text(cell.gobblers) %>
