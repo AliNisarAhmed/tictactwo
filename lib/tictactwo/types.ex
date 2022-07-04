@@ -20,7 +20,7 @@ defmodule Tictactwo.Types do
       @type selected_gobbler ::
               nil
               | %{
-                  name: gobbler(),
+                  name: gobbler_name(),
                   played?: coords() | nil
                 }
       @type game :: %{
