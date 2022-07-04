@@ -80,4 +80,13 @@ defmodule TictactwoWeb.RoomView do
     end
   end
 
+  defp hide_last_gobbler(game, cell_coords) do
+    selected_gobbler = game.selected_gobbler
+    if not is_nil(selected_gobbler.played?) and selected_gobbler.played? == cell_coords do
+      "hidden"
+    else
+      ""
+    end
+  end
+
 end

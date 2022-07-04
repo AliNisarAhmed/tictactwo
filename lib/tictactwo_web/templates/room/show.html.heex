@@ -57,7 +57,12 @@
 					<button phx-click="play-gobbler"
 							phx-value-row={elem(cell.coords, 0)}
 							phx-value-col={elem(cell.coords, 1)}
-							class={"w-full h-full #{set_cursor(@game, cell.gobblers)}"}
+							class={"
+								w-full
+								h-full
+								#{set_cursor(@game, cell.gobblers)}
+								#{hide_last_gobbler(@game, cell.coords)}
+							"}
 							disabled={not Games.move_allowed?(@game, cell.gobblers)}
 					>
 							<span class={"#{played_gobbler_color(cell.gobblers)}"}>
