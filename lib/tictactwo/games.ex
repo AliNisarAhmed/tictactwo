@@ -8,17 +8,46 @@ defmodule Tictactwo.Games do
     %{
       status: :in_play,
       blue: %{
-        username: "tyshawn2053",
+        username: "emely_schmidt",
         gobblers: Gobblers.new_gobblers()
       },
       orange: %{
-        username: "declan2073",
+        username: "gene.oberbrunner",
         gobblers: Gobblers.new_gobblers()
       },
       cells: gen_empty_cells(),
       player_turn: player_turn,
       selected_gobbler: nil
     }
+  end
+
+  @spec select_already_played_gobbler(
+          game :: game(),
+          gobbler_name :: gobbler_name(),
+          coords :: coords()
+        ) :: game()
+  def select_already_played_gobbler(game, gobbler_name, {row, col}) do
+    selected_gobbler = %{
+      name: gobbler_name,
+      played?: {row, col}
+    }
+
+    game
+    |> pop_first_gobbler_from_cell({row, col})
+    |> set_selected_gobbler(selected_gobbler)
+    |> update_gobbler_status(gobbler_name, :selected)
+  end
+
+  @spec select_unplayed_gobbler(game :: game(), gobbler_name :: gobbler_name()) :: game()
+  def select_unplayed_gobbler(game, gobbler_name) do
+    selected_gobbler = %{
+      name: gobbler_name,
+      played?: nil
+    }
+
+    game
+    |> set_selected_gobbler(selected_gobbler)
+    |> update_gobbler_status(gobbler_name, :selected)
   end
 
   @spec gen_empty_cells() :: [cell()]
@@ -30,15 +59,15 @@ defmodule Tictactwo.Games do
     end)
   end
 
-  @spec pop_first_gobbler(game :: game(), coords :: coords()) :: game()
-  def pop_first_gobbler(game, {row, col}) do
+  @spec pop_first_gobbler_from_cell(game :: game(), coords :: coords()) :: game()
+  def pop_first_gobbler_from_cell(game, {row, col}) do
     Map.put(
       game,
       :cells,
       game.cells
       |> Enum.map(fn cell ->
         case cell.coords do
-          {^row, ^col} -> Map.update!(cell, :gobblers, fn [_first | rest] -> rest end)
+          {^row, ^col} -> Map.update!(cell, :gobblers, &Enum.drop(&1, 1))
           _ -> cell
         end
       end)
@@ -97,7 +126,7 @@ defmodule Tictactwo.Games do
   @spec deselect_played_gobbler(game :: game(), coords :: coords()) :: game()
   defp deselect_played_gobbler(game, coords) do
     game
-    |> pop_first_gobbler(coords)
+    |> pop_first_gobbler_from_cell(coords)
     |> update_gobbler_status(game.selected_gobbler.name, :not_selected)
     |> set_selected_gobbler(nil)
   end

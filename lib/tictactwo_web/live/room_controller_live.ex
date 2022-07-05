@@ -39,16 +39,9 @@ defmodule TictactwoWeb.RoomControllerLive do
     row = String.to_integer(row)
     col = String.to_integer(col)
 
-    selected_gobbler = %{
-      name: gobbler_name,
-      played?: {row, col}
-    }
-
     socket =
       socket
-      |> remove_selected_gobbler_from_cells({row, col})
-      |> set_selected_gobbler(selected_gobbler)
-      |> update_gobbler_status(gobbler_name, :selected)
+      |> update(:game, &Games.select_already_played_gobbler(&1, gobbler_name, {row, col}))
 
     {:noreply, socket}
   end
@@ -62,13 +55,11 @@ defmodule TictactwoWeb.RoomControllerLive do
         },
         socket
       ) do
-    name = gobbler_name_str |> String.to_atom()
-    selected_gobbler = %{name: name, played?: nil}
+    gobbler_name = gobbler_name_str |> String.to_atom()
 
     socket =
       socket
-      |> set_selected_gobbler(selected_gobbler)
-      |> update_gobbler_status(name, :selected)
+      |> update(:game, &Games.select_unplayed_gobbler(&1, gobbler_name))
 
     {:noreply, socket}
   end
@@ -90,7 +81,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
     socket =
       socket
-      |> update(:game, &(Games.play_gobbler(&1, {row, col})))
+      |> update(:game, &Games.play_gobbler(&1, {row, col}))
 
     {:noreply, socket}
   end
