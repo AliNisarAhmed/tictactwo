@@ -8,11 +8,11 @@ defmodule Tictactwo.Games do
     %{
       status: :in_play,
       blue: %{
-        username: "emely_schmidt",
+        username: "gerda1980",
         gobblers: Gobblers.new_gobblers()
       },
       orange: %{
-        username: "gene.oberbrunner",
+        username: "tyra2065",
         gobblers: Gobblers.new_gobblers()
       },
       cells: gen_empty_cells(),
@@ -50,6 +50,31 @@ defmodule Tictactwo.Games do
     |> update_gobbler_status(gobbler_name, :selected)
   end
 
+  @spec deselect_gobbler(game :: game()) :: game()
+  def deselect_gobbler(game) do
+    case game.selected_gobbler.played? do
+      nil -> deselect_unplayed_gobbler(game)
+      {row, col} -> deselect_played_gobbler(game, {row, col})
+    end
+  end
+
+  @spec play_gobbler(game :: game(), coords :: coords()) :: game()
+  def play_gobbler(game, coords) do
+    selected_gobbler = game.selected_gobbler
+    gobbler_name = selected_gobbler.name
+
+    game
+    |> push_gobbler_to_cell(coords)
+    |> update_gobbler_status(gobbler_name, {:played, coords})
+    |> set_selected_gobbler(nil)
+    |> update_game_status()
+    |> toggle_player_turn()
+  end
+
+  # --------------------------------------------------------------
+  # --------------------- PRIVATE FUNCTIONS ----------------------
+  # --------------------------------------------------------------
+
   @spec gen_empty_cells() :: [cell()]
   defp gen_empty_cells() do
     Enum.flat_map(0..2, fn row ->
@@ -74,8 +99,8 @@ defmodule Tictactwo.Games do
     )
   end
 
-  @spec push_gobbler(game :: game(), coords :: coords()) :: game()
-  def push_gobbler(game, {row, col}) do
+  @spec push_gobbler_to_cell(game :: game(), coords :: coords()) :: game()
+  def push_gobbler_to_cell(game, {row, col}) do
     Map.put(
       game,
       :cells,
@@ -115,19 +140,11 @@ defmodule Tictactwo.Games do
     )
   end
 
-  @spec deselect_gobbler(game :: game()) :: game()
-  def deselect_gobbler(game) do
-    case game.selected_gobbler.played? do
-      nil -> deselect_unplayed_gobbler(game)
-      {row, col} -> deselect_played_gobbler(game, {row, col})
-    end
-  end
-
   @spec deselect_played_gobbler(game :: game(), coords :: coords()) :: game()
   defp deselect_played_gobbler(game, coords) do
     game
-    |> pop_first_gobbler_from_cell(coords)
-    |> update_gobbler_status(game.selected_gobbler.name, :not_selected)
+    |> push_gobbler_to_cell(coords)
+    |> update_gobbler_status(game.selected_gobbler.name, {:played, coords})
     |> set_selected_gobbler(nil)
   end
 
@@ -156,8 +173,14 @@ defmodule Tictactwo.Games do
 
   @spec toggle_player_turn(game :: game()) :: game()
   def toggle_player_turn(game) do
-    game
-    |> Map.update!(:player_turn, &toggle_player/1)
+    case game.status do
+      :in_play ->
+        game
+        |> Map.update!(:player_turn, &toggle_player/1)
+
+      _ ->
+        game
+    end
   end
 
   @spec game_status(game :: game()) :: game_status()
@@ -175,23 +198,6 @@ defmodule Tictactwo.Games do
   defp update_game_status(game) do
     Map.put(game, :status, game_status(game))
   end
-
-  @spec play_gobbler(game :: game(), coords :: coords()) :: game()
-  def play_gobbler(game, coords) do
-    selected_gobbler = game.selected_gobbler
-    gobbler_name = selected_gobbler.name
-
-    game
-    |> push_gobbler(coords)
-    |> update_gobbler_status(gobbler_name, {:played, coords})
-    |> set_selected_gobbler(nil)
-    |> update_game_status()
-    |> toggle_player_turn()
-  end
-
-  # --------------------------------------------------------------
-  # --------------------- PRIVATE FUNCTIONS ----------------------
-  # --------------------------------------------------------------
 
   @spec check_rising_diag(cells :: cells()) :: game_status()
   defp check_rising_diag(cells) do

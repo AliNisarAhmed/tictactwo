@@ -109,9 +109,9 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("deselect-gobbler", _, socket) do
-    socket =
-      socket
-      |> deselect_gobbler()
+    # socket =
+    #   socket
+    #   |> update(:game, &Games.deselect_gobbler(&1))
 
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-deselected", %{})
 
@@ -130,36 +130,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   # ----------------------------------------------------------------------
   # -------------------- SOCKET FUNCTIONS --------------------------------
   # ----------------------------------------------------------------------
-  defp remove_selected_gobbler_from_cells(socket, coords) do
-    socket
-    |> update(:game, &Games.pop_first_gobbler(&1, coords))
-  end
-
-  defp set_selected_gobbler(socket, selected_gobbler) do
-    socket
-    |> update(:game, &Games.set_selected_gobbler(&1, selected_gobbler))
-  end
-
-  defp update_gobbler_status(socket, gobbler_name, status) do
-    socket
-    |> update(:game, &Games.update_gobbler_status(&1, gobbler_name, status))
-  end
-
-  defp deselect_gobbler(socket) do
-    socket
-    |> update(:game, &Games.deselect_gobbler(&1))
-  end
-
-  defp push_first_gobbler(socket, coords) do
-    socket
-    |> update(:game, &Games.push_gobbler(&1, coords))
-  end
-
-  defp toggle_player_turn(socket) do
-    socket
-    |> update(:game, &Games.toggle_player_turn/1)
-  end
-
   # ----------------------------------------------------------------------
 
   defp topic(socket) do

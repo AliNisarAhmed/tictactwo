@@ -5,17 +5,8 @@
 	You are <%= get_current_user_color(@current_user, @game) %>
 </h2>
 
-<div>
-	<%= if my_turn?(@current_user, @game) do %>
-		It's your turn
-	<% else %>
-	  	Waiting for your opponent to play their move
-	<% end %>
-</div>
-
-<div>
-	<h3><%= @game.player_turn %>'s turn</h3>
-</div>
+<GameStatus.show_for_player game={@game} current_user={@current_user}/>
+<GameStatus.show game={@game} />
 
 <div class="">
 	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">

@@ -2,9 +2,14 @@ defmodule TictactwoWeb.RoomView do
   use TictactwoWeb, :view
 
   alias Tictactwo.Games
+  alias TictactwoWeb.Components.GameStatus
 
-  defp my_turn?(current_user, game) do
+  def my_turn?(current_user, game) do
     current_user.username == game[game.player_turn].username
+  end
+
+  def winning_player(%{status: {:won, player}}) do
+    player |> to_string()
   end
 
   defp gobbler_class(color) do
@@ -82,11 +87,11 @@ defmodule TictactwoWeb.RoomView do
 
   defp hide_last_gobbler(game, cell_coords) do
     selected_gobbler = game.selected_gobbler
+
     if not is_nil(selected_gobbler.played?) and selected_gobbler.played? == cell_coords do
       "hidden"
     else
       ""
     end
   end
-
 end
