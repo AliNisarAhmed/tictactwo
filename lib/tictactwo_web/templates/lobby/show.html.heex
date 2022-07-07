@@ -1,46 +1,57 @@
 <%= if @loading do %>
 <h2>Loading...</h2>
 <% else %>
-<h2><%= @current_user.username %> You are in lobby</h2>
+<div>
+	<h2>Welcome <span class="text-lg"><%= @current_user.username %> </span></h2>
 
-<h3>Current Online users: <%= map_size(@users) %></h3>
+	<p>You are in Lobby</p>
+</div>
 
-<ul>
-	<%= for {user_id, user_data} <- @users do %>
-		<%= if user_id == @current_user.id do %>
-			<li>
-				<p><%= user_data.username %> (You)</p>
-			</li>
+<div class="container mx-auto max-w-6xl grid grid-cols-3 border-2 border-red-500 h-full">
+	<div class="border-2 border-black-300 border-solid h-full">
+		<h3 class="text-lg">Current Online users: <%= map_size(@users) %></h3>
 
-			<% else %>
+		<ul class="my-4">
+			<%= for {user_id, user_data} <- filter_self(@users, @current_user.username) do %>
+					<li class="flex my-2 border-2 border-black-200 items-center">
+						<p class="mx-4 b-2 b-blue-300 grow"><%= user_data.username %></p>
+						<button
+							phx-click="challenge-user"
+							phx-value-userid={user_id}
+							class="px-4 py-2 bg-orange-500 text-white-500 cursor-pointer"
+						>
+							<%= if user_data.status == :challenge_sent do %>
+								Challenge sent
+							<% else %>
+								Challenge!
+							<% end %>
+						</button>
+					</li>
+			<% end %>
+		</ul>
+	</div>
 
-			<li>
-				<p><%= user_data.username %></p>
-				<button phx-click="challenge-user"
-						phx-value-userid={user_id}
-						class="px-4 py-2 bg-green-500 text-white-500">
-					<%= if user_data.status == :challenge_sent do %>
-						Challenge sent
-					<% else %>
-						Challenge!
-					<% end %>
-				</button>
-			</li>
-		<% end %>
-	<% end %>
-</ul>
+	<div class="h-full">
+		<h3 class="text-lg">Challenges</h3>
+		<ul>
+			<%= for challenge <- @challenges do %>
+			 	<div class="flex border-2 border-black-200 items-center my-2">
+					<p class="grow"><%= challenge.username %> challenges you!</p>
+					<button
+						phx-click="accept-challenge"
+						phx-value-challenger="{challenge.id}"
+						class="px-4 py-2 bg-green-500 text-white-500"
+					>
+						Accept
+					</button>
+				 </div>
+			<% end %>
+		</ul>
+	</div>
 
-<h3>
-	Challenges
-</h3>
-<ul>
-	<%= for challenge <- @challenges do %>
-		<p>Challenge received from:
-			<%= challenge.username %>
-		</p>
-		<button phx-click="accept-challenge"
-				phx-value-challenger={challenge.id}
-				class="px-4 py-2 bg-green-500 text-white-500">Accept</button>
-	<% end %>
-</ul>
+	<div>
+		<h3 class="text-lg">Current games</h3>
+	</div>
+
+</div>
 <% end %>
