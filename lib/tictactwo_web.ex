@@ -45,7 +45,8 @@ defmodule TictactwoWeb do
   def live_view do
     quote do
       use Phoenix.LiveView,
-        layout: {TictactwoWeb.LayoutView, "live.html"}
+        layout: {TictactwoWeb.LayoutView, "live.html"},
+        container: {:div, class: "h-full"}
 
       unquote(view_helpers())
     end

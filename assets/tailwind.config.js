@@ -7,7 +7,11 @@ module.exports = {
     '../lib/tictactwo_web/**/*.*ex'
   ],
   theme: {
-    extend: {},
+    extend: {
+      gridTemplateColumns: {
+        'lobby-desktop': '1fr 6fr'
+      }
+    },
   },
   plugins: [
     require('@tailwindcss/forms')
