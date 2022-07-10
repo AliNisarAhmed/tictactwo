@@ -5,7 +5,8 @@ defmodule TictactwoWeb.RoomView do
   alias TictactwoWeb.Components.GameStatus
 
   def my_turn?(current_user, game) do
-    current_user.username == game[game.player_turn].username
+    username = Map.get(game, game.player_turn)
+    current_user.username == username
   end
 
   def winning_player(%{status: {:won, player}}) do

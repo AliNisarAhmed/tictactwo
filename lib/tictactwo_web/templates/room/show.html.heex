@@ -67,7 +67,7 @@
 
 	<h3>Blue gobblers</h3>
 	<%= for blue_gobbler <-
-				not_selected_gobblers(@game.blue.gobblers) do %>
+				not_selected_gobblers(@game.blue_gobblers) do %>
 		<button
 			class={"w-20 h-10 p-4 b-2 bg-blue-500"}
 			disabled={
@@ -84,7 +84,7 @@
 
 	<h3>Orange gobblers</h3>
 	<%= for orange_gobbler <-
-				not_selected_gobblers(@game.orange.gobblers) do %>
+				not_selected_gobblers(@game.orange_gobblers) do %>
 		<button
 			class="w-20 h-10 p-4 b-2 bg-orange-500"
 			disabled={

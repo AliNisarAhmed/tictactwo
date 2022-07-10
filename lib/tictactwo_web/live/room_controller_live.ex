@@ -8,12 +8,14 @@ defmodule TictactwoWeb.RoomControllerLive do
   def mount(_params, session, socket) do
     send(self(), :after_join)
 
+    game = Games.get_game_by_slug!(session["game_slug"]) |> IO.inspect
+
     socket =
       socket
       |> assign(
-        roomid: session["roomid"],
+        game_slug: session["game_slug"],
         current_user: session["current_user"],
-        game: Games.new_game()
+        game: game
       )
 
     {:ok, assign(socket, roomid: session["roomid"])}
@@ -133,7 +135,7 @@ defmodule TictactwoWeb.RoomControllerLive do
   # ----------------------------------------------------------------------
 
   defp topic(socket) do
-    @room_topic <> "#{socket.assigns.roomid}"
+    @room_topic <> "#{socket.assigns.game_slug}"
   end
 
   defp set_gobbler_status(gobblers, gobbler, status) do

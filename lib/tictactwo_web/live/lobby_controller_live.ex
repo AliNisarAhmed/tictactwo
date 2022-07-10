@@ -4,6 +4,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
   @type status() :: :challenge_sent | nil
 
   alias Tictactwo.Presence
+  alias Tictactwo.Games
 
   @lobby_topic "rooms:lobby"
   @events_topic "event_bus:"
@@ -36,9 +37,17 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, users: users)}
   end
 
-  def handle_event("accept-challenge", %{"challenger" => challenger}, socket) do
-    TictactwoWeb.Endpoint.broadcast(@events_topic <> challenger, "challenge-accepted", %{
-      userid: socket.assigns.current_user.id
+  def handle_event(
+        "accept-challenge",
+        %{"challenger_username" => challenger_username, "challenger_id" => challenger_id},
+        socket
+      ) do
+
+    game_slug = Games.new_game(:blue, socket.assigns.current_user.username, challenger_username)
+
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> challenger_id, "challenge-accepted", %{
+      userid: socket.assigns.current_user.id,
+      game_slug: game_slug
     })
 
     {:noreply, socket}
@@ -79,25 +88,20 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, challenges: [payload.challenger | socket.assigns.challenges])}
   end
 
-  def handle_info(%{event: "challenge-accepted", payload: %{userid: userid}}, socket) do
-    # Create a room
-    roomid = "abcdefghijk"
-
-    # redirect owner to the room
-
-    socket = push_redirect(socket, to: "/rooms/#{roomid}")
+  def handle_info(%{event: "challenge-accepted", payload: %{userid: userid, game_slug: game_slug}}, socket) do
+    # redirect owner to the game room
+    socket = push_redirect(socket, to: "/rooms/#{game_slug}")
 
     # send the other player an event to join the room
     TictactwoWeb.Endpoint.broadcast(@events_topic <> userid, "room-created", %{
-      roomid: roomid
+      game_slug: game_slug
     })
 
     {:noreply, socket}
   end
 
-    def handle_info(%{event: "room-created", payload: %{roomid: roomid}}, socket) do
-
-    socket = push_redirect(socket, to: "/rooms/#{roomid}")
+  def handle_info(%{event: "room-created", payload: %{game_slug: game_slug}}, socket) do
+    socket = push_redirect(socket, to: "/rooms/#{game_slug}")
 
     {:noreply, socket}
   end
