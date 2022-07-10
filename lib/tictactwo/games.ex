@@ -11,12 +11,12 @@ defmodule Tictactwo.Games do
     new_gobblers = Gobblers.new_gobblers()
 
     attrs = %{
-      blue: blue_username,
-      orange: orange_username,
+      blue_username: blue_username,
+      orange_username: orange_username,
       player_turn: player_turn,
       cells: gen_empty_cells(),
-      blue_gobblers: new_gobblers,
-      orange_gobblers: new_gobblers
+      blue: new_gobblers,
+      orange: new_gobblers
     }
 
     with {:ok, game} <- create_game(attrs) do
@@ -137,9 +137,7 @@ defmodule Tictactwo.Games do
     game
     |> Map.update!(
       game.player_turn,
-      fn player ->
-        %{player | gobblers: set_gobbler_status(player.gobblers, gobbler_name, status)}
-      end
+      fn gobblers -> set_gobbler_status(gobblers, gobbler_name, status) end
     )
   end
 
@@ -404,7 +402,7 @@ defmodule Tictactwo.Games do
   end
 
   def fetch_players(slug) do
-    from(g in Game, select: {g.blue, g.orange}, where: g.slug == ^slug)
+    from(g in Game, select: {g.blue_username, g.orange_username}, where: g.slug == ^slug)
     |> Repo.one()
   end
 
