@@ -5,14 +5,14 @@ defmodule Tictactwo.Games.Game do
   alias Tictactwo.EctoErlangBinary
 
   schema "games" do
-    field :blue, :string
-    field :orange, :string
+    field :blue_username, :string
+    field :orange_username, :string
     field :player_turn, Ecto.Enum, values: [:blue, :orange]
     field :slug, :string
     field :status, Ecto.Enum, values: [:in_play, :won]
     field :cells, EctoErlangBinary
-    field :blue_gobblers, EctoErlangBinary
-    field :orange_gobblers, EctoErlangBinary
+    field :blue, EctoErlangBinary
+    field :orange, EctoErlangBinary
 
     timestamps()
   end
@@ -20,19 +20,16 @@ defmodule Tictactwo.Games.Game do
   @doc false
   def create_changeset(game, attrs) do
     game
-    |> cast(attrs, [:blue, :orange, :player_turn, :cells, :blue_gobblers, :orange_gobblers])
-    |> IO.inspect
+    |> cast(attrs, [:blue_username, :orange_username, :player_turn, :cells, :blue, :orange])
     |> put_change(:slug, generate_slug())
     |> put_change(:status, :in_play)
-
-    |> IO.inspect
     |> validate_required([
-      :blue,
-      :orange,
+      :blue_username,
+      :orange_username,
       :player_turn,
       :cells,
-      :blue_gobblers,
-      :orange_gobblers
+      :blue,
+      :orange
     ])
   end
 

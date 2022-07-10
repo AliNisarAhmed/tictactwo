@@ -5,14 +5,14 @@ defmodule Tictactwo.Repo.Migrations.CreateGames do
 
   def change do
     create table(:games) do
-      add :blue, :string
-      add :orange, :string
+      add :blue_username, :string
+      add :orange_username, :string
       add :slug, :string, null: false
       add :status, :string, null: false
       add :player_turn, :string
       add :cells, :binary, null: false
-      add :blue_gobblers, :binary, null: false
-      add :orange_gobblers, :binary, null: false
+      add :blue, :binary, null: false
+      add :orange, :binary, null: false
 
       timestamps(@timestamp_opts)
     end
