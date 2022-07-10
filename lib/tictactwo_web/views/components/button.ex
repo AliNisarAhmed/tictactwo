@@ -21,7 +21,8 @@ defmodule TictactwoWeb.Components.Button do
     ~H"""
       <button
           phx-click="accept-challenge"
-          phx-value-challenger={@challenger}
+          phx-value-challenger_username={@challenge.username}
+          phx-value-challenger_id={@challenge.id}
           class="px-2 py-1 bg-green-500 rounded-xl text-white cursor-pointer mr-1"
       >
         <%= @text %>
@@ -33,7 +34,8 @@ defmodule TictactwoWeb.Components.Button do
     ~H"""
       <button
           phx-click="reject-challenge"
-          phx-value-challenger={@challenger}
+          phx-value-challenger_username={@challenge.username}
+          phx-value-challenger_id={@challenge.id}
           class="px-2 py-1 bg-red-500 rounded-xl text-white cursor-pointer"
       >
         <%= @text %>
