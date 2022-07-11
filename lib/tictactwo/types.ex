@@ -26,14 +26,10 @@ defmodule Tictactwo.Types do
       @type game :: %{
               status: game_status(),
               player_turn: player(),
-              blue: %{
-                username: String.t(),
-                gobblers: [gobbler()]
-              },
-              orange: %{
-                username: String.t(),
-                gobblers: [gobbler()]
-              },
+              blue_username: String.t(),
+              orange_username: String.t(),
+              blue: [gobbler()],
+              orange: [gobbler()],
               cells: [cell()],
               selected_gobbler: selected_gobbler()
             }

@@ -9,7 +9,7 @@ defmodule TictactwoWeb.RoomController do
     current_user = get_session(conn, "current_user") |> IO.inspect(label: "CURRENT_USER")
 
     {blue_username, orange_username} =
-      Games.fetch_players(game_slug) |> IO.inspect(label: "PLAYERS")
+      Games.fetch_players(game_slug)
 
     case current_user do
       %{"username" => ^blue_username, "id" => _id} ->

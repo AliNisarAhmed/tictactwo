@@ -9,7 +9,7 @@ defmodule Tictactwo.Games.Game do
     field :orange_username, :string
     field :player_turn, Ecto.Enum, values: [:blue, :orange]
     field :slug, :string
-    field :status, Ecto.Enum, values: [:in_play, :won]
+    field :status, Ecto.Enum, values: [:in_play, :blue_won, :orange_won]
     field :cells, EctoErlangBinary
     field :blue, EctoErlangBinary
     field :orange, EctoErlangBinary

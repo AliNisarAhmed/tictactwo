@@ -8,7 +8,7 @@ defmodule TictactwoWeb.RoomControllerLive do
   def mount(_params, session, socket) do
     send(self(), :after_join)
 
-    game = Games.get_game_by_slug!(session["game_slug"]) |> IO.inspect
+    game = Games.get_game_by_slug!(session["game_slug"])
 
     socket =
       socket
@@ -66,13 +66,12 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  def handle_info(%{event: "gobbler-deselected", payload: payload}, socket) do
+  def handle_info(%{event: "gobbler-deselected", payload: _payload}, socket) do
     socket = assign(socket, selected_gobbler: nil)
 
     socket =
-      update(socket, socket.assigns.player_turn, fn m ->
-        Map.update!(m, :gobblers, &set_gobbler_status(&1, payload.gobbler, :not_selected))
-      end)
+      socket
+      |> update(:game, &Games.deselect_gobbler/1)
 
     {:noreply, socket}
   end
@@ -111,10 +110,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("deselect-gobbler", _, socket) do
-    # socket =
-    #   socket
-    #   |> update(:game, &Games.deselect_gobbler(&1))
-
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-deselected", %{})
 
     {:noreply, socket}
@@ -130,20 +125,8 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # ----------------------------------------------------------------------
-  # -------------------- SOCKET FUNCTIONS --------------------------------
-  # ----------------------------------------------------------------------
-  # ----------------------------------------------------------------------
 
   defp topic(socket) do
     @room_topic <> "#{socket.assigns.game_slug}"
-  end
-
-  defp set_gobbler_status(gobblers, gobbler, status) do
-    for g <- gobblers do
-      case g.name == gobbler do
-        true -> %{name: g.name, status: status}
-        false -> g
-      end
-    end
   end
 end

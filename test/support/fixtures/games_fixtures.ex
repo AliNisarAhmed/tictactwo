@@ -7,18 +7,18 @@ defmodule Tictactwo.GamesFixtures do
   @doc """
   Generate a game.
   """
-  def game_fixture(attrs \\ %{}) do
-    {:ok, game} =
-      attrs
-      |> Enum.into(%{
-        blue: "some blue",
-        orange: "some orange",
-        player_turn: "some player_turn",
-        slug: "some slug",
-        status: "some status"
-      })
-      |> Tictactwo.Games.create_game()
+  # def game_fixture(attrs \\ %{}) do
+  #   {:ok, game} =
+  #     attrs
+  #     |> Enum.into(%{
+  #       blue: "some blue",
+  #       orange: "some orange",
+  #       player_turn: "some player_turn",
+  #       slug: "some slug",
+  #       status: "some status"
+  #     })
+  #     |> Tictactwo.Games.create_game()
 
-    game
-  end
+  #   game
+  # end
 end
