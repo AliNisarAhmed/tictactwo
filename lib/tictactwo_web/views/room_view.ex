@@ -17,8 +17,12 @@ defmodule TictactwoWeb.RoomView do
     |> String.to_atom()
   end
 
-  def winning_player(%{status: {:won, player}}) do
-    player |> to_string()
+  def winning_player(%{status: :blue_won}) do
+    "blue"
+  end
+
+  def winning_player(%{status: :orange_won}) do
+    "orange"
   end
 
   defp gobbler_class(color) do
