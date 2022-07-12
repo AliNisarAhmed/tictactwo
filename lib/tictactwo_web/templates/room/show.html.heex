@@ -2,7 +2,7 @@
 
 <h2 class={"text-#{get_current_user_color(@current_user, @game)}-500"}>
 	Welcome <%= @current_user.username %>:
-	You are <%= get_current_user_color(@current_user, @game) %>
+	You are <span class={"text-white bg-#{get_current_user_color(@current_user, @game)}-500"}><%= get_current_user_color(@current_user, @game) %></span>
 </h2>
 
 <GameStatus.show_for_player game={@game} current_user={@current_user}/>
