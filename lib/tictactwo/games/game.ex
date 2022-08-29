@@ -4,6 +4,10 @@ defmodule Tictactwo.Games.Game do
 
   alias Tictactwo.EctoErlangBinary
 
+  use Tictactwo.Types
+
+  @type t :: game()
+
   schema "games" do
     field :blue_username, :string
     field :orange_username, :string
@@ -26,6 +30,17 @@ defmodule Tictactwo.Games.Game do
     |> validate_required([
       :blue_username,
       :orange_username,
+      :player_turn,
+      :cells,
+      :blue,
+      :orange
+    ])
+  end
+
+  def update_changeset(game, attrs) do
+    game
+    |> cast(attrs, [:player_turn, :cells, :blue, :orange, :status])
+    |> validate_required([
       :player_turn,
       :cells,
       :blue,

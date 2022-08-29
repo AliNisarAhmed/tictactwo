@@ -4,6 +4,7 @@ defmodule Tictactwo.Games do
   alias Tictactwo.Repo
   alias Tictactwo.Gobblers
   import Ecto.Query
+  alias Tictactwo.Games.Game
 
   @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) ::
           String.t()
@@ -66,12 +67,19 @@ defmodule Tictactwo.Games do
     selected_gobbler = game.selected_gobbler
     gobbler_name = selected_gobbler.name
 
+    updated_game =
+      game
+      |> push_gobbler_to_cell(coords)
+      |> update_gobbler_status(gobbler_name, {:played, coords})
+      |> set_selected_gobbler(nil)
+      |> update_game_status()
+      |> toggle_player_turn()
+
     game
-    |> push_gobbler_to_cell(coords)
-    |> update_gobbler_status(gobbler_name, {:played, coords})
-    |> set_selected_gobbler(nil)
-    |> update_game_status()
-    |> toggle_player_turn()
+    |> Game.update_changeset(Map.from_struct(updated_game))
+    |> Repo.update!()
+
+    updated_game
   end
 
   @spec get_player_gobblers(game :: game(), player :: player()) :: [gobbler()]
@@ -158,8 +166,25 @@ defmodule Tictactwo.Games do
   """
   def update_game(%Game{} = game, attrs) do
     game
-    |> Game.changeset(attrs)
+    |> Game.update_changeset(attrs)
     |> Repo.update()
+  end
+
+  def save_game(game) do
+    game
+    # |> Ecto.Changeset.change(%{
+    #   player_turn: game.player_turn,
+    #   cells: game.cells,
+    #   blue: game.blue,
+    #   orange: game.orange
+    # })
+    |> Game.update_changeset(%{
+      player_turn: game.player_turn,
+      cells: game.cells,
+      blue: game.blue,
+      orange: game.orange
+    })
+    |> Repo.update!()
   end
 
   @doc """
