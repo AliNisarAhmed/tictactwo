@@ -26,6 +26,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # gobbler-selected: Already played Gobbler
   def handle_info(
         %{
           event: "gobbler-selected",
@@ -48,6 +49,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # gobbler-selected: Unplayed Gobbler
   def handle_info(
         %{
           event: "gobbler-selected",
@@ -66,6 +68,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # gobbler-deselected:
   def handle_info(%{event: "gobbler-deselected", payload: _payload}, socket) do
     socket = assign(socket, selected_gobbler: nil)
 
@@ -76,13 +79,18 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # gobbler-played
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
     row = String.to_integer(row)
     col = String.to_integer(col)
 
+    updated_game =
+      socket.assigns.game
+      |> Games.play_gobbler({row, col})
+
     socket =
       socket
-      |> update(:game, &Games.play_gobbler(&1, {row, col}))
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
@@ -91,6 +99,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
 
+  # Broadcast event for selecting already played Gobbler
   def handle_event("select-gobbler", %{"gobbler" => gobbler, "row" => row, "col" => col}, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-selected", %{
       gobbler_name: gobbler,
@@ -101,6 +110,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # Broadcast event for selecting unselected Gobbler
   def handle_event("select-gobbler", %{"gobbler" => gobbler}, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-selected", %{
       gobbler_name: gobbler
@@ -109,12 +119,14 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # Broadcast event: deselect Gobbler
   def handle_event("deselect-gobbler", _, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-deselected", %{})
 
     {:noreply, socket}
   end
 
+  # Broadcast event: play Gobbler
   def handle_event("play-gobbler", %{"row" => row, "col" => col}, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-played", %{
       row: row,
