@@ -3,6 +3,8 @@ defmodule TictactwoWeb.RoomView do
 
   alias Tictactwo.Games
   alias TictactwoWeb.Components.GameStatus
+  alias TictactwoWeb.Components.Board
+  alias TictactwoWeb.Components.Gobbler
 
   def my_turn?(current_user, game) do
     key = make_player_key(game.player_turn)
@@ -29,18 +31,18 @@ defmodule TictactwoWeb.RoomView do
     "w-20 h-10 py-2 px-4 bg-#{color |> to_string()}-500"
   end
 
-  defp not_selected_gobblers(gobblers) do
+  def not_selected_gobblers(gobblers) do
     gobblers
     |> Enum.filter(&(&1.status == :not_selected))
   end
 
-  defp played_gobbler_text(gobblers) do
+  def played_gobbler_text(gobblers) do
     gobblers
     |> List.first({" ", " "})
     |> elem(1)
   end
 
-  defp played_gobbler_color(gobblers) do
+  def played_gobbler_color(gobblers) do
     gobblers
     |> List.first({" ", " "})
     |> elem(0)
@@ -57,7 +59,7 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  defp first_gobbler_name(gobblers) do
+  def first_gobbler_name(gobblers) do
     gobblers
     |> List.first()
     |> then(fn
@@ -66,7 +68,7 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  defp first_gobbler_selected?(gobblers, selected_gobbler, player_turn) do
+  def first_gobbler_selected?(gobblers, selected_gobbler, player_turn) do
     gobblers
     |> List.first()
     |> then(fn
@@ -78,7 +80,7 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  defp get_current_user_color(current_user, game) do
+  def get_current_user_color(current_user, game) do
     if my_turn?(current_user, game) do
       game.player_turn |> to_string
     else
@@ -88,17 +90,17 @@ defmodule TictactwoWeb.RoomView do
     end
   end
 
-  defp toggle_player_turn(:blue), do: :orange
-  defp toggle_player_turn(:orange), do: :blue
+  def toggle_player_turn(:blue), do: :orange
+  def toggle_player_turn(:orange), do: :blue
 
-  defp set_cursor(game, gobblers) do
+  def set_cursor(game, gobblers) do
     case Games.move_allowed?(game, gobblers) do
       true -> "cursor-pointer"
       false -> "cursor-not-allowed"
     end
   end
 
-  defp hide_last_gobbler(game, cell_coords) do
+  def hide_last_gobbler(game, cell_coords) do
     selected_gobbler = game.selected_gobbler
 
     if not is_nil(selected_gobbler.played?) and selected_gobbler.played? == cell_coords do
