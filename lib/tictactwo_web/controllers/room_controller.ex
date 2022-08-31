@@ -12,10 +12,10 @@ defmodule TictactwoWeb.RoomController do
       Games.fetch_players(game_slug)
 
     case current_user do
-      %{"username" => ^blue_username, "id" => _id} ->
+      %{username: ^blue_username, id: _id} ->
         render_game(conn, game_slug, current_user, :blue)
 
-      %{"username" => ^orange_username, "id" => _id} ->
+      %{username: ^orange_username, id: _id} ->
         render_game(conn, game_slug, current_user, :orange)
 
       _ ->

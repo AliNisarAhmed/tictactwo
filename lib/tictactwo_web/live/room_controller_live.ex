@@ -15,10 +15,13 @@ defmodule TictactwoWeb.RoomControllerLive do
       |> assign(
         game_slug: session["game_slug"],
         current_user: session["current_user"],
-        game: game
+        user_type: session["user_type"],
+        game: game,
+        roomid: session["roomid"]
       )
 
-    {:ok, assign(socket, roomid: session["roomid"])}
+
+    {:ok, socket}
   end
 
   def handle_info(:after_join, socket) do

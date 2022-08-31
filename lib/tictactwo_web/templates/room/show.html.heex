@@ -9,95 +9,21 @@
 <GameStatus.show game={@game} />
 
 <div class="">
-	<div class="grid grid-cols-3 grid-rows-3 w-1/2 max-w-xs">
-		<%= for cell <- @game.cells do %>
-			<div class="border-2 w-full h-full">
-				<%= if is_nil(@game.selected_gobbler) do %>
-					<%= if my_turn?(@current_user, @game) and
-							can_select?(cell.gobblers, @game.player_turn) do %>
-						<button phx-click="select-gobbler"
-								phx-value-gobbler={first_gobbler_name(cell.gobblers)}
-								phx-value-row={elem(cell.coords, 0)}
-								phx-value-col={elem(cell.coords, 1)}
-								class="w-full h-full"
-						>
-							<span class={"#{played_gobbler_color(cell.gobblers)}"}>
-								<%= played_gobbler_text(cell.gobblers) %>
-							</span>
-						</button>
-					<% else %>
-						<%= if first_gobbler_selected?(
-									cell.gobblers,
-									@game.selected_gobbler,
-									@game.player_turn
-							) do %>
-							<button class="w-full h-full"
-									disabled
-							></button>
-						<% else %>
-							<button class="w-full h-full"
-									disabled
-							>
-								<span class={"#{played_gobbler_color(cell.gobblers)}"}>
-									<%= played_gobbler_text(cell.gobblers) %>
-								</span>
-							</button>
-						<% end %>
-					<% end %>
-				<% else %>
-					<button phx-click="play-gobbler"
-							phx-value-row={elem(cell.coords, 0)}
-							phx-value-col={elem(cell.coords, 1)}
-							class={"
-								w-full
-								h-full
-								#{set_cursor(@game, cell.gobblers)}
-								#{hide_last_gobbler(@game, cell.coords)}
-							"}
-							disabled={not Games.move_allowed?(@game, cell.gobblers)}
-					>
-							<span class={"#{played_gobbler_color(cell.gobblers)}"}>
-								<%= played_gobbler_text(cell.gobblers) %>
-							</span>
-					</button>
-				<% end %>
-			</div>
-		<% end %>
-	</div>
 
-	<h3>Blue gobblers</h3>
-	<%= for blue_gobbler <-
-				not_selected_gobblers(@game.blue) do %>
-		<button
-			class={"w-20 h-10 p-4 b-2 bg-blue-500"}
-			disabled={
-				not is_nil(@game.selected_gobbler) ||
-				not my_turn?(@current_user, @game) ||
-				@game.player_turn == :orange
-			}
-			phx-click="select-gobbler"
-			phx-value-gobbler={blue_gobbler.name}
-		>
-			<%= blue_gobbler.name %>
-		</button>
-	<% end %>
+	<Gobbler.list
+		game={@game}
+		current_user={@current_user}
+		current_player={toggle_player_turn(@user_type)}
+	/>
 
-	<h3>Orange gobblers</h3>
-	<%= for orange_gobbler <-
-				not_selected_gobblers(@game.orange) do %>
-		<button
-			class="w-20 h-10 p-4 b-2 bg-orange-500"
-			disabled={
-				not is_nil(@game.selected_gobbler) ||
-				not my_turn?(@current_user, @game) ||
-				@game.player_turn == :blue
-			}
-			phx-click="select-gobbler"
-			phx-value-gobbler={orange_gobbler.name}
-		>
-			<%= orange_gobbler.name %>
-		</button>
-	<% end %>
+	<Board.draw_board game={@game} current_user={@current_user} />
+
+	<Gobbler.list
+		game={@game} 
+		current_user={@current_user}
+		current_player={@user_type}
+		/>
+
 </div>
 
 <div>
