@@ -27,8 +27,8 @@
 
 	<Gobbler.list
 		game={@game}
-		current_user={@current_user}
-		user_type={toggle_player_turn(@user_type)}
+		user_type={@user_type}
+		color={get_current_user_color(toggle_user_type(@user_type))}
 	/>
 
 	<Board.draw_board 
@@ -39,18 +39,17 @@
 
 	<Gobbler.list
 		game={@game} 
-		current_user={@current_user}
 		user_type={@user_type}
-		/>
+		color={get_current_user_color(@user_type)}
+	/>
 
 </div>
 
 <div>
 	<%= if not is_nil(@game.selected_gobbler) do %>
-		<button class={gobbler_class(@game.player_turn)}
-				phx-click="deselect-gobbler"
-				disabled={not my_turn?(@game, @user_type)}>
-			<%= @game.selected_gobbler.name %>
-		</button>
+		<Gobbler.selected 
+			game={@game}
+			user_type={@user_type}
+		/>
 	<% end %>
 </div>

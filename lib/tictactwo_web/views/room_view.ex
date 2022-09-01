@@ -22,8 +22,8 @@ defmodule TictactwoWeb.RoomView do
     "orange"
   end
 
-  defp gobbler_class(color) do
-    "w-20 h-10 py-2 px-4 bg-#{color |> to_string()}-500"
+  def gobbler_class(color) do
+    "w-20 h-10 py-2 px-4 border-2 border-#{color |> to_string()}-500 bg-#{color |> to_string()}-500"
   end
 
   def not_selected_gobblers(game, :spectator) do
@@ -83,7 +83,10 @@ defmodule TictactwoWeb.RoomView do
   def get_current_user_color(_), do: "blue"
 
   def toggle_player_turn(:blue), do: :orange
-  def toggle_player_turn(_), do: :blue
+  def toggle_player_turn(:orange), do: :blue
+
+  def toggle_user_type(:spectator), do: :spectator
+  def toggle_user_type(x), do: toggle_player_turn(x)
 
   def set_cursor(game, gobblers) do
     case Games.move_allowed?(game, gobblers) do
