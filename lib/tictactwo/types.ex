@@ -33,6 +33,7 @@ defmodule Tictactwo.Types do
               cells: [cell()],
               selected_gobbler: selected_gobbler()
             }
+      @type viewer_type :: :blue | :orange | :spectator
     end
   end
 end

@@ -1,27 +1,46 @@
 <h1 class="text-3xl font-bold underline">In the room <%= @roomid %></h1>
 
-<h2 class={"text-#{get_current_user_color(@current_user, @game)}-500"}>
-	Welcome <%= @current_user.username %>:
-	You are <span class={"text-white bg-#{get_current_user_color(@current_user, @game)}-500"}><%= get_current_user_color(@current_user, @game) %></span>
-</h2>
+<%= if is_player?(@user_type) do %>
 
-<GameStatus.show_for_player game={@game} current_user={@current_user}/>
+	<h2 class={"text-#{get_current_user_color(@user_type)}-500"}>
+		Welcome <%= @current_user.username %>:
+		You are 
+		<span class={"text-white bg-#{get_current_user_color(@user_type)}-500"}>
+			<%= get_current_user_color(@user_type) %>
+		</span>
+	</h2>
+<% else %>
+	<p>Welcome, you are spectating</p>
+<% end %>
+
+
+<%= if is_player?(@user_type) do %>
+	<GameStatus.show_for_player 
+		game={@game} 
+		current_user={@current_user}
+		user_type={@user_type}
+	/>
+<% end %>
 <GameStatus.show game={@game} />
 
-<div class="">
+<div class="flex flex-col">
 
 	<Gobbler.list
 		game={@game}
 		current_user={@current_user}
-		current_player={toggle_player_turn(@user_type)}
+		user_type={toggle_player_turn(@user_type)}
 	/>
 
-	<Board.draw_board game={@game} current_user={@current_user} />
+	<Board.draw_board 
+		game={@game} 
+		current_user={@current_user} 
+		user_type={@user_type}
+	/>
 
 	<Gobbler.list
 		game={@game} 
 		current_user={@current_user}
-		current_player={@user_type}
+		user_type={@user_type}
 		/>
 
 </div>
@@ -30,7 +49,7 @@
 	<%= if not is_nil(@game.selected_gobbler) do %>
 		<button class={gobbler_class(@game.player_turn)}
 				phx-click="deselect-gobbler"
-				disabled={not my_turn?(@current_user, @game)}>
+				disabled={not my_turn?(@game, @user_type)}>
 			<%= @game.selected_gobbler.name %>
 		</button>
 	<% end %>

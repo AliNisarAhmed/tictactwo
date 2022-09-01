@@ -7,7 +7,7 @@ defmodule TictactwoWeb.Components.GameStatus do
     ~H"""
       <div>
         <%= if @game.status == :in_play do %>
-          <%= if my_turn?(@current_user, @game) do %>
+          <%= if my_turn?(@game, @user_type) do %>
             <p> It's your turn </p>
           <% else %>
             <p>Waiting for your opponent to play their move</p>

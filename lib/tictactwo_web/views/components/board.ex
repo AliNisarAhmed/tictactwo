@@ -10,7 +10,7 @@ defmodule TictactwoWeb.Components.Board do
     <%= for cell <- @game.cells do %>
     <div class="border-2 w-full h-full">
     <%= if is_nil(@game.selected_gobbler) do %>
-    	<%= if my_turn?(@current_user, @game) and
+    	<%= if my_turn?(@game, @user_type) and
     			can_select?(cell.gobblers, @game.player_turn) do %>
     		<button phx-click="select-gobbler"
     				phx-value-gobbler={first_gobbler_name(cell.gobblers)}

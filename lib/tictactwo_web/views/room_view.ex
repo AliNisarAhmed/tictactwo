@@ -1,22 +1,17 @@
 defmodule TictactwoWeb.RoomView do
   use TictactwoWeb, :view
 
+  use Tictactwo.Types
+
   alias Tictactwo.Games
   alias TictactwoWeb.Components.GameStatus
   alias TictactwoWeb.Components.Board
   alias TictactwoWeb.Components.Gobbler
 
-  def my_turn?(current_user, game) do
-    key = make_player_key(game.player_turn)
-    username = Map.get(game, key)
-    current_user.username == username
-  end
-
-  defp make_player_key(player_turn) do
-    player_turn
-    |> to_string()
-    |> then(&("#{&1}_username"))
-    |> String.to_atom()
+  @spec my_turn?(game :: game(), user_type:: viewer_type())::boolean()
+  def my_turn?(_, :spectator), do: false
+  def my_turn?(game, user_type) do 
+    game.player_turn == user_type
   end
 
   def winning_player(%{status: :blue_won}) do
@@ -31,8 +26,12 @@ defmodule TictactwoWeb.RoomView do
     "w-20 h-10 py-2 px-4 bg-#{color |> to_string()}-500"
   end
 
-  def not_selected_gobblers(gobblers) do
-    gobblers
+  def not_selected_gobblers(game, :spectator) do
+    not_selected_gobblers(game, :blue)
+  end
+  def not_selected_gobblers(game, user_type) do 
+    game 
+    |> Map.get(user_type)
     |> Enum.filter(&(&1.status == :not_selected))
   end
 
@@ -80,18 +79,11 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  def get_current_user_color(current_user, game) do
-    if my_turn?(current_user, game) do
-      game.player_turn |> to_string
-    else
-      game.player_turn
-      |> toggle_player_turn()
-      |> to_string()
-    end
-  end
+  def get_current_user_color(:orange), do: "orange"
+  def get_current_user_color(_), do: "blue"
 
   def toggle_player_turn(:blue), do: :orange
-  def toggle_player_turn(:orange), do: :blue
+  def toggle_player_turn(_), do: :blue
 
   def set_cursor(game, gobblers) do
     case Games.move_allowed?(game, gobblers) do
@@ -109,4 +101,8 @@ defmodule TictactwoWeb.RoomView do
       ""
     end
   end
+
+  @spec is_player?(viewer_type) :: boolean()
+  def is_player?(:spectator), do: false 
+  def is_player?(_), do: true
 end
