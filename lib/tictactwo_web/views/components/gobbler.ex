@@ -5,13 +5,14 @@ defmodule TictactwoWeb.Components.Gobbler do
 
   def list(assigns) do
     ~H"""
-    <div class="flex flex-row">
+    <div class="flex flex-row w-screen max-w-screen-sm">
     <%= for gobbler <- not_selected_gobblers(@game, @user_type) do %>
       <.list_item
         game={@game}
         user_type={@user_type}
         gobbler={gobbler}
         color={@color}
+        class={@class}
       />
     <% end %>
     </div>
@@ -21,7 +22,7 @@ defmodule TictactwoWeb.Components.Gobbler do
   def list_item(assigns) do 
     ~H"""
       <button
-        class={"w-20 h-20 border-2 rounded-sm p-2 bg-#{@color}-500"}
+        class={"#{@class} h-20 border-2 rounded-sm p-2 bg-#{@color}-500 grow basis-0 shrink min-w-0"}
         disabled={
           not (@color == to_string(@user_type)) ||
           not my_turn?(@game, @user_type) || 

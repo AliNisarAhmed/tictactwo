@@ -23,27 +23,30 @@
 <% end %>
 <GameStatus.show game={@game} />
 
-<div class="flex flex-col">
+<section class="grid grid-rows-[1fr_2fr_1fr]">
 
 	<Gobbler.list
 		game={@game}
 		user_type={@user_type}
 		color={get_current_user_color(toggle_user_type(@user_type))}
+		class="row-start-1 row-end-2"
 	/>
 
 	<Board.draw_board 
 		game={@game} 
 		current_user={@current_user} 
 		user_type={@user_type}
+		class="row-start-2 row-end-3"
 	/>
 
 	<Gobbler.list
 		game={@game} 
 		user_type={@user_type}
 		color={get_current_user_color(@user_type)}
+		class="row-start-3 row-end-4"
 	/>
 
-</div>
+</section>
 
 <div>
 	<%= if not is_nil(@game.selected_gobbler) do %>

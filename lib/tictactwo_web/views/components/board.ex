@@ -6,8 +6,8 @@ defmodule TictactwoWeb.Components.Board do
 
   def draw_board(assigns) do
     ~H"""
-    <div class="p-1">
-    <div class="grid grid-cols-3 grid-rows-3 w-full sm:max-w-sm">
+    <div class={"#{@class} p-1 w-screen max-w-screen-sm"}>
+    <div class="grid grid-cols-3 grid-rows-3 w-full">
     <%= for cell <- @game.cells do %>
       <div class="border-2 w-full h-28">
         <%= if is_nil(@game.selected_gobbler) do %>
@@ -17,7 +17,6 @@ defmodule TictactwoWeb.Components.Board do
     				    phx-value-gobbler={first_gobbler_name(cell.gobblers)}
     				    phx-value-row={elem(cell.coords, 0)}
     				    phx-value-col={elem(cell.coords, 1)}
-    				    class="w-full h-full"
     		      >
     			      <span class={"#{played_gobbler_color(cell.gobblers)}"}>
     				      <%= played_gobbler_text(cell.gobblers) %>
@@ -47,8 +46,6 @@ defmodule TictactwoWeb.Components.Board do
     			    phx-value-row={elem(cell.coords, 0)}
     			    phx-value-col={elem(cell.coords, 1)}
     			    class={"
-    				    w-full
-    				    h-full
     				    #{set_cursor(@game, cell.gobblers)}
     				    #{hide_last_gobbler(@game, cell.coords)}
     			    "}
