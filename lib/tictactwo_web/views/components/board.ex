@@ -11,8 +11,7 @@ defmodule TictactwoWeb.Components.Board do
     <%= for cell <- @game.cells do %>
       <div class="border-2 w-full h-28">
         <%= if is_nil(@game.selected_gobbler) do %>
-    	    <%= if my_turn?(@game, @user_type) and
-    			      can_select?(cell.gobblers, @game.player_turn) do %>
+    	    <%= if can_select_played_gobbler?(@game, @current_user, cell.gobblers) do %>
     		    <button phx-click="select-gobbler"
     				    phx-value-gobbler={first_gobbler_name(cell.gobblers)}
     				    phx-value-row={elem(cell.coords, 0)}
@@ -42,24 +41,47 @@ defmodule TictactwoWeb.Components.Board do
     		    <% end %>
     	    <% end %>
         <% else %>
-    	    <button phx-click="play-gobbler"
-    			    phx-value-row={elem(cell.coords, 0)}
-    			    phx-value-col={elem(cell.coords, 1)}
-    			    class={"
-    				    #{set_cursor(@game, cell.gobblers)}
-    				    #{hide_last_gobbler(@game, cell.coords)}
-    			    "}
-    			    disabled={not Games.move_allowed?(@game, cell.gobblers)}
-    	    >
-    			    <span class={"#{played_gobbler_color(cell.gobblers)}"}>
-    				    <%= played_gobbler_text(cell.gobblers) %>
-    			    </span>
-    	    </button>
+    	    <.gobbler_selected
+            my_turn={my_turn?(@game, @current_user)}
+            move_allowed={Games.move_allowed?(@game, cell.gobblers)}
+            played_gobbler_text={played_gobbler_text(cell.gobblers)}
+            played_gobbler_color={played_gobbler_color(cell.gobblers)}
+            hide_last_gobbler={hide_last_gobbler(@game, cell.coords)}
+            row_value={elem(cell.coords, 0)}
+            col_value={elem(cell.coords, 1)}
+    	    />
           <% end %>
         </div>
       <% end %>
       </div>
     </div>
     """
+  end
+
+  def gobbler_selected(assigns) do 
+    ~H"""
+      <button
+        phx-click="play-gobbler"
+        phx-value-row={@row_value}
+        phx-value-col={@col_value}
+        disabled={not @my_turn or not @move_allowed}
+        class={"
+          w-full
+          h-full
+          #{if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
+          #{@hide_last_gobbler}
+        "}
+      >
+    		<span class={"#{@played_gobbler_color}"}>
+    			<%= @played_gobbler_text %>
+    		</span>
+      </button>
+    """
+  end
+
+  defp can_select_played_gobbler?(game, current_user, gobblers) do 
+    my_turn?(game, current_user) && 
+      can_select?(gobblers, current_user) && 
+        game_in_play?(game)
   end
 end

@@ -1,7 +1,5 @@
-<h1 class="text-3xl font-bold underline">In the room <%= @roomid %></h1>
 
 <%= if is_player?(@user_type) do %>
-
 	<h2 class={"text-#{get_current_user_color(@user_type)}-500"}>
 		Welcome <%= @current_user.username %>:
 		You are 
@@ -17,17 +15,21 @@
 <%= if is_player?(@user_type) do %>
 	<GameStatus.show_for_player 
 		game={@game} 
-		current_user={@current_user}
-		user_type={@user_type}
+		current_user={@user_type}
+	/>
+<% else %>
+	<GameStatus.show_for_spectator
+		game={@game}
+		current_user={@user_typej}
 	/>
 <% end %>
-<GameStatus.show game={@game} />
 
 <section class="grid grid-rows-[1fr_2fr_1fr]">
 
-	<Gobbler.list
+	<Player.info
 		game={@game}
-		user_type={@user_type}
+		current_user={@user_type}
+		display_user={toggle_user_type(@user_type)}
 		color={get_current_user_color(toggle_user_type(@user_type))}
 		class="row-start-1 row-end-2"
 	/>
@@ -35,24 +37,16 @@
 	<Board.draw_board 
 		game={@game} 
 		current_user={@current_user} 
-		user_type={@user_type}
+		current_user={@user_type}
 		class="row-start-2 row-end-3"
 	/>
 
-	<Gobbler.list
+	<Player.info
 		game={@game} 
-		user_type={@user_type}
+		current_user={@user_type}
+		display_user={@user_type}
 		color={get_current_user_color(@user_type)}
 		class="row-start-3 row-end-4"
 	/>
 
 </section>
-
-<div>
-	<%= if not is_nil(@game.selected_gobbler) do %>
-		<Gobbler.selected 
-			game={@game}
-			user_type={@user_type}
-		/>
-	<% end %>
-</div>

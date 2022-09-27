@@ -7,12 +7,18 @@ defmodule TictactwoWeb.RoomView do
   alias TictactwoWeb.Components.GameStatus
   alias TictactwoWeb.Components.Board
   alias TictactwoWeb.Components.Gobbler
+  alias TictactwoWeb.Components.Player
 
-  @spec my_turn?(game :: game(), user_type:: viewer_type())::boolean()
+  @spec my_turn?(game :: game(), user_type :: viewer_type()) :: boolean()
   def my_turn?(_, :spectator), do: false
-  def my_turn?(game, user_type) do 
+
+  def my_turn?(game, user_type) do
     game.player_turn == user_type
   end
+
+  @spec game_in_play?(game :: game()) :: boolean()
+  def game_in_play?(%{status: :in_play}), do: true
+  def game_in_play?(_game), do: false
 
   def winning_player(%{status: :blue_won}) do
     "blue"
@@ -29,8 +35,9 @@ defmodule TictactwoWeb.RoomView do
   def not_selected_gobblers(game, :spectator) do
     not_selected_gobblers(game, :blue)
   end
-  def not_selected_gobblers(game, user_type) do 
-    game 
+
+  def not_selected_gobblers(game, user_type) do
+    game
     |> Map.get(user_type)
     |> Enum.filter(&(&1.status == :not_selected))
   end
@@ -88,13 +95,6 @@ defmodule TictactwoWeb.RoomView do
   def toggle_user_type(:spectator), do: :spectator
   def toggle_user_type(x), do: toggle_player_turn(x)
 
-  def set_cursor(game, gobblers) do
-    case Games.move_allowed?(game, gobblers) do
-      true -> "cursor-pointer"
-      false -> "cursor-not-allowed"
-    end
-  end
-
   def hide_last_gobbler(game, cell_coords) do
     selected_gobbler = game.selected_gobbler
 
@@ -106,6 +106,12 @@ defmodule TictactwoWeb.RoomView do
   end
 
   @spec is_player?(viewer_type) :: boolean()
-  def is_player?(:spectator), do: false 
+  def is_player?(:spectator), do: false
   def is_player?(_), do: true
+
+  @spec show_player_name(game :: game(), color :: String.t()) :: String.t()
+  def show_player_name(game, color) do
+    atom = "#{color}_username" |> String.to_atom()
+    Map.get(game, atom)
+  end
 end

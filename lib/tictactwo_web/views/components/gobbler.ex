@@ -6,10 +6,18 @@ defmodule TictactwoWeb.Components.Gobbler do
   def list(assigns) do
     ~H"""
     <div class="flex flex-row w-screen max-w-screen-sm">
-    <%= for gobbler <- not_selected_gobblers(@game, @user_type) do %>
+    <div>
+      <.selected
+        game={@game}
+        current_user={@current_user}
+        display_user={@display_user}
+      />
+    </div>
+    <%= for gobbler <- not_selected_gobblers(@game, @display_user) do %>
       <.list_item
         game={@game}
-        user_type={@user_type}
+        current_user={@current_user}
+        display_user={@display_user}
         gobbler={gobbler}
         color={@color}
         class={@class}
@@ -19,15 +27,11 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
-  def list_item(assigns) do 
+  def list_item(assigns) do
     ~H"""
       <button
         class={"#{@class} h-20 border-2 rounded-sm p-2 bg-#{@color}-500 grow basis-0 shrink min-w-0"}
-        disabled={
-          not (@color == to_string(@user_type)) ||
-          not my_turn?(@game, @user_type) || 
-          not is_nil(@game.selected_gobbler)
-        }
+        disabled={is_button_disabled?(@game, @current_user, @display_user)}
         phx-click="select-gobbler"
         phx-value-gobbler={@gobbler.name} >
         <%= @gobbler.name %>
@@ -35,26 +39,25 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
-  def selected(assigns) do 
+  def selected(assigns) do
     ~H"""
-		  <button 
-		    class={gobbler_class(@game.player_turn)}
-				phx-click="deselect-gobbler"
-				disabled={not my_turn?(@game, @user_type)}
-			  >
-			    <%= @game.selected_gobbler.name %>
-		  </button>
+    <button 
+      class={gobbler_class(@game.player_turn)}
+      phx-click="deselect-gobbler"
+      disabled={is_selected_disabled?(@game, @current_user, @display_user)}
+     >
+       <%= if not is_nil(@game.selected_gobbler) and my_turn?(@game, @display_user) do %>
+         <%= @game.selected_gobbler.name %>
+       <% end %>
+    </button>
     """
   end
 
-  def board_item(assigns) do 
+  def board_item(assigns) do
     ~H"""
       <button
-        class={"w-full h-full border-2 p-2 bg-#{get_current_user_color(@user_type)}-500"}
-        disabled={
-          not is_nil(@game.selected_gobbler) ||
-          not my_turn?(@game, @user_type)
-        }
+        class={"w-full h-full border-2 p-2 bg-#{get_current_user_color(@current_user)}-500"}
+        disabled={is_button_disabled?(@game, @current_user, @display_user)}
         phx-click="select-gobbler"
         phx-value-gobbler={@gobbler.name} >
         <%= @gobbler.name %>
@@ -62,4 +65,17 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
+  defp is_button_disabled?(game, current_user, display_user) do
+    not my_turn?(game, current_user) ||
+      not is_nil(game.selected_gobbler) ||
+      current_user != display_user || 
+      game.status != :in_play
+  end
+
+  defp is_selected_disabled?(game, current_user, display_user) do
+    not my_turn?(game, current_user) ||
+      is_nil(game.selected_gobbler) ||
+      current_user != display_user ||
+      game.status != :in_play
+  end
 end
