@@ -30,7 +30,7 @@ defmodule TictactwoWeb.Components.GameStatus do
           <%= if game_in_play?(@game) do %>
             <p><%= @game.player_turn %>'s turn</p>
           <% else %>
-            <p>Game Ended - <%= @game.status.player %> won</p>
+            <p>Game Ended - <%= game_status_to_player(@game.status) %> won</p>
           <% end %>
       </div>
     """

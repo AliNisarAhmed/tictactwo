@@ -114,4 +114,8 @@ defmodule TictactwoWeb.RoomView do
     atom = "#{color}_username" |> String.to_atom()
     Map.get(game, atom)
   end
+
+  @spec game_status_to_player(game_status :: game_status()) :: String.t()
+  def game_status_to_player(:blue_won), do: "Blue"
+  def game_status_to_player(_), do: "Orange"
 end

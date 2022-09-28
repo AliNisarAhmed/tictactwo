@@ -24,6 +24,11 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:ok, socket}
   end
 
+  def terminate(_reason, _socket) do 
+    # TODO: Handle users leaving the room 
+    # Close the game once both players leave
+  end
+
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(topic(socket))
     {:noreply, socket}
