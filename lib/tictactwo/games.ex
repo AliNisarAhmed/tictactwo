@@ -1,26 +1,14 @@
 defmodule Tictactwo.Games do
   use Tictactwo.Types
 
-  alias Tictactwo.Repo
-  alias Tictactwo.Gobblers
+  alias Tictactwo.{Repo, Gobblers, GameManager}
   import Ecto.Query
   alias Tictactwo.Games.Game
 
   @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) ::
           String.t()
   def new_game(player_turn, blue_username, orange_username) do
-    new_gobblers = Gobblers.new_gobblers()
-
-    attrs = %{
-      blue_username: blue_username,
-      orange_username: orange_username,
-      player_turn: player_turn,
-      cells: gen_empty_cells(),
-      blue: new_gobblers,
-      orange: new_gobblers
-    }
-
-    with {:ok, game} <- create_game(attrs) do
+    with {:ok, game} <- GameManager.new_game(player_turn, blue_username, orange_username) do
       game.slug
     end
   end
@@ -75,9 +63,7 @@ defmodule Tictactwo.Games do
       |> update_game_status()
       |> toggle_player_turn()
 
-    game
-    |> Game.update_changeset(Map.from_struct(updated_game))
-    |> Repo.update!()
+    GameManager.update_game(updated_game)
 
     updated_game
   end
@@ -203,28 +189,12 @@ defmodule Tictactwo.Games do
     Repo.delete(game)
   end
 
-  @doc """
-  Returns an `%Ecto.Changeset{}` for tracking game changes.
-
-  ## Examples
-
-      iex> change_game(game)
-      %Ecto.Changeset{data: %Game{}}
-
-  """
-  def change_game(%Game{} = game, attrs \\ %{}) do
-    Game.changeset(game, attrs)
-  end
-
   def fetch_players(slug) do
-    from(g in Game, select: {g.blue_username, g.orange_username}, where: g.slug == ^slug)
-    |> Repo.one()
+    GameManager.fetch_players(slug)
   end
 
   def get_game_by_slug!(slug) do
-    from(g in Game, where: g.slug == ^slug)
-    |> Repo.one!()
-    |> Map.put(:selected_gobbler, nil)
+    GameManager.get_game_by_slug(slug)
   end
 
   @spec game_status(game :: game()) :: game_status()
@@ -248,7 +218,7 @@ defmodule Tictactwo.Games do
   # --------------------------------------------------------------
 
   @spec gen_empty_cells() :: [cell()]
-  defp gen_empty_cells() do
+  def gen_empty_cells() do
     Enum.flat_map(0..2, fn row ->
       Enum.map(0..2, fn col ->
         gen_empty_cell(row, col)

@@ -17,9 +17,11 @@ defmodule Tictactwo.Application do
       # Start the Endpoint (http/https)
       TictactwoWeb.Endpoint,
       # Start Presence process
-      Tictactwo.Presence
+      Tictactwo.Presence,
       # Start a worker by calling: Tictactwo.Worker.start_link(arg)
       # {Tictactwo.Worker, arg}
+      {Registry, [name: Tictactwo.Registry.GameManager, keys: :unique]},
+      {DynamicSupervisor, [name: Tictactwo.DynamicSupervisor, strategy: :one_for_one]}
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
