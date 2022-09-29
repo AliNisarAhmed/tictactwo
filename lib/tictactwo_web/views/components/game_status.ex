@@ -14,11 +14,7 @@ defmodule TictactwoWeb.Components.GameStatus do
               <p>Waiting for opponent</p>
             <% end %>
           <% else %>
-            <%= if Games.check_if_player_won?(@game, @current_user) do %> 
-              <p>You won</p>
-            <% else %>
-              <p>You lost</p>
-            <% end %>
+            <p><%= game_ended_status(@game, @current_user) %></p>
           <% end %>
       </div>
     """
@@ -36,4 +32,15 @@ defmodule TictactwoWeb.Components.GameStatus do
     """
   end
 
+  defp game_ended_status(%{rematch_offered_by: username}, _current_user) do
+    "#{username} is offering a rematch"
+  end
+
+  defp game_ended_status(game, current_user) do
+    if Games.check_if_player_won?(game, current_user) do
+      "You won"
+    else
+      "You lost"
+    end
+  end
 end

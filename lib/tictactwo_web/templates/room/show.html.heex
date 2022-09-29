@@ -36,7 +36,6 @@
 
 	<Board.draw_board 
 		game={@game} 
-		current_user={@current_user} 
 		current_user={@user_type}
 		class="row-start-2 row-end-3"
 	/>
@@ -49,4 +48,12 @@
 		class="row-start-3 row-end-4"
 	/>
 
+</section>
+
+<section>
+	<Controls.panel 
+		game={@game} 
+		current_user={@current_user}
+		user_type={@user_type}
+	/>
 </section>

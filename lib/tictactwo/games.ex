@@ -89,6 +89,14 @@ defmodule Tictactwo.Games do
     end)
   end
 
+  def rematch_offered(game, username) do 
+    updated_game = Map.put(game, :rematch_offered_by, username)
+
+    GameManager.update_game(updated_game)
+
+    updated_game
+  end
+
   alias Tictactwo.Games.Game
 
   @doc """

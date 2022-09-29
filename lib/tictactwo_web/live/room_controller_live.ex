@@ -20,11 +20,10 @@ defmodule TictactwoWeb.RoomControllerLive do
         roomid: session["roomid"]
       )
 
-
     {:ok, socket}
   end
 
-  def terminate(_reason, _socket) do 
+  def terminate(_reason, _socket) do
     # TODO: Handle users leaving the room 
     # Close the game once both players leave
   end
@@ -103,6 +102,18 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  def handle_info(%{event: "offer-rematch", payload: %{username: username}}, socket) do
+    updated_game =
+      socket.assigns.game
+      |> Games.rematch_offered(username)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
@@ -139,6 +150,17 @@ defmodule TictactwoWeb.RoomControllerLive do
     TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-played", %{
       row: row,
       col: col
+    })
+
+    {:noreply, socket}
+  end
+
+  # Broadcast event: offer rematch
+  def handle_event("offer-rematch" = event, %{"username" => username} = payload, socket) do
+    IO.inspect(payload, label: "OFFER REMATCH")
+
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
+      username: username
     })
 
     {:noreply, socket}

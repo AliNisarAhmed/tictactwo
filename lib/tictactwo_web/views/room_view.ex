@@ -8,6 +8,7 @@ defmodule TictactwoWeb.RoomView do
   alias TictactwoWeb.Components.Board
   alias TictactwoWeb.Components.Gobbler
   alias TictactwoWeb.Components.Player
+  alias TictactwoWeb.Components.Controls
 
   @spec my_turn?(game :: game(), user_type :: viewer_type()) :: boolean()
   def my_turn?(_, :spectator), do: false
@@ -118,4 +119,9 @@ defmodule TictactwoWeb.RoomView do
   @spec game_status_to_player(game_status :: game_status()) :: String.t()
   def game_status_to_player(:blue_won), do: "Blue"
   def game_status_to_player(_), do: "Orange"
+
+  def rematch_offered?(game, current_user, user_type) do
+    user_type != :spectator and not is_nil(game.rematch_offered_by) and
+      game.rematch_offered_by != current_user.username
+  end
 end
