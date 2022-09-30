@@ -89,12 +89,34 @@ defmodule Tictactwo.Games do
     end)
   end
 
-  def rematch_offered(game, username) do 
-    updated_game = Map.put(game, :rematch_offered_by, username)
+  def rematch_offered(game, username, color) do
+    updated_game = Map.put(game, :rematch_offered_by, %{username: username, color: color})
 
     GameManager.update_game(updated_game)
 
     updated_game
+  end
+
+  def rematch_accepted(game) do
+    new_game = setup_rematch(game)
+
+    GameManager.update_game(new_game)
+
+    new_game
+  end
+
+  defp setup_rematch(game) do
+    player_turn = :blue
+
+    {blue_username, orange_username} =
+      case game.rematch_offered_by.color do
+        "blue" -> {game.orange_username, game.rematch_offered_by.username}
+        "orange" -> {game.rematch_offered_by.username, game.blue_username}
+      end
+
+    with {:ok, game} <- GameManager.new_game(player_turn, blue_username, orange_username) do
+      game
+    end
   end
 
   alias Tictactwo.Games.Game
@@ -221,10 +243,6 @@ defmodule Tictactwo.Games do
   def check_if_player_won?(%{status: :orange_won}, :orange), do: true
   def check_if_player_won?(_game, _player), do: false
 
-  # --------------------------------------------------------------
-  # --------------------- PRIVATE FUNCTIONS ----------------------
-  # --------------------------------------------------------------
-
   @spec gen_empty_cells() :: [cell()]
   def gen_empty_cells() do
     Enum.flat_map(0..2, fn row ->
@@ -233,6 +251,21 @@ defmodule Tictactwo.Games do
       end)
     end)
   end
+
+  @spec get_current_user_color(game :: game(), current_user :: current_user()) :: player()
+  def get_current_user_color(game, current_user) do
+    game
+    |> Enum.find(fn {_key, val} -> val == current_user.username end)
+    |> elem(0)
+    |> case do
+      :blue_username -> :blue
+      :orange_username -> :orange
+    end
+  end
+
+  # --------------------------------------------------------------
+  # --------------------- PRIVATE FUNCTIONS ----------------------
+  # --------------------------------------------------------------
 
   @spec pop_first_gobbler_from_cell(game :: game(), coords :: coords()) :: game()
   defp pop_first_gobbler_from_cell(game, {row, col}) do

@@ -9,7 +9,6 @@ defmodule TictactwoWeb.Components.Controls do
         <%= if rematch_offered?(@game, @current_user, @user_type) do %>
           <button 
             phx-click="rematch-accepted"
-            phx-value-acceptor={@current_user.username}
           >
             Accept Rematch
           </button>
@@ -18,6 +17,7 @@ defmodule TictactwoWeb.Components.Controls do
             <button 
               phx-click="offer-rematch"
               phx-value-username={@current_user.username}
+              phx-value-color={@user_type}
             >
               Rematch
             </button>

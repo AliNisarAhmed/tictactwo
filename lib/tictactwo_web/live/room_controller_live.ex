@@ -102,16 +102,28 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  def handle_info(%{event: "offer-rematch", payload: %{username: username}}, socket) do
+  # offer rematch
+  def handle_info(%{event: "offer-rematch", payload: %{username: username, color: color}}, socket) do
     updated_game =
       socket.assigns.game
-      |> Games.rematch_offered(username)
+      |> Games.rematch_offered(username, color)
 
     socket =
       socket
       |> assign(:game, updated_game)
 
     {:noreply, socket}
+  end
+
+  # rematch-accepted
+  def handle_info(%{event: "rematch-accepted"}, socket) do
+    IO.puts("REMATCH ACCEPTED")
+
+    updated_game = Games.rematch_accepted(socket.assigns.game)
+
+    socket = socket |> assign(:game, updated_game)
+
+    {:noreply, push_patch(socket, to: "/rooms/#{updated_game.slug}", replace: true)}
   end
 
   def render(assigns) do
@@ -156,13 +168,23 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # Broadcast event: offer rematch
-  def handle_event("offer-rematch" = event, %{"username" => username} = payload, socket) do
+  def handle_event(
+        "offer-rematch" = event,
+        %{"username" => username, "color" => color} = payload,
+        socket
+      ) do
     IO.inspect(payload, label: "OFFER REMATCH")
 
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
-      username: username
+      username: username,
+      color: color
     })
 
+    {:noreply, socket}
+  end
+
+  def handle_event("rematch-accepted" = event, _payload, socket) do
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{})
     {:noreply, socket}
   end
 

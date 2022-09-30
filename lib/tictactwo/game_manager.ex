@@ -37,7 +37,8 @@ defmodule Tictactwo.GameManager do
       cells: Games.gen_empty_cells(),
       blue: new_gobblers,
       orange: new_gobblers,
-      selected_gobbler: nil
+      selected_gobbler: nil,
+      rematch_offered_by: nil
     }
 
     with {:ok, _} <-

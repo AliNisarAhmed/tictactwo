@@ -32,7 +32,7 @@ defmodule TictactwoWeb.Components.GameStatus do
     """
   end
 
-  defp game_ended_status(%{rematch_offered_by: username}, _current_user) do
+  defp game_ended_status(%{rematch_offered_by: %{ username: username }}, _current_user) do
     "#{username} is offering a rematch"
   end
 

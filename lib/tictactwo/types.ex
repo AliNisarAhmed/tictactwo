@@ -35,6 +35,7 @@ defmodule Tictactwo.Types do
               selected_gobbler: selected_gobbler()
             }
       @type viewer_type :: :blue | :orange | :spectator
+      @type current_user :: %{ username: String.t() }
     end
   end
 end
