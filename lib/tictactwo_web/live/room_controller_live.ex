@@ -5,22 +5,22 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   alias Tictactwo.Games
 
-  def mount(_params, session, socket) do
-    send(self(), :after_join)
+  def mount(params, session, socket) do
+    if connected?(socket), do: send(self(), :after_join)
 
-    game = Games.get_game_by_slug!(session["game_slug"])
+    game = Games.get_game_by_slug!(params["game_slug"])
 
     socket =
       socket
       |> assign(
-        game_slug: session["game_slug"],
+        game_slug: params["game_slug"],
         current_user: session["current_user"],
         user_type: session["user_type"],
-        game: game,
-        roomid: session["roomid"]
+        game: game
       )
 
     {:ok, socket}
+
   end
 
   def terminate(_reason, _socket) do
@@ -170,10 +170,9 @@ defmodule TictactwoWeb.RoomControllerLive do
   # Broadcast event: offer rematch
   def handle_event(
         "offer-rematch" = event,
-        %{"username" => username, "color" => color} = payload,
+        %{"username" => username, "color" => color} = _payload,
         socket
       ) do
-    IO.inspect(payload, label: "OFFER REMATCH")
 
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username,
