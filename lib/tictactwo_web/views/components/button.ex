@@ -17,7 +17,7 @@ defmodule TictactwoWeb.Components.Button do
     """
   end
 
-  def accept(assigns) do
+  def accept_challenge(assigns) do
     ~H"""
       <button
           phx-click="accept-challenge"
@@ -30,7 +30,7 @@ defmodule TictactwoWeb.Components.Button do
     """
   end
 
-  def reject(assigns) do
+  def reject_challenge(assigns) do
     ~H"""
       <button
           phx-click="reject-challenge"
@@ -39,6 +39,37 @@ defmodule TictactwoWeb.Components.Button do
           class="px-2 py-1 bg-red-500 rounded-xl text-white cursor-pointer"
       >
         <%= @text %>
+      </button>
+    """
+  end
+
+  def accept_rematch(assigns) do
+    ~H"""
+      <button 
+        phx-click="rematch-accepted"
+      >
+        Accept Rematch
+      </button>
+    """
+  end
+
+  def offer_rematch(assigns) do
+    ~H"""
+      <button 
+        phx-click="offer-rematch"
+        phx-value-username={@current_user.username}
+        phx-value-color={@user_type}
+      >
+        Rematch
+      </button>
+    """
+  end
+
+  def abort_game(assigns) do 
+    ~H"""
+      <button 
+      >
+        Abort Game
       </button>
     """
   end

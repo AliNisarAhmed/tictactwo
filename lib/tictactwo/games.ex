@@ -98,14 +98,6 @@ defmodule Tictactwo.Games do
   end
 
   def rematch_accepted(game) do
-    new_game = setup_rematch(game)
-
-    GameManager.update_game(new_game)
-
-    new_game
-  end
-
-  defp setup_rematch(game) do
     player_turn = :blue
 
     {blue_username, orange_username} =
@@ -114,9 +106,7 @@ defmodule Tictactwo.Games do
         "orange" -> {game.rematch_offered_by.username, game.blue_username}
       end
 
-    with {:ok, game} <- GameManager.new_game(player_turn, blue_username, orange_username) do
-      game
-    end
+    new_game(player_turn, blue_username, orange_username)
   end
 
   alias Tictactwo.Games.Game

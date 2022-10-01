@@ -122,6 +122,6 @@ defmodule TictactwoWeb.RoomView do
 
   def rematch_offered?(game, current_user, user_type) do
     user_type != :spectator and not is_nil(game.rematch_offered_by) and
-      game.rematch_offered_by != current_user.username
+      game.rematch_offered_by.username != current_user.username
   end
 end

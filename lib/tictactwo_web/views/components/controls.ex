@@ -3,24 +3,18 @@ defmodule TictactwoWeb.Components.Controls do
 
   import TictactwoWeb.RoomView
 
+  alias TictactwoWeb.Components.Button
+
   def panel(assigns) do
     ~H"""
       <div class="flex">
-        <%= if rematch_offered?(@game, @current_user, @user_type) do %>
-          <button 
-            phx-click="rematch-accepted"
-          >
-            Accept Rematch
-          </button>
+        <%= if game_in_play?(@game) do %>
+          <Button.abort_game />
         <% else %>
-          <%= if not game_in_play?(@game) do %>
-            <button 
-              phx-click="offer-rematch"
-              phx-value-username={@current_user.username}
-              phx-value-color={@user_type}
-            >
-              Rematch
-            </button>
+          <%= if rematch_offered?(@game, @current_user, @user_type) do %> 
+            <Button.accept_rematch />
+          <% else %> 
+            <Button.offer_rematch current_user={@current_user} user_type={@user_type}/>
           <% end %>
         <% end %>
       </div>
