@@ -8,19 +8,28 @@ defmodule TictactwoWeb.RoomControllerLive do
   def mount(params, session, socket) do
     if connected?(socket), do: send(self(), :after_join)
 
-    game = Games.get_game_by_slug!(params["game_slug"])
+    game_slug = params["game_slug"]
+    current_user = session["current_user"]
+
+    game = Games.get_game_by_slug!(game_slug)
+
+    user_type =
+      case current_user do
+        %{username: username} when username == game.blue_username -> :blue
+        %{username: username} when username == game.orange_username -> :orange
+        _ -> :spectator
+      end
 
     socket =
       socket
       |> assign(
-        game_slug: params["game_slug"],
-        current_user: session["current_user"],
-        user_type: session["user_type"],
+        game_slug: game_slug,
+        current_user: current_user,
+        user_type: user_type,
         game: game
       )
 
     {:ok, socket}
-
   end
 
   def terminate(_reason, _socket) do
@@ -116,14 +125,10 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # rematch-accepted
-  def handle_info(%{event: "rematch-accepted"}, socket) do
+  def handle_info(%{event: "rematch-accepted", payload: %{new_game_slug: new_game_slug}}, socket) do
     IO.puts("REMATCH ACCEPTED")
 
-    updated_game = Games.rematch_accepted(socket.assigns.game)
-
-    socket = socket |> assign(:game, updated_game)
-
-    {:noreply, push_patch(socket, to: "/rooms/#{updated_game.slug}", replace: true)}
+    {:noreply, push_redirect(socket, to: "/rooms/#{new_game_slug}", replace: true)}
   end
 
   def render(assigns) do
@@ -173,7 +178,6 @@ defmodule TictactwoWeb.RoomControllerLive do
         %{"username" => username, "color" => color} = _payload,
         socket
       ) do
-
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username,
       color: color
@@ -183,7 +187,12 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("rematch-accepted" = event, _payload, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{})
+    new_game_slug = Games.rematch_accepted(socket.assigns.game)
+
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
+      new_game_slug: new_game_slug
+    })
+
     {:noreply, socket}
   end
 
