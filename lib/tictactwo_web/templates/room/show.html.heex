@@ -8,7 +8,7 @@
 		</span>
 	</h2>
 <% else %>
-	<p>Welcome, you are spectating</p>
+	<p>Welcome <%= @current_user.username %>, you are spectating</p>
 <% end %>
 
 
@@ -26,27 +26,7 @@
 
 <section class="grid grid-rows-[1fr_2fr_1fr]">
 
-	<Player.info
-		game={@game}
-		current_user={@user_type}
-		display_user={toggle_user_type(@user_type)}
-		color={get_current_user_color(toggle_user_type(@user_type))}
-		class="row-start-1 row-end-2"
-	/>
-
-	<Board.draw_board 
-		game={@game} 
-		current_user={@user_type}
-		class="row-start-2 row-end-3"
-	/>
-
-	<Player.info
-		game={@game} 
-		current_user={@user_type}
-		display_user={@user_type}
-		color={get_current_user_color(@user_type)}
-		class="row-start-3 row-end-4"
-	/>
+	<View.play game={@game} user_type={@user_type} />
 
 </section>
 

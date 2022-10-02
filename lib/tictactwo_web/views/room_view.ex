@@ -9,6 +9,7 @@ defmodule TictactwoWeb.RoomView do
   alias TictactwoWeb.Components.Gobbler
   alias TictactwoWeb.Components.Player
   alias TictactwoWeb.Components.Controls
+  alias TictactwoWeb.Components.View
 
   @spec my_turn?(game :: game(), user_type :: viewer_type()) :: boolean()
   def my_turn?(_, :spectator), do: false
