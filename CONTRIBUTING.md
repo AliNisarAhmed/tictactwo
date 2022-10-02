@@ -3,7 +3,7 @@
 
 This is a toy project that I started to learn Phoenix LiveView. 
 
-Most of the app features are based on [Lichess.org](https://lichess.org/), so if you want to see how a feature will work, go to Lichess and see it live there.
+Most of the app features are based on [Lichess.org](https://lichess.org/), (with piece style matching the diagram in README.md) so if you want to see how a feature will work, go to Lichess and see it live there.
 
 The design of the app will also eventually be influenced by Lichess (especially the playing area), though not a 100% copy.
 
