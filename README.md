@@ -1,5 +1,10 @@
 # Tictactwo
 
+Also known as Gobblers/Gobblet, its a variation of TicTacTow where larger pieces can gobble up smaller pieces (even your own pieces). The diagram below illustrates the rules.
+
+![tict](https://user-images.githubusercontent.com/35175560/193474682-5d464942-ac0c-4947-9c31-0f57055fdfe2.png)
+
+
 To start your Phoenix server:
 
   * Install dependencies with `mix deps.get`
