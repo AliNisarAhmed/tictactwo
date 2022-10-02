@@ -125,4 +125,8 @@ defmodule TictactwoWeb.RoomView do
     user_type != :spectator and not is_nil(game.rematch_offered_by) and
       game.rematch_offered_by.username != current_user.username
   end
+
+  @spec game_aborted?(game :: game()) :: boolean()
+  def game_aborted?(%{status: {:aborted, _}}), do: true
+  def game_aborted?(_game), do: false
 end

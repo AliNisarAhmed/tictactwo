@@ -14,14 +14,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
     game = Games.get_game_by_slug!(game_slug)
 
-    user_type =
-      case current_user do
-        %{username: username} when username == game.blue_username -> :blue
-        %{username: username} when username == game.orange_username -> :orange
-        _ -> :spectator
-      end
-
-    IO.inspect(user_type, label: "ON MOUNT USER TYPE")
+    user_type = Games.get_user_type(game, current_user)
 
     socket =
       socket
@@ -60,7 +53,7 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # presence diff
-  def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: assigns} = socket) do 
+  def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: _assigns} = socket) do
     IO.inspect(payload, label: "Presence PAYLOAD")
     {:noreply, socket}
   end
@@ -154,6 +147,17 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, push_redirect(socket, to: "/rooms/#{new_game_slug}", replace: true)}
   end
 
+  # abort-game
+  def handle_info(%{event: "abort-game", payload: %{username: username}}, socket) do
+    updated_game = Games.abort_game(socket.assigns.game, username)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
@@ -209,6 +213,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # Broadcast event - rematch accepted
   def handle_event("rematch-accepted" = event, _payload, socket) do
     new_game_slug = Games.rematch_accepted(socket.assigns.game)
 
@@ -217,6 +222,18 @@ defmodule TictactwoWeb.RoomControllerLive do
     })
 
     {:noreply, socket}
+  end
+
+  def handle_event("abort-game" = event, %{"username" => username}, socket) do
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
+      username: username
+    })
+
+    {:noreply, push_redirect(socket, to: "/lobby")}
+  end
+
+  def handle_event("back-to-lobby", _payload, socket) do
+    {:noreply, push_redirect(socket, to: "/lobby")}
   end
 
   # ----------------------------------------------------------------------
