@@ -3,6 +3,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   use TictactwoWeb, :live_view
 
+  alias Tictactwo.Presence
   alias Tictactwo.Games
 
   def mount(params, session, socket) do
@@ -20,6 +21,8 @@ defmodule TictactwoWeb.RoomControllerLive do
         _ -> :spectator
       end
 
+    IO.inspect(user_type, label: "ON MOUNT USER TYPE")
+
     socket =
       socket
       |> assign(
@@ -32,13 +35,33 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:ok, socket}
   end
 
-  def terminate(_reason, _socket) do
+  def terminate(reason, _socket) do
+    IO.inspect(reason, label: "TERMINATED")
     # TODO: Handle users leaving the room 
     # Close the game once both players leave
   end
 
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(topic(socket))
+
+    Presence.track(
+      self(),
+      topic(socket),
+      socket.assigns.current_user.id,
+      %{
+        id: socket.assigns.current_user.id,
+        username: socket.assigns.current_user.username
+      }
+    )
+
+    # Presence.track(socket, topic(socket), %{})
+
+    {:noreply, socket}
+  end
+
+  # presence diff
+  def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: assigns} = socket) do 
+    IO.inspect(payload, label: "Presence PAYLOAD")
     {:noreply, socket}
   end
 

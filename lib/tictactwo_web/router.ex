@@ -1,6 +1,8 @@
 defmodule TictactwoWeb.Router do
   use TictactwoWeb, :router
 
+  import TictactwoWeb.UserAuth
+
   pipeline :browser do
     plug :accepts, ["html"]
     plug :fetch_session
@@ -15,14 +17,14 @@ defmodule TictactwoWeb.Router do
   end
 
   scope "/", TictactwoWeb do
-    pipe_through :browser
+    pipe_through [:browser, :populate_current_user]
 
     get "/", PageController, :index
-    get "/lobby", LobbyController, :show
+    live "/lobby", LobbyControllerLive, :show
   end
 
   scope "/rooms", TictactwoWeb do
-    pipe_through [:browser]
+    pipe_through [:browser, :populate_current_user]
 
     live "/:game_slug", RoomControllerLive
   end
