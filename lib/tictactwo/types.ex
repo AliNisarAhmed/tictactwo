@@ -1,7 +1,7 @@
 defmodule Tictactwo.Types do
   defmacro __using__(_opts) do
     quote do
-      @type game_status() :: :blue_won | :orange_won | :in_play
+      @type game_status() :: :blue_won | :orange_won | :in_play | {:aborted, String.t()}
       @type player() :: :blue | :orange
       @type gobbler_name() :: :xl | :large | :medium | :small | :xs | :premie
       @type gobbler() :: %{
