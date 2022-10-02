@@ -4,6 +4,11 @@ Also known as Gobblers/Gobblet, its a variation of TicTacTow where larger pieces
 
 ![tict](https://user-images.githubusercontent.com/35175560/193474682-5d464942-ac0c-4947-9c31-0f57055fdfe2.png)
 
+## Contributions
+
+See [CONTRIBUTING.md](./CONTRIBUTING.md)
+
+## Setup
 
 To start your Phoenix server:
 
