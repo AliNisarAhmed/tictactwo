@@ -64,6 +64,7 @@ defmodule Tictactwo.GameManager do
     GenServer.call(via(game_slug), :fetch_players)
   end
 
+  # Callbacks
   def handle_call(:get_game, _from, game) do
     {:reply, game, game}
   end

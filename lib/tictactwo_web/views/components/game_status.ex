@@ -36,6 +36,9 @@ defmodule TictactwoWeb.Components.GameStatus do
     "#{username} is offering a rematch"
   end
 
+  defp game_ended_status(%{status: {:aborted, _}}, _current_user) do 
+    "Game aborted"
+  end
   defp game_ended_status(game, current_user) do
     if Games.check_if_player_won?(game, current_user) do
       "You won"

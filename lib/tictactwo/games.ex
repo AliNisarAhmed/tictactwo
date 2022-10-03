@@ -109,7 +109,73 @@ defmodule Tictactwo.Games do
     new_game(player_turn, blue_username, orange_username)
   end
 
-  alias Tictactwo.Games.Game
+  def fetch_players(slug) do
+    GameManager.fetch_players(slug)
+  end
+
+  def get_game_by_slug!(slug) do
+    GameManager.get_game_by_slug(slug)
+  end
+
+  @spec game_status(game :: game()) :: game_status()
+  def game_status(game) do
+    with :in_play <- check_rows(game.cells),
+         :in_play <- check_cols(game.cells),
+         :in_play <- check_falling_diag(game.cells) do
+      check_rising_diag(game.cells)
+    else
+      v -> v
+    end
+  end
+
+  @spec check_if_player_won?(game :: game(), player :: player()) :: boolean()
+  def check_if_player_won?(%{status: :blue_won}, :blue), do: true
+  def check_if_player_won?(%{status: :orange_won}, :orange), do: true
+  def check_if_player_won?(_game, _player), do: false
+
+  @spec gen_empty_cells() :: [cell()]
+  def gen_empty_cells() do
+    Enum.flat_map(0..2, fn row ->
+      Enum.map(0..2, fn col ->
+        gen_empty_cell(row, col)
+      end)
+    end)
+  end
+
+  @spec get_current_user_color(game :: game(), current_user :: current_user()) :: player()
+  def get_current_user_color(game, current_user) do
+    game
+    |> Enum.find(fn {_key, val} -> val == current_user.username end)
+    |> elem(0)
+    |> case do
+      :blue_username -> :blue
+      :orange_username -> :orange
+    end
+  end
+
+  @spec get_user_type(game(), current_user()) :: viewer_type()
+  def get_user_type(game, current_user) do
+    case current_user do
+      %{username: username} when username == game.blue_username -> :blue
+      %{username: username} when username == game.orange_username -> :orange
+      _ -> :spectator
+    end
+  end
+
+  @spec abort_game(game :: game(), username :: String.t()) :: game()
+  def abort_game(game, username) do
+    updated_game =
+      game
+      |> Map.put(:status, {:aborted, username})
+
+    GameManager.update_game(updated_game)
+
+    updated_game
+  end
+
+  # --------------------------------------------------------------
+  # --------------------- DB FUNCTIONS ----------------------
+  # --------------------------------------------------------------
 
   @doc """
   Returns the list of games.
@@ -207,50 +273,6 @@ defmodule Tictactwo.Games do
   """
   def delete_game(%Game{} = game) do
     Repo.delete(game)
-  end
-
-  def fetch_players(slug) do
-    GameManager.fetch_players(slug)
-  end
-
-  def get_game_by_slug!(slug) do
-    GameManager.get_game_by_slug(slug)
-  end
-
-  @spec game_status(game :: game()) :: game_status()
-  def game_status(game) do
-    with :in_play <- check_rows(game.cells),
-         :in_play <- check_cols(game.cells),
-         :in_play <- check_falling_diag(game.cells) do
-      check_rising_diag(game.cells)
-    else
-      v -> v
-    end
-  end
-
-  @spec check_if_player_won?(game :: game(), player :: player()) :: boolean()
-  def check_if_player_won?(%{status: :blue_won}, :blue), do: true
-  def check_if_player_won?(%{status: :orange_won}, :orange), do: true
-  def check_if_player_won?(_game, _player), do: false
-
-  @spec gen_empty_cells() :: [cell()]
-  def gen_empty_cells() do
-    Enum.flat_map(0..2, fn row ->
-      Enum.map(0..2, fn col ->
-        gen_empty_cell(row, col)
-      end)
-    end)
-  end
-
-  @spec get_current_user_color(game :: game(), current_user :: current_user()) :: player()
-  def get_current_user_color(game, current_user) do
-    game
-    |> Enum.find(fn {_key, val} -> val == current_user.username end)
-    |> elem(0)
-    |> case do
-      :blue_username -> :blue
-      :orange_username -> :orange
-    end
   end
 
   # --------------------------------------------------------------
