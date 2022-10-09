@@ -39,7 +39,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   def handle_event(
         "accept-challenge",
-        %{"challenger_username" => challenger_username, "challenger_id" => challenger_id},
+        %{"challenger-username" => challenger_username, "challenger-id" => challenger_id},
         socket
       ) do
 

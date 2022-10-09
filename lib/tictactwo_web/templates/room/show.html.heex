@@ -1,11 +1,11 @@
 
 <%= if is_player?(@user_type) do %>
-	<h2 class={"text-#{get_current_user_color(@user_type)}-500"}>
+	<h2>
 		Welcome <%= @current_user.username %>:
 		You are 
-		<span class={"text-white bg-#{get_current_user_color(@user_type)}-500"}>
-			<%= get_current_user_color(@user_type) %>
-		</span>
+		<.badge color={get_current_user_color_type(@user_type)}>
+			<%= @user_type %>
+		</.badge>
 	</h2>
 <% else %>
 	<p>Welcome <%= @current_user.username %>, you are spectating</p>

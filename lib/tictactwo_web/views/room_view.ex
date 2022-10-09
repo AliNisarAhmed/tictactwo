@@ -88,8 +88,8 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  def get_current_user_color(:orange), do: "orange"
-  def get_current_user_color(_), do: "blue"
+  def get_current_user_color_type(:orange), do: "secondary"
+  def get_current_user_color_type(_), do: "primary"
 
   def toggle_player_turn(:blue), do: :orange
   def toggle_player_turn(:orange), do: :blue

@@ -56,7 +56,7 @@ defmodule TictactwoWeb.Components.Gobbler do
   def board_item(assigns) do
     ~H"""
       <button
-        class={"w-full h-full border-2 p-2 bg-#{get_current_user_color(@current_user)}-500"}
+        class={"w-full h-full border-2 p-2 bg-#{get_current_user_color_type(@current_user)}-500"}
         disabled={is_button_disabled?(@game, @current_user, @display_user)}
         phx-click="select-gobbler"
         phx-value-gobbler={@gobbler.name} >
