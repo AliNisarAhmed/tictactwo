@@ -8,20 +8,25 @@ defmodule TictactwoWeb.Components.Controls do
   def panel(assigns) do
     ~H"""
       <div class="flex">
-        <%= if game_aborted?(@game) do %> 
+        <%= if game_ended?(@game) do %> 
           <Button.back_to_lobby />
         <% else %>
-
-          <%= if game_in_play?(@game) do %>
-            <Button.abort_game current_user={@current_user}/>
+          
+          <%= if game_ready?(@game) do %>
+            <Button.abort_game current_user={@current_user} />
           <% else %>
-            <%= if rematch_offered?(@game, @current_user, @user_type) do %> 
-              <Button.accept_rematch />
-            <% else %> 
-              <Button.offer_rematch current_user={@current_user} user_type={@user_type}/>
+            <%= if game_in_play?(@game) do %>
+              <Button.resign_game current_user={@current_user}/>
+            <% else %>
+              <%= if rematch_offered?(@game, @current_user, @user_type) do %> 
+                <Button.accept_rematch />
+                <Button.back_to_lobby />
+              <% else %> 
+                <Button.offer_rematch current_user={@current_user} user_type={@user_type}/>
+                <Button.back_to_lobby />
+              <% end %>
             <% end %>
           <% end %>
-
         <% end %>
       </div>
     """

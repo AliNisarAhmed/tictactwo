@@ -1,7 +1,13 @@
 defmodule Tictactwo.Types do
   defmacro __using__(_opts) do
     quote do
-      @type game_status() :: :blue_won | :orange_won | :in_play | {:aborted, String.t()}
+      @type game_status() ::
+              :ready
+              | :in_play
+              | :blue_won
+              | :orange_won
+              | {:aborted, String.t()}
+              | {:resigned, String.t()}
       @type player() :: :blue | :orange
       @type gobbler_name() :: :xl | :large | :medium | :small | :xs | :premie
       @type gobbler() :: %{
@@ -35,7 +41,7 @@ defmodule Tictactwo.Types do
               selected_gobbler: selected_gobbler()
             }
       @type viewer_type :: :blue | :orange | :spectator
-      @type current_user :: %{ username: String.t() }
+      @type current_user :: %{username: String.t()}
     end
   end
 end

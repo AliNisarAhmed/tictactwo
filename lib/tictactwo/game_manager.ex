@@ -30,7 +30,7 @@ defmodule Tictactwo.GameManager do
 
     game = %{
       slug: game_slug,
-      status: :in_play,
+      status: :ready,
       player_turn: player_turn,
       blue_username: blue_username,
       orange_username: orange_username,

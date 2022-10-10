@@ -156,6 +156,17 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # resign-game 
+  def handle_info(%{event: "resign-game", payload: %{username: username}}, socket) do
+    updated_game = Games.resign_game(socket.assigns.game, username)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
@@ -222,21 +233,35 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # Broadcast event - abort game
   def handle_event("abort-game" = event, %{"username" => username}, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username
     })
 
-    {:noreply, push_redirect(socket, to: "/lobby")}
+    redirect_to_lobby(socket)
+  end
+
+  # Broadcast event - resign game
+  def handle_event("resign-game" = event, %{"username" => username}, socket) do
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
+      username: username
+    })
+
+    redirect_to_lobby(socket)
   end
 
   def handle_event("back-to-lobby", _payload, socket) do
-    {:noreply, push_redirect(socket, to: "/lobby")}
+    redirect_to_lobby(socket)
   end
 
   # ----------------------------------------------------------------------
 
   defp topic(socket) do
     @room_topic <> "#{socket.assigns.game_slug}"
+  end
+
+  defp redirect_to_lobby(socket) do
+    {:noreply, push_redirect(socket, to: "/lobby")}
   end
 end

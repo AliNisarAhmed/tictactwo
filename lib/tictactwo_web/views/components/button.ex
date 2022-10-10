@@ -75,22 +75,37 @@ defmodule TictactwoWeb.Components.Button do
 
   def abort_game(assigns) do
     ~H"""
-      <button 
+      <.button 
+        color="danger"
         phx-click="abort-game"
         phx-value-username={@current_user.username}
       >
         Abort Game
-      </button>
+      </.button>
+    """
+  end
+
+  def resign_game(assigns) do
+    ~H"""
+      <.button 
+        color="danger"
+        variant="outline"
+        phx-click="resign-game"
+        phx-value-username={@current_user.username}
+      >
+        Resign Game
+      </.button>
     """
   end
 
   def back_to_lobby(assigns) do
     ~H"""
-      <button 
+      <.button 
+        color="info"
         phx-click="back-to-lobby"
       >
         Back to Lobby
-      </button>
+      </.button>
     """
   end
 end
