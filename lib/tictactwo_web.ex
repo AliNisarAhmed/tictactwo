@@ -38,6 +38,7 @@ defmodule TictactwoWeb do
         only: [get_flash: 1, get_flash: 2, view_module: 1, view_template: 1]
 
       # Include shared imports and aliases for views
+      import Phoenix.Component
       unquote(view_helpers())
     end
   end
@@ -75,6 +76,7 @@ defmodule TictactwoWeb do
       import Plug.Conn
       import Phoenix.Controller
       import Phoenix.LiveView.Router
+      import Phoenix.Component
     end
   end
 
@@ -99,6 +101,8 @@ defmodule TictactwoWeb do
       import TictactwoWeb.ErrorHelpers
       import TictactwoWeb.Gettext
       alias TictactwoWeb.Router.Helpers, as: Routes
+
+      use PetalComponents
     end
   end
 
