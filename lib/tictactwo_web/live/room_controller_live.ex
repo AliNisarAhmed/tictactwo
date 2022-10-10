@@ -29,7 +29,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def terminate(reason, _socket) do
-    IO.inspect(reason, label: "TERMINATED")
     # TODO: Handle users leaving the room 
     # Close the game once both players leave
   end
@@ -54,7 +53,6 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   # presence diff
   def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: _assigns} = socket) do
-    IO.inspect(payload, label: "Presence PAYLOAD")
     {:noreply, socket}
   end
 
