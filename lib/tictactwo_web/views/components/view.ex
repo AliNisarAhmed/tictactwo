@@ -3,6 +3,7 @@ defmodule TictactwoWeb.Components.View do
 
   import TictactwoWeb.RoomView
   alias TictactwoWeb.Components.{Player, Board}
+  alias PetalComponents.HeroiconsV1
 
   def play(assigns) do
     ~H"""
@@ -66,6 +67,15 @@ defmodule TictactwoWeb.Components.View do
     color="blue"
     class="row-start-3 row-end-4"
     />
+    """
+  end
+
+  def spectator_count(assigns) do
+    ~H"""
+    <div class="flex">
+      <HeroiconsV1.Outline.user class="w-6 h-6"/>
+      <span><%= @count %></span>
+    </div>
     """
   end
 end

@@ -22,7 +22,8 @@ defmodule TictactwoWeb.RoomControllerLive do
         game_slug: game_slug,
         current_user: current_user,
         user_type: user_type,
-        game: game
+        game: game,
+        spectator_count: 0
       )
 
     {:ok, socket}
@@ -42,17 +43,23 @@ defmodule TictactwoWeb.RoomControllerLive do
       socket.assigns.current_user.id,
       %{
         id: socket.assigns.current_user.id,
-        username: socket.assigns.current_user.username
+        username: socket.assigns.current_user.username,
+        user_type: socket.assigns.user_type
       }
     )
-
-    # Presence.track(socket, topic(socket), %{})
 
     {:noreply, socket}
   end
 
   # presence diff
-  def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: _assigns} = socket) do
+  def handle_info(%{event: "presence_diff", payload: _payload}, %{assigns: _assigns} = socket) do
+    socket =
+      assign(
+        socket,
+        :spectator_count,
+        spectator_count(topic(socket))
+      )
+
     {:noreply, socket}
   end
 
@@ -263,5 +270,12 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   defp redirect_to_lobby(socket) do
     {:noreply, push_redirect(socket, to: "/lobby")}
+  end
+
+  defp spectator_count(topic) do
+    topic
+    |> Presence.list()
+    |> Map.values()
+    |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
   end
 end
