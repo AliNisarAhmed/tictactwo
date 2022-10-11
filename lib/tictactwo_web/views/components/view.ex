@@ -72,7 +72,7 @@ defmodule TictactwoWeb.Components.View do
 
   def spectator_count(assigns) do
     ~H"""
-    <div class="flex">
+    <div class="flex" :if={@count > 0}>
       <HeroiconsV1.Outline.user class="w-6 h-6"/>
       <span><%= @count %></span>
     </div>
