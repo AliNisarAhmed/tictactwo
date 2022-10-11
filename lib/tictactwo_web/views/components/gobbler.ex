@@ -69,13 +69,13 @@ defmodule TictactwoWeb.Components.Gobbler do
     not my_turn?(game, current_user) ||
       not is_nil(game.selected_gobbler) ||
       current_user != display_user || 
-      game.status != :in_play
+       game_ended?(game)
   end
 
   defp is_selected_disabled?(game, current_user, display_user) do
     not my_turn?(game, current_user) ||
       is_nil(game.selected_gobbler) ||
       current_user != display_user ||
-      game.status != :in_play
+        game_ended?(game)
   end
 end

@@ -22,7 +22,8 @@ defmodule TictactwoWeb.RoomControllerLive do
         game_slug: game_slug,
         current_user: current_user,
         user_type: user_type,
-        game: game
+        game: game,
+        spectator_count: 0
       )
 
     {:ok, socket}
@@ -42,17 +43,23 @@ defmodule TictactwoWeb.RoomControllerLive do
       socket.assigns.current_user.id,
       %{
         id: socket.assigns.current_user.id,
-        username: socket.assigns.current_user.username
+        username: socket.assigns.current_user.username,
+        user_type: socket.assigns.user_type
       }
     )
-
-    # Presence.track(socket, topic(socket), %{})
 
     {:noreply, socket}
   end
 
   # presence diff
-  def handle_info(%{event: "presence_diff", payload: payload}, %{assigns: _assigns} = socket) do
+  def handle_info(%{event: "presence_diff", payload: _payload}, %{assigns: _assigns} = socket) do
+    socket =
+      assign(
+        socket,
+        :spectator_count,
+        spectator_count(topic(socket))
+      )
+
     {:noreply, socket}
   end
 
@@ -156,6 +163,17 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # resign-game 
+  def handle_info(%{event: "resign-game", payload: %{username: username}}, socket) do
+    updated_game = Games.resign_game(socket.assigns.game, username)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
+  end
+
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
@@ -222,21 +240,42 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # Broadcast event - abort game
   def handle_event("abort-game" = event, %{"username" => username}, socket) do
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username
     })
 
-    {:noreply, push_redirect(socket, to: "/lobby")}
+    redirect_to_lobby(socket)
+  end
+
+  # Broadcast event - resign game
+  def handle_event("resign-game" = event, %{"username" => username}, socket) do
+    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
+      username: username
+    })
+
+    redirect_to_lobby(socket)
   end
 
   def handle_event("back-to-lobby", _payload, socket) do
-    {:noreply, push_redirect(socket, to: "/lobby")}
+    redirect_to_lobby(socket)
   end
 
   # ----------------------------------------------------------------------
 
   defp topic(socket) do
     @room_topic <> "#{socket.assigns.game_slug}"
+  end
+
+  defp redirect_to_lobby(socket) do
+    {:noreply, push_redirect(socket, to: "/lobby")}
+  end
+
+  defp spectator_count(topic) do
+    topic
+    |> Presence.list()
+    |> Map.values()
+    |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
   end
 end

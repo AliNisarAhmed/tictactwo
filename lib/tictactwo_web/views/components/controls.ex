@@ -6,23 +6,21 @@ defmodule TictactwoWeb.Components.Controls do
   alias TictactwoWeb.Components.Button
 
   def panel(assigns) do
+    assigns =
+      assigns
+      |> assign(:game_ended?, game_ended?(assigns.game))
+      |> assign(
+        :rematch_offered?,
+        rematch_offered?(assigns.game, assigns.current_user, assigns.user_type)
+      )
+
     ~H"""
       <div class="flex">
-        <%= if game_aborted?(@game) do %> 
-          <Button.back_to_lobby />
-        <% else %>
-
-          <%= if game_in_play?(@game) do %>
-            <Button.abort_game current_user={@current_user}/>
-          <% else %>
-            <%= if rematch_offered?(@game, @current_user, @user_type) do %> 
-              <Button.accept_rematch />
-            <% else %> 
-              <Button.offer_rematch current_user={@current_user} user_type={@user_type}/>
-            <% end %>
-          <% end %>
-
-        <% end %>
+        <Button.abort_game :if={game_ready?(@game)} current_user={@current_user} />
+        <Button.resign_game :if={game_in_play?(@game)} current_user={@current_user}/>
+        <Button.accept_rematch :if={@game_ended? && @rematch_offered?}/>
+        <Button.offer_rematch :if={@game_ended? and not @rematch_offered?} current_user={@current_user} user_type={@user_type}/>
+        <Button.back_to_lobby :if={@game_ended?}/>
       </div>
     """
   end

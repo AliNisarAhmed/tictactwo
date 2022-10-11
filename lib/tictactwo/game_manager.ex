@@ -3,6 +3,8 @@ defmodule Tictactwo.GameManager do
 
   alias Tictactwo.{Games, Gobblers}
 
+  @timeout 300_000 # 5 minutes
+
   def child_spec(game_slug) do
     %{
       id: {__MODULE__, game_slug},
@@ -20,7 +22,7 @@ defmodule Tictactwo.GameManager do
   end
 
   def init(game) do
-    {:ok, game}
+    {:ok, game, @timeout}
   end
 
   def new_game(player_turn, blue_username, orange_username) do
@@ -30,7 +32,7 @@ defmodule Tictactwo.GameManager do
 
     game = %{
       slug: game_slug,
-      status: :in_play,
+      status: :ready,
       player_turn: player_turn,
       blue_username: blue_username,
       orange_username: orange_username,
@@ -64,13 +66,16 @@ defmodule Tictactwo.GameManager do
     GenServer.call(via(game_slug), :fetch_players)
   end
 
-  # Callbacks
+  # ---- --------- ----
+  # ---- CALLBACKS ----
+  # ---- --------- ----
+
   def handle_call(:get_game, _from, game) do
-    {:reply, game, game}
+    {:reply, game, game, @timeout}
   end
 
   def handle_call({:update_game, new_game_state}, _from, _old_state) do
-    {:reply, new_game_state, new_game_state}
+    {:reply, new_game_state, new_game_state, @timeout}
   end
 
   def handle_call(
@@ -78,7 +83,13 @@ defmodule Tictactwo.GameManager do
         _from,
         %{blue_username: blue_username, orange_username: orange_username} = game
       ) do
-    {:reply, {blue_username, orange_username}, game}
+    {:reply, {blue_username, orange_username}, game, @timeout}
+  end
+
+  # handle timeout
+  def handle_info(:timeout, state) do
+    DynamicSupervisor.terminate_child(Tictactwo.DynamicSupervisor, self())
+    {:stop, :timed_out, state}
   end
 
   defp via(game_slug) do

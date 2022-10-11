@@ -7,7 +7,7 @@ defmodule TictactwoWeb.Components.GameStatus do
   def show_for_player(assigns) do
     ~H"""
       <div>
-          <%= if game_in_play?(@game) do %>
+          <%= if game_not_ended?(@game) do %>
             <%= if my_turn?(@game, @current_user) do %>
               <p>Your turn</p>
             <% else %> 
@@ -32,13 +32,18 @@ defmodule TictactwoWeb.Components.GameStatus do
     """
   end
 
-  defp game_ended_status(%{rematch_offered_by: %{ username: username }}, _current_user) do
+  defp game_ended_status(%{rematch_offered_by: %{username: username}}, _current_user) do
     "#{username} is offering a rematch"
   end
 
-  defp game_ended_status(%{status: {:aborted, _}}, _current_user) do 
-    "Game aborted"
+  defp game_ended_status(%{status: {:aborted, username}}, _current_user) do
+    "Game aborted by #{username}"
   end
+
+  defp game_ended_status(%{status: {:resigned, username}}, _current_user) do
+    "#{username} resigned"
+  end
+
   defp game_ended_status(game, current_user) do
     if Games.check_if_player_won?(game, current_user) do
       "You won"

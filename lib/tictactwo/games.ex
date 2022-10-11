@@ -173,6 +173,17 @@ defmodule Tictactwo.Games do
     updated_game
   end
 
+  @spec resign_game(game :: game(), username :: String.t()) :: game()
+  def resign_game(game, username) do
+    updated_game =
+      game
+      |> Map.put(:status, {:resigned, username})
+
+    GameManager.update_game(updated_game)
+
+    updated_game
+  end
+
   # --------------------------------------------------------------
   # --------------------- DB FUNCTIONS ----------------------
   # --------------------------------------------------------------

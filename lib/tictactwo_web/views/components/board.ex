@@ -82,6 +82,6 @@ defmodule TictactwoWeb.Components.Board do
   defp can_select_played_gobbler?(game, current_user, gobblers) do 
     my_turn?(game, current_user) && 
       can_select?(gobblers, current_user) && 
-        game_in_play?(game)
+        game_not_ended?(game)
   end
 end

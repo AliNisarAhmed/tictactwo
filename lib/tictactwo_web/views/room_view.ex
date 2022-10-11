@@ -18,9 +18,27 @@ defmodule TictactwoWeb.RoomView do
     game.player_turn == user_type
   end
 
+  @spec game_not_ended?(game :: game()) :: boolean()
+  def game_not_ended?(game) do 
+    game_ready?(game) || game_in_play?(game)
+  end
+
+  @spec game_ended?(game :: game()) :: boolean()
+  def game_ended?(game) do 
+    not game_not_ended?(game) 
+  end
+
   @spec game_in_play?(game :: game()) :: boolean()
   def game_in_play?(%{status: :in_play}), do: true
   def game_in_play?(_game), do: false
+
+  @spec game_ready?(game :: game()) :: boolean()
+  def game_ready?(%{status: :ready}), do: true
+  def game_ready?(_game), do: false
+
+  @spec game_aborted?(game :: game()) :: boolean()
+  def game_aborted?(%{status: {:aborted, _}}), do: true
+  def game_aborted?(_game), do: false
 
   def winning_player(%{status: :blue_won}) do
     "blue"
@@ -126,7 +144,4 @@ defmodule TictactwoWeb.RoomView do
       game.rematch_offered_by.username != current_user.username
   end
 
-  @spec game_aborted?(game :: game()) :: boolean()
-  def game_aborted?(%{status: {:aborted, _}}), do: true
-  def game_aborted?(_game), do: false
 end
