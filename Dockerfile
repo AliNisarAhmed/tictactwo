@@ -53,6 +53,7 @@ COPY priv priv
 COPY assets assets
 
 # For Phoenix 1.6 and later, compile assets using esbuild
+COPY lib lib
 RUN mix assets.deploy
 
 # For Phoenix versions earlier than 1.6, compile assets npm
@@ -60,7 +61,6 @@ RUN mix assets.deploy
 # RUN mix phx.digest
 
 # Compile the release
-COPY lib lib
 
 RUN mix compile
 
