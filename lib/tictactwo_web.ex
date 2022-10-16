@@ -39,6 +39,9 @@ defmodule TictactwoWeb do
 
       # Include shared imports and aliases for views
       import Phoenix.Component
+
+      use PhoenixInlineSvg.Helpers
+
       unquote(view_helpers())
     end
   end

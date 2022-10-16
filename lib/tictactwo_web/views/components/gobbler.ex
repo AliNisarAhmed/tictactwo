@@ -28,13 +28,18 @@ defmodule TictactwoWeb.Components.Gobbler do
   end
 
   def list_item(assigns) do
+    assigns = 
+      assigns 
+      |> assign(:gobbler_file, "#{assigns.gobbler.name}-#{assigns.color}")
+
     ~H"""
       <button
         class={"#{@class} h-20 border-2 rounded-sm p-2 bg-#{@color}-500 grow basis-0 shrink min-w-0"}
         disabled={is_button_disabled?(@game, @current_user, @display_user)}
         phx-click="select-gobbler"
         phx-value-gobbler={@gobbler.name} >
-        <%= @gobbler.name %>
+        <%= @gobbler_file %>
+        <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file) %>
       </button>
     """
   end

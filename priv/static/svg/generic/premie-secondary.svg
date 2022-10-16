@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" class="xl-secondary secondary" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient gradientUnits="userSpaceOnUse" cx="257.36" cy="162.369" r="98.187" id="gradient-1" gradientTransform="matrix(0.005126, 0.321191, -0.584698, 0.008689, 351.483545, 77.539297)">
+      <stop offset="0" style="stop-color: rgba(241, 105, 15, 1)"/>
+      <stop offset="1" style="stop-color: rgb(218, 93, 9);"/>
+    </radialGradient>
+  </defs>
+  <g transform="matrix(0.972239, 0, 0, 0.929823, 28.931849, 24.392448)" style="">
+    <title>gobbler_xl</title>
+    <g transform="matrix(0.994908, 0, 0, 0.726719, 1.031645, 37.677773)" style="">
+      <path style="stroke: rgb(0, 0, 0); stroke-width: 0px; fill-rule: nonzero; paint-order: stroke; fill: url(#gradient-1); stroke-miterlimit: 19; stroke-dashoffset: -1px;" d="M 358.499 356.707 C 358.499 359.323 356.01 361.445 352.94 361.445 C 344.832 412.157 171.427 415.026 166.964 361.445 C 163.894 361.445 161.405 359.323 161.405 356.707 L 161.405 249.914 C 161.287 247.784 161.227 245.636 161.227 243.474 C 161.227 184.726 205.418 137.101 259.93 137.101 C 314.442 137.101 358.634 184.726 358.634 243.474 C 358.634 245.353 358.588 247.221 358.499 249.076 L 358.499 356.707 Z"/>
+      <ellipse style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 0px;" cx="229.017" cy="255.541" rx="24.812" ry="30.338"/>
+      <ellipse style="fill: rgb(216, 216, 216); stroke: rgb(0, 0, 0); stroke-width: 0px;" cx="297.237" cy="254.058" rx="24.809" ry="30.334"/>
+      <ellipse style="stroke: rgb(0, 0, 0);" cx="237.8" cy="258.127" rx="7.753" ry="10.728"/>
+      <ellipse style="stroke: rgb(0, 0, 0);" cx="290.001" cy="256.278" rx="7.753" ry="10.728"/>
+      <ellipse style="stroke: rgb(0, 0, 0);" cx="266.485" cy="342.102" rx="17.314" ry="17.757"/>
+    </g>
+    <path stroke-width="0" d="M 263.783 135.904 C 256.949 132.236 286.738 143.966 290.756 138.142 C 297.905 127.781 291.986 157.124 284.428 163.083 C 275.162 170.388 260.017 155.397 271.529 151.022 C 278.641 148.319 259.249 172.844 260.696 158.705 C 249.178 165.123 231.934 163.557 224.719 153.19 C 205.656 125.797 272.269 140.458 263.783 135.904 Z" style="stroke-width: 2px; fill: rgb(117, 199, 227); stroke: rgb(151, 170, 89); stroke-opacity: 0; paint-order: fill markers;" class="hair">
+      <title>Hair</title>
+    </path>
+  </g>
+</svg>

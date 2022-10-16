@@ -39,7 +39,7 @@ defmodule Tictactwo.MixProject do
       {:phoenix_html, "~> 3.0"},
       {:phoenix_live_reload, "~> 1.2", only: :dev},
       {:phoenix_live_view, "~> 0.18"},
-      {:floki, ">= 0.30.0", only: :test},
+      {:floki, ">= 0.30.0"},
       {:phoenix_live_dashboard, "~> 0.6"},
       {:esbuild, "~> 0.4", runtime: Mix.env() == :dev},
       {:swoosh, "~> 1.3"},
@@ -50,7 +50,8 @@ defmodule Tictactwo.MixProject do
       {:plug_cowboy, "~> 2.5"},
       {:faker, "~> 0.17"},
       {:tailwind, "~> 0.1", runtime: Mix.env() == :dev},
-      {:petal_components, "~> 0.17"}
+      {:petal_components, "~> 0.17"},
+      {:phoenix_inline_svg, "~> 1.4"}
     ]
   end
 
