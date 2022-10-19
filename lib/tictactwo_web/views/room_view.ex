@@ -94,8 +94,8 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  def first_gobbler_selected?(%{color: color, name: name}, selected_gobbler, player_turn) do
-    player_turn == color and name == selected_gobbler.name
+  def first_gobbler_selected?(game, cell_coords) do 
+    game.selected_gobbler.played? == cell_coords
   end
 
   def get_current_user_color_type(:orange), do: "secondary"

@@ -30,7 +30,6 @@ defmodule TictactwoWeb.Components.Gobbler do
   end
 
   def list_item(assigns) do
-
     ~H"""
       <button
         disabled={is_button_disabled?(@game, @current_user, @display_user)}
@@ -54,9 +53,9 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
-  def board_item(assigns) do 
-    assigns = 
-      assigns 
+  def board_item(assigns) do
+    assigns =
+      assigns
       |> assign(:first_gobbler, first_gobbler(assigns.cell.gobblers))
       |> assign_new(:class, fn -> "" end)
 
@@ -78,57 +77,93 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
-  def board_item_selected(assigns) do 
-    assigns = 
-      assigns 
+  def board_item_selected(assigns) do
+    assigns =
+      assigns
       |> assign(:my_turn, my_turn?(assigns.game, assigns.current_user))
       |> assign(:move_allowed, Games.move_allowed?(assigns.game, assigns.cell.gobblers))
       |> assign(:played_gobbler_color, played_gobbler_color(assigns.cell.gobblers))
       |> assign(:row_value, elem(assigns.cell.coords, 0))
       |> assign(:col_value, elem(assigns.cell.coords, 1))
       |> assign(:first_gobbler, first_gobbler(assigns.cell.gobblers))
+      |> assign(
+        :first_gobbler_selected,
+        first_gobbler_selected?(
+          assigns.game,
+          assigns.cell.coords
+        )
+      )
 
     ~H"""
-      <button
-        phx-click="play-gobbler"
-        disabled={not @my_turn or not @move_allowed}
-        class={"
-          #{if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
-          #{hide_last_gobbler(@game, @cell.coords)}
-        "}
-      >
-        <%= if not is_nil(@first_gobbler) and not first_gobbler_selected?(@first_gobbler, @game.selected_gobbler, @game.player_turn) do %>
-          <.gobbler_image 
-            name={@first_gobbler.name}
-            color={@first_gobbler.color}
-          />
-        <% end %>
-      </button>
+      <%= if is_nil(@first_gobbler) do %> 
+
+        <button 
+          phx-click="play-gobbler"
+          phx-value-row={@row_value}
+          phx-value-col={@col_value}
+          disabled={not @my_turn}
+          class={if @my_turn, do: "cursor-pointer w-full h-full", else: ""}
+        />
+
+      <% else %> 
+
+          <%= if @first_gobbler_selected do %>
+
+            <button 
+              phx-click="play-gobbler"
+              phx-value-row={@row_value}
+              phx-value-col={@col_value}
+              disabled={not @my_turn}
+              class={"w-full h-full 
+                #{if @my_turn, do: "cursor-pointer"}
+                hidden
+              "}
+            />
+
+          <% else %> 
+
+            <button
+              phx-click="play-gobbler"
+              phx-value-row={@row_value}
+              phx-value-col={@col_value}
+              disabled={not @move_allowed}
+              class={"w-full h-full 
+                #{if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
+              "}
+            >
+              <.gobbler_image 
+                name={@first_gobbler.name}
+                color={get_current_user_color_type(@first_gobbler.color)}
+              />
+            </button>
+
+          <% end %>
+
+      <% end %> 
     """
   end
 
-  def gobbler_image(assigns) do 
-    assigns = 
-      assigns 
+  def gobbler_image(assigns) do
+    assigns =
+      assigns
       |> assign(:gobbler_file, "#{assigns.name}-#{assigns.color}")
 
     ~H"""
-    <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file, class: "w-full h-full") %>
+      <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file, class: "w-full h-full") %>
     """
   end
 
   defp is_button_disabled?(game, current_user, display_user) do
     not my_turn?(game, current_user) ||
       not is_nil(game.selected_gobbler) ||
-      current_user != display_user || 
-       game_ended?(game)
+      current_user != display_user ||
+      game_ended?(game)
   end
 
   defp is_selected_disabled?(game, current_user, display_user) do
     not my_turn?(game, current_user) ||
       is_nil(game.selected_gobbler) ||
       current_user != display_user ||
-        game_ended?(game)
+      game_ended?(game)
   end
-
 end
