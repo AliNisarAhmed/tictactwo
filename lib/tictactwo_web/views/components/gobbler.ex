@@ -97,49 +97,56 @@ defmodule TictactwoWeb.Components.Gobbler do
     ~H"""
       <%= if is_nil(@first_gobbler) do %> 
 
-        <button 
-          phx-click="play-gobbler"
-          phx-value-row={@row_value}
-          phx-value-col={@col_value}
+        <.item_selected_button
+          row_value={@row_value}
+          col_value={@col_value}
           disabled={not @my_turn}
-          class={if @my_turn, do: "cursor-pointer w-full h-full", else: ""}
-        />
+          class={if @my_turn, do: "cursor-pointer"}
+        ></.item_selected_button>
+          
 
       <% else %> 
 
           <%= if @first_gobbler_selected do %>
 
-            <button 
-              phx-click="play-gobbler"
-              phx-value-row={@row_value}
-              phx-value-col={@col_value}
+            <.item_selected_button
+              row_value={@row_value}
+              col_value={@col_value}
               disabled={not @my_turn}
-              class={"w-full h-full 
-                #{if @my_turn, do: "cursor-pointer"}
-                hidden
-              "}
-            />
+              class={"hidden #{if @my_turn, do: "cursor-pointer"}"}
+            ></.item_selected_button>
 
           <% else %> 
 
-            <button
-              phx-click="play-gobbler"
-              phx-value-row={@row_value}
-              phx-value-col={@col_value}
+            <.item_selected_button
+              row_value={@row_value}
+              col_value={@col_value}
               disabled={not @move_allowed}
-              class={"w-full h-full 
-                #{if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
-              "}
+              class={if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
             >
               <.gobbler_image 
                 name={@first_gobbler.name}
                 color={get_current_user_color_type(@first_gobbler.color)}
               />
-            </button>
+            </.item_selected_button>
 
           <% end %>
 
       <% end %> 
+    """
+  end
+
+  def item_selected_button(assigns) do
+    ~H"""
+    <button 
+      phx-click="play-gobbler"
+      phx-value-row={@row_value}
+      phx-value-col={@col_value}
+      disabled={@disabled}
+      class={"w-full h-full #{@class}"}
+    >
+      <%= render_slot(@inner_block) %>
+    </button>
     """
   end
 
