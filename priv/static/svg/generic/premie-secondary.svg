@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg viewBox="0 0 500 500" class="xl-secondary secondary" xmlns="http://www.w3.org/2000/svg">
+  <g transform="matrix(0.972239, 0, 0, 0.929823, -2.430743, 34.303165)" style="">
+    <title>premie</title>
+    <path style="stroke: rgb(0, 0, 0); stroke-width: 0px; fill-rule: nonzero; paint-order: stroke; stroke-miterlimit: 19; stroke-dashoffset: -1px; fill: rgb(249, 115, 22);" d="M 357.705 296.903 C 357.705 298.805 355.229 300.347 352.174 300.347 C 344.108 337.2 171.586 339.285 167.145 300.347 C 164.091 300.347 161.615 298.805 161.615 296.903 L 161.615 219.295 C 161.497 217.747 161.438 216.186 161.438 214.615 C 161.438 171.922 205.404 137.312 259.638 137.312 C 313.872 137.312 357.839 171.922 357.839 214.615 C 357.839 215.98 357.794 217.338 357.705 218.686 L 357.705 296.903 Z"/>
+    <path stroke-width="0" d="M 263.783 135.904 C 256.949 132.236 286.738 143.966 290.756 138.142 C 297.905 127.781 291.985 157.124 284.428 163.083 C 275.162 170.388 260.017 155.397 271.529 151.022 C 278.641 148.319 259.249 172.844 260.696 158.705 C 249.178 165.123 231.934 163.557 224.719 153.19 C 205.656 125.797 272.269 140.458 263.783 135.904 Z" style="stroke-width: 2px; stroke: rgb(151, 170, 89); stroke-opacity: 0; paint-order: fill markers; fill: rgb(117, 199, 227);" class="hair">
+      <title>Hair</title>
+    </path>
+    <g transform="matrix(0.994908, 0, 0, 0.726719, 1.031645, 37.677773)" style="">
+      <ellipse style="stroke: rgb(0, 0, 0); stroke-width: 0px; fill: rgb(243, 243, 243);" cx="229.017" cy="255.541" rx="24.812" ry="30.338"/>
+      <ellipse style="stroke: rgb(0, 0, 0); stroke-width: 0px; fill: rgb(243, 243, 243);" cx="297.237" cy="254.058" rx="24.809" ry="30.334"/>
+      <ellipse style="stroke: rgb(0, 0, 0);" cx="237.8" cy="258.127" rx="7.753" ry="10.728"/>
+      <ellipse style="stroke: rgb(0, 0, 0);" cx="290.001" cy="256.278" rx="7.753" ry="10.728"/>
+      <ellipse style="stroke: rgb(0, 0, 0); fill: rgb(3, 1, 0);" cx="266.485" cy="342.102" rx="17.314" ry="17.757"/>
+    </g>
+  </g>
+</svg>
