@@ -7,7 +7,7 @@ defmodule Tictactwo.CurrentGames do
   def start_link(_) do
     GenServer.start_link(
       __MODULE__,
-      [],
+      {0, []},
       name: __MODULE__
     )
   end
@@ -38,18 +38,19 @@ defmodule Tictactwo.CurrentGames do
     {:reply, state, state}
   end
 
-  def handle_cast({:add_game, game_info}, current_games) do
-    new_state =
+  def handle_cast({:add_game, game_info}, {count, current_games} = _state) do
+    new_current_games =
       [game_info | current_games]
       |> Enum.take(@current_games_count)
-
+    
+    new_state = {count + 1, new_current_games}
     broadcast_event(new_state)
-
     {:noreply, new_state}
   end
 
-  def handle_cast({:remove_game, game_slug}, current_games) do
-    new_state = Enum.filter(current_games, fn game -> game.slug != game_slug end)
+  def handle_cast({:remove_game, game_slug}, {count, current_games} = _state) do
+    new_current_games = Enum.filter(current_games, fn game -> game.slug != game_slug end)
+    new_state = {count - 1, new_current_games}
     broadcast_event(new_state)
     {:noreply, new_state}
   end

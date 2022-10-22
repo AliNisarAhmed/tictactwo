@@ -17,6 +17,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
        current_user: session["current_user"],
        users: %{},
        challenges: [],
+       current_games_count: 0,
        current_games: []
      )}
   end
@@ -69,11 +70,12 @@ defmodule TictactwoWeb.LobbyControllerLive do
       }
     )
 
-    current_games = CurrentGames.get_current_games()
+    {count, current_games} = CurrentGames.get_current_games()
 
     {:noreply,
      assign(socket,
        loading: false,
+       current_games_count: count,
        current_games: current_games
      )}
   end
@@ -113,10 +115,11 @@ defmodule TictactwoWeb.LobbyControllerLive do
   end
 
   # Handle current games change event
-  def handle_info(%{event: "current-games-updated", payload: payload}, socket) do
+  def handle_info(%{event: "current-games-updated", payload: {count, current_games}}, socket) do
     socket =
       socket
-      |> assign(:current_games, payload)
+      |> assign(:current_games, current_games)
+      |> assign(:current_games_count, count)
 
     {:noreply, socket}
   end

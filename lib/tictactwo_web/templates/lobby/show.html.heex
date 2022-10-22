@@ -42,7 +42,9 @@
 			</div>
 
 			<div class="h-full">
-				<h3 class="text-lg border-2 border-black-300 text-center">Current games</h3>
+				<h3 class="text-lg border-2 border-black-300 text-center">
+					Current games (<%= @current_games_count %>)
+				</h3>
 				<%= for game <- @current_games do %>
 					<.link href={"/rooms/#{game.slug}"}>
 						<span><%= game.blue_username %></span><.badge color="primary">blue</.badge> vs 
