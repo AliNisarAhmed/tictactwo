@@ -6,6 +6,7 @@ defmodule Tictactwo.GameManager do
   # 5 minutes
   # @timeout 300_000
   @timeout 60_000
+  @room_topic "rooms:"
 
   def child_spec(game_slug) do
     %{
@@ -87,10 +88,12 @@ defmodule Tictactwo.GameManager do
   end
 
   def handle_call({:update_game, new_game_state}, _from, _old_state) do
+    broadcast_game_update(new_game_state)
     {:reply, new_game_state, new_game_state, @timeout}
   end
 
   def handle_call({:game_ended, updated_game}, _from, _old_state) do
+    broadcast_game_update(updated_game)
     CurrentGames.remove_game(updated_game.slug)
     {:reply, updated_game, updated_game, @timeout}
   end
@@ -118,5 +121,13 @@ defmodule Tictactwo.GameManager do
     :crypto.strong_rand_bytes(length)
     |> Base.url_encode64()
     |> binary_part(0, length)
+  end
+
+  defp broadcast_game_update(game) do 
+    TictactwoWeb.Endpoint.broadcast(topic(game), "game-updated", game)
+  end
+
+  defp topic(game) do
+    @room_topic <> "#{game.slug}"
   end
 end

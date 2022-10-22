@@ -2,7 +2,6 @@ defmodule Tictactwo.Games do
   use Tictactwo.Types
 
   alias Tictactwo.{Repo, Gobblers, GameManager}
-  import Ecto.Query
   alias Tictactwo.Games.Game
 
   @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) ::
@@ -24,10 +23,13 @@ defmodule Tictactwo.Games do
       played?: {row, col}
     }
 
-    game
-    |> pop_first_gobbler_from_cell({row, col})
-    |> set_selected_gobbler(selected_gobbler)
-    |> update_gobbler_status(gobbler_name, :selected)
+    updated_game =
+      game
+      |> pop_first_gobbler_from_cell({row, col})
+      |> set_selected_gobbler(selected_gobbler)
+      |> update_gobbler_status(gobbler_name, :selected)
+
+    GameManager.update_game(updated_game)
   end
 
   @spec select_unplayed_gobbler(game :: game(), gobbler_name :: gobbler_name()) :: game()
@@ -37,17 +39,23 @@ defmodule Tictactwo.Games do
       played?: nil
     }
 
-    game
-    |> set_selected_gobbler(selected_gobbler)
-    |> update_gobbler_status(gobbler_name, :selected)
+    updated_game =
+      game
+      |> set_selected_gobbler(selected_gobbler)
+      |> update_gobbler_status(gobbler_name, :selected)
+
+    GameManager.update_game(updated_game)
   end
 
   @spec deselect_gobbler(game :: game()) :: game()
   def deselect_gobbler(game) do
-    case game.selected_gobbler.played? do
-      nil -> deselect_unplayed_gobbler(game)
-      {row, col} -> deselect_played_gobbler(game, {row, col})
-    end
+    updated_game =
+      case game.selected_gobbler.played? do
+        nil -> deselect_unplayed_gobbler(game)
+        {row, col} -> deselect_played_gobbler(game, {row, col})
+      end
+
+    GameManager.update_game(updated_game)
   end
 
   @spec play_gobbler(game :: game(), coords :: coords()) :: game()

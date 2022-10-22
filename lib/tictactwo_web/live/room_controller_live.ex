@@ -63,55 +63,11 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  # gobbler-selected: Already played Gobbler
-  def handle_info(
-        %{
-          event: "gobbler-selected",
-          payload: %{
-            gobbler_name: gobbler_name_str,
-            row: row,
-            col: col
-          }
-        },
-        socket
-      ) do
-    gobbler_name = gobbler_name_str |> String.to_atom()
-    row = String.to_integer(row)
-    col = String.to_integer(col)
-
+  # game updated
+  def handle_info(%{event: "game-updated", payload: payload}, socket) do
     socket =
       socket
-      |> update(:game, &Games.select_already_played_gobbler(&1, gobbler_name, {row, col}))
-
-    {:noreply, socket}
-  end
-
-  # gobbler-selected: Unplayed Gobbler
-  def handle_info(
-        %{
-          event: "gobbler-selected",
-          payload: %{
-            gobbler_name: gobbler_name_str
-          }
-        },
-        socket
-      ) do
-    gobbler_name = gobbler_name_str |> String.to_atom()
-
-    socket =
-      socket
-      |> update(:game, &Games.select_unplayed_gobbler(&1, gobbler_name))
-
-    {:noreply, socket}
-  end
-
-  # gobbler-deselected:
-  def handle_info(%{event: "gobbler-deselected", payload: _payload}, socket) do
-    socket = assign(socket, selected_gobbler: nil)
-
-    socket =
-      socket
-      |> update(:game, &Games.deselect_gobbler/1)
+      |> assign(:game, payload)
 
     {:noreply, socket}
   end
@@ -147,70 +103,70 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   # rematch-accepted
   def handle_info(%{event: "rematch-accepted", payload: %{new_game_slug: new_game_slug}}, socket) do
-    IO.puts("REMATCH ACCEPTED")
-
     {:noreply, push_redirect(socket, to: "/rooms/#{new_game_slug}", replace: true)}
-  end
-
-  # abort-game
-  def handle_info(%{event: "abort-game", payload: %{username: username}}, socket) do
-    updated_game = Games.abort_game(socket.assigns.game, username)
-
-    socket =
-      socket
-      |> assign(:game, updated_game)
-
-    {:noreply, socket}
-  end
-
-  # resign-game 
-  def handle_info(%{event: "resign-game", payload: %{username: username}}, socket) do
-    updated_game = Games.resign_game(socket.assigns.game, username)
-
-    socket =
-      socket
-      |> assign(:game, updated_game)
-
-    {:noreply, socket}
   end
 
   def render(assigns) do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
 
-  # Broadcast event for selecting already played Gobbler
-  def handle_event("select-gobbler", %{"gobbler" => gobbler, "row" => row, "col" => col}, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-selected", %{
-      gobbler_name: gobbler,
-      row: row,
-      col: col
-    })
+  # select gobbler
+  def handle_event(
+        "select-gobbler",
+        %{"gobbler" => gobbler_name_str, "row" => row, "col" => col},
+        socket
+      ) do
+    gobbler_name = gobbler_name_str |> String.to_atom()
+    row = String.to_integer(row)
+    col = String.to_integer(col)
+
+    updated_game =
+      socket.assigns.game
+      |> Games.select_already_played_gobbler(gobbler_name, {row, col})
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
 
   # Broadcast event for selecting unselected Gobbler
-  def handle_event("select-gobbler", %{"gobbler" => gobbler}, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-selected", %{
-      gobbler_name: gobbler
-    })
+  def handle_event("select-gobbler", %{"gobbler" => gobbler_name_str}, socket) do
+    gobbler_name = gobbler_name_str |> String.to_atom()
+
+    updated_game =
+      socket.assigns.game
+      |> Games.select_unplayed_gobbler(gobbler_name)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
 
   # Broadcast event: deselect Gobbler
   def handle_event("deselect-gobbler", _, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-deselected", %{})
+    updated_game = Games.deselect_gobbler(socket.assigns.game)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
 
   # Broadcast event: play Gobbler
   def handle_event("play-gobbler", %{"row" => row, "col" => col}, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), "gobbler-played", %{
-      row: row,
-      col: col
-    })
+    row = String.to_integer(row)
+    col = String.to_integer(col)
+
+    updated_game =
+      socket.assigns.game
+      |> Games.play_gobbler({row, col})
+
+    socket = assign(socket, :game, updated_game)
 
     {:noreply, socket}
   end
@@ -221,6 +177,7 @@ defmodule TictactwoWeb.RoomControllerLive do
         %{"username" => username, "color" => color} = _payload,
         socket
       ) do
+
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username,
       color: color
@@ -241,19 +198,17 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # Broadcast event - abort game
-  def handle_event("abort-game" = event, %{"username" => username}, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
-      username: username
-    })
+  def handle_event("abort-game", %{"username" => username}, socket) do
+    socket.assigns.game
+    |> Games.abort_game(username)
 
     redirect_to_lobby(socket)
   end
 
   # Broadcast event - resign game
-  def handle_event("resign-game" = event, %{"username" => username}, socket) do
-    TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
-      username: username
-    })
+  def handle_event("resign-game", %{"username" => username}, socket) do
+    socket.assigns.game
+    |> Games.resign_game(username)
 
     redirect_to_lobby(socket)
   end
