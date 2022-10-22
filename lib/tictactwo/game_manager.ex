@@ -1,7 +1,7 @@
 defmodule Tictactwo.GameManager do
   use GenServer
 
-  alias Tictactwo.{Games, Gobblers}
+  alias Tictactwo.{Games, Gobblers, CurrentGames}
 
   # 5 minutes
   @timeout 300_000
@@ -49,7 +49,6 @@ defmodule Tictactwo.GameManager do
              Tictactwo.DynamicSupervisor,
              {__MODULE__, game}
            ) do
-
       Tictactwo.CurrentGames.add_game(%{
         slug: game.slug,
         blue_username: game.blue_username,
@@ -70,6 +69,10 @@ defmodule Tictactwo.GameManager do
     GenServer.call(via(new_game_state.slug), {:update_game, new_game_state})
   end
 
+  def end_game(updated_game) do
+    GenServer.call(via(updated_game.slug), {:game_ended, updated_game})
+  end
+
   def fetch_players(game_slug) do
     GenServer.call(via(game_slug), :fetch_players)
   end
@@ -84,6 +87,11 @@ defmodule Tictactwo.GameManager do
 
   def handle_call({:update_game, new_game_state}, _from, _old_state) do
     {:reply, new_game_state, new_game_state, @timeout}
+  end
+
+  def handle_call({:game_ended, updated_game}, _from, _old_state) do
+    CurrentGames.remove_game(updated_game.slug)
+    {:reply, updated_game, updated_game, @timeout}
   end
 
   def handle_call(

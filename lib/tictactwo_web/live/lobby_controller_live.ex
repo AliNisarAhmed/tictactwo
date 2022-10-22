@@ -110,7 +110,8 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, socket}
   end
 
-  def handle_info(%{event: "game-added", payload: payload}, socket) do
+  # Handle current games change event
+  def handle_info(%{event: "current-games-updated", payload: payload}, socket) do
     socket =
       socket
       |> assign(:current_games, payload)

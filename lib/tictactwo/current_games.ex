@@ -24,6 +24,10 @@ defmodule Tictactwo.CurrentGames do
     GenServer.cast(__MODULE__, {:add_game, game_info})
   end
 
+  def remove_game(game_slug) do
+    GenServer.cast(__MODULE__, {:remove_game, game_slug})
+  end
+
   # ---------------------------
 
   def handle_cast({:add_game, game_info}, current_games) do
@@ -31,8 +35,20 @@ defmodule Tictactwo.CurrentGames do
       [game_info | current_games]
       |> Enum.take(@current_games_count)
 
-    TictactwoWeb.Endpoint.broadcast(@current_games_topic, "game-added", new_state)
+    broadcast_event(new_state)
 
     {:noreply, new_state}
+  end
+
+  def handle_cast({:remove_game, game_slug}, current_games) do
+    new_state = Enum.filter(current_games, fn game -> game.slug != game_slug end)
+    broadcast_event(new_state)
+    {:noreply, new_state}
+  end
+
+  # ----------------------------
+
+  defp broadcast_event(new_state) do
+    TictactwoWeb.Endpoint.broadcast(@current_games_topic, "current-games-updated", new_state)
   end
 end

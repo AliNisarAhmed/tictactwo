@@ -168,7 +168,7 @@ defmodule Tictactwo.Games do
       game
       |> Map.put(:status, {:aborted, username})
 
-    GameManager.update_game(updated_game)
+    GameManager.end_game(updated_game)
 
     updated_game
   end
@@ -179,7 +179,7 @@ defmodule Tictactwo.Games do
       game
       |> Map.put(:status, {:resigned, username})
 
-    GameManager.update_game(updated_game)
+    GameManager.end_game(updated_game)
 
     updated_game
   end
