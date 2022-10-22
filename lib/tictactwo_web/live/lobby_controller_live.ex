@@ -3,8 +3,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   @type status() :: :challenge_sent | nil
 
-  alias Tictactwo.Presence
-  alias Tictactwo.Games
+  alias Tictactwo.{Presence, Games, CurrentGames}
 
   @lobby_topic "rooms:lobby"
   @events_topic "event_bus:"
@@ -58,7 +57,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(@lobby_topic)
     TictactwoWeb.Endpoint.subscribe(@events_topic <> socket.assigns.current_user.id)
-    TictactwoWeb.Endpoint.subscribe(Tictactwo.CurrentGames.topic())
+    TictactwoWeb.Endpoint.subscribe(CurrentGames.topic())
 
     Presence.track(
       self(),
@@ -70,9 +69,12 @@ defmodule TictactwoWeb.LobbyControllerLive do
       }
     )
 
+    current_games = CurrentGames.get_current_games()
+
     {:noreply,
      assign(socket,
-       loading: false
+       loading: false,
+       current_games: current_games
      )}
   end
 

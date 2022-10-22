@@ -28,7 +28,15 @@ defmodule Tictactwo.CurrentGames do
     GenServer.cast(__MODULE__, {:remove_game, game_slug})
   end
 
+  def get_current_games() do
+    GenServer.call(__MODULE__, :get_current_games)
+  end
+
   # ---------------------------
+
+  def handle_call(:get_current_games, _from, state) do
+    {:reply, state, state}
+  end
 
   def handle_cast({:add_game, game_info}, current_games) do
     new_state =
