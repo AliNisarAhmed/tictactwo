@@ -3,7 +3,8 @@ defmodule Tictactwo.GameManager do
 
   alias Tictactwo.{Games, Gobblers}
 
-  @timeout 300_000 # 5 minutes
+  # 5 minutes
+  @timeout 300_000
 
   def child_spec(game_slug) do
     %{
@@ -48,6 +49,13 @@ defmodule Tictactwo.GameManager do
              Tictactwo.DynamicSupervisor,
              {__MODULE__, game}
            ) do
+
+      Tictactwo.CurrentGames.add_game(%{
+        slug: game.slug,
+        blue_username: game.blue_username,
+        orange_username: game.orange_username
+      })
+
       {:ok, game}
     else
       error -> {:error, "failed to start the game #{error}"}
@@ -93,11 +101,7 @@ defmodule Tictactwo.GameManager do
   end
 
   defp via(game_slug) do
-    {
-      :via,
-      Registry,
-      {Tictactwo.Registry.GameManager, game_slug}
-    }
+    Tictactwo.GameRegistry.via(game_slug)
   end
 
   defp generate_slug(length \\ 12) do
