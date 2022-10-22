@@ -17,7 +17,8 @@ defmodule TictactwoWeb.LobbyControllerLive do
        loading: true,
        current_user: session["current_user"],
        users: %{},
-       challenges: []
+       challenges: [],
+       current_games: []
      )}
   end
 
@@ -42,7 +43,6 @@ defmodule TictactwoWeb.LobbyControllerLive do
         %{"challenger-username" => challenger_username, "challenger-id" => challenger_id},
         socket
       ) do
-
     game_slug = Games.new_game(:blue, socket.assigns.current_user.username, challenger_username)
 
     TictactwoWeb.Endpoint.broadcast(@events_topic <> challenger_id, "challenge-accepted", %{
@@ -58,6 +58,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(@lobby_topic)
     TictactwoWeb.Endpoint.subscribe(@events_topic <> socket.assigns.current_user.id)
+    TictactwoWeb.Endpoint.subscribe(Tictactwo.CurrentGames.topic())
 
     Presence.track(
       self(),
@@ -88,7 +89,10 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, challenges: [payload.challenger | socket.assigns.challenges])}
   end
 
-  def handle_info(%{event: "challenge-accepted", payload: %{userid: userid, game_slug: game_slug}}, socket) do
+  def handle_info(
+        %{event: "challenge-accepted", payload: %{userid: userid, game_slug: game_slug}},
+        socket
+      ) do
     # redirect owner to the game room
     socket = push_redirect(socket, to: "/rooms/#{game_slug}")
 
@@ -102,6 +106,14 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   def handle_info(%{event: "room-created", payload: %{game_slug: game_slug}}, socket) do
     socket = push_redirect(socket, to: "/rooms/#{game_slug}")
+
+    {:noreply, socket}
+  end
+
+  def handle_info(%{event: "game-added", payload: payload}, socket) do
+    socket =
+      socket
+      |> assign(:current_games, payload)
 
     {:noreply, socket}
   end
