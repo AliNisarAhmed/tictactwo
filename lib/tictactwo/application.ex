@@ -20,8 +20,10 @@ defmodule Tictactwo.Application do
       Tictactwo.Presence,
       # Start a worker by calling: Tictactwo.Worker.start_link(arg)
       # {Tictactwo.Worker, arg}
-      {Registry, [name: Tictactwo.Registry.GameManager, keys: :unique]},
-      {DynamicSupervisor, [name: Tictactwo.DynamicSupervisor, strategy: :one_for_one]}
+      # {Registry, [name: Tictactwo.Registry.GameManager, keys: :unique]},
+      {Tictactwo.GameRegistry, [name: Tictactwo.GameRegistry, keys: :unique]},
+      {DynamicSupervisor, [name: Tictactwo.DynamicSupervisor, strategy: :one_for_one]},
+      Tictactwo.CurrentGames
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
