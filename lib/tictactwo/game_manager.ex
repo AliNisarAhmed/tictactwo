@@ -4,7 +4,8 @@ defmodule Tictactwo.GameManager do
   alias Tictactwo.{Games, Gobblers, CurrentGames}
 
   # 5 minutes
-  @timeout 300_000
+  # @timeout 300_000
+  @timeout 60_000
 
   def child_spec(game_slug) do
     %{
@@ -103,9 +104,10 @@ defmodule Tictactwo.GameManager do
   end
 
   # handle timeout
-  def handle_info(:timeout, state) do
+  def handle_info(:timeout, game) do
     DynamicSupervisor.terminate_child(Tictactwo.DynamicSupervisor, self())
-    {:stop, :timed_out, state}
+    CurrentGames.remove_game(game.slug)
+    {:stop, :timed_out, game}
   end
 
   defp via(game_slug) do

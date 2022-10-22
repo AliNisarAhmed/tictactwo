@@ -63,7 +63,10 @@ defmodule Tictactwo.Games do
       |> update_game_status()
       |> toggle_player_turn()
 
-    GameManager.update_game(updated_game)
+    cond do
+      updated_game.status in [:blue_won, :orange_won] -> GameManager.end_game(updated_game)
+      true -> GameManager.update_game(updated_game)
+    end
 
     updated_game
   end
