@@ -12,6 +12,9 @@ defmodule TictactwoWeb.Components.Player do
           <span>
             <%= show_player_name(@game, @color) %> 
           </span>
+          <span>
+            <%= @move_timer %>
+          </span>
         </div>
         <Gobbler.list
           game={@game}
