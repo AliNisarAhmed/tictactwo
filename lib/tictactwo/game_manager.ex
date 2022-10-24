@@ -1,12 +1,13 @@
 defmodule Tictactwo.GameManager do
   use GenServer
 
-  alias Tictactwo.{Games, Gobblers, CurrentGames}
+  alias Tictactwo.{Games, Gobblers, CurrentGames, TimeKeeper, GameSupervisor}
 
   # 5 minutes
   # @timeout 300_000
   @timeout 60_000
   @room_topic "rooms:"
+  @time_topic "time:"
 
   def child_spec(game_slug) do
     %{
@@ -25,6 +26,7 @@ defmodule Tictactwo.GameManager do
   end
 
   def init(game) do
+    send(self(), :after_join)
     {:ok, game, @timeout}
   end
 
@@ -49,7 +51,7 @@ defmodule Tictactwo.GameManager do
     with {:ok, _} <-
            DynamicSupervisor.start_child(
              Tictactwo.DynamicSupervisor,
-             {__MODULE__, game}
+             {GameSupervisor, game}
            ) do
       Tictactwo.CurrentGames.add_game(%{
         slug: game.slug,
@@ -106,12 +108,32 @@ defmodule Tictactwo.GameManager do
     {:reply, {blue_username, orange_username}, game, @timeout}
   end
 
+  def handle_info(:after_join, game) do
+    TictactwoWeb.Endpoint.subscribe(TimeKeeper.topic(game.slug))
+    {:noreply, game}
+  end
+
   # handle timeout
   def handle_info(:timeout, game) do
     DynamicSupervisor.terminate_child(Tictactwo.DynamicSupervisor, self())
     CurrentGames.remove_game(game.slug)
     {:stop, :timed_out, game}
   end
+
+  def handle_info(%{event: "tick", payload: payload}, game) do
+    broadcast_time_update(game, payload)
+    {:noreply, game}
+  end
+
+  def handle_info(%{event: "time-ran-out", payload: payload}, game) do
+    updated_game = Games.time_ran_out(game)
+    broadcast_time_update(updated_game, payload)
+    broadcast_game_update(updated_game)
+    CurrentGames.remove_game(game.slug)
+    {:noreply, updated_game}
+  end
+
+  # -------------------------------------------------------------
 
   defp via(game_slug) do
     Tictactwo.GameRegistry.via(game_slug)
@@ -123,11 +145,19 @@ defmodule Tictactwo.GameManager do
     |> binary_part(0, length)
   end
 
-  defp broadcast_game_update(game) do 
+  defp broadcast_game_update(game) do
     TictactwoWeb.Endpoint.broadcast(topic(game), "game-updated", game)
+  end
+
+  defp broadcast_time_update(game, time_payload) do
+    TictactwoWeb.Endpoint.broadcast(time_topic(game), "time-updated", time_payload)
   end
 
   defp topic(game) do
     @room_topic <> "#{game.slug}"
+  end
+
+  defp time_topic(game) do
+    @time_topic <> "#{game.slug}"
   end
 end

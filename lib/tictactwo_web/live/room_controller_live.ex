@@ -1,5 +1,6 @@
 defmodule TictactwoWeb.RoomControllerLive do
   @room_topic "rooms:"
+  @time_topic "time:"
   @time_per_move 25
 
   use TictactwoWeb, :live_view
@@ -41,8 +42,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(topic(socket))
-
-    :timer.send_interval(1000, self(), :move_tick)
+    TictactwoWeb.Endpoint.subscribe(time_topic(socket.assigns.game))
 
     Presence.track(
       self(),
@@ -54,16 +54,6 @@ defmodule TictactwoWeb.RoomControllerLive do
         user_type: socket.assigns.user_type
       }
     )
-
-    {:noreply, socket}
-  end
-
-  def handle_info(:move_tick, socket) do
-    socket =
-      socket
-      |> update(:move_timers, fn timers ->
-        Map.update(timers, socket.assigns.game.player_turn, 0, fn time -> time - 1 end)
-      end)
 
     {:noreply, socket}
   end
@@ -89,6 +79,21 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
+  # time updated
+  def handle_info(%{event: "time-updated", payload: %{current_time: current_time}}, socket) do
+    socket =
+      socket
+      |> update(:move_timers, fn timers ->
+        Map.replace(
+          timers,
+          socket.assigns.game.player_turn,
+          current_time
+        )
+      end)
+
+    {:noreply, socket}
+  end
+
   # gobbler-played
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
     row = String.to_integer(row)
@@ -97,16 +102,6 @@ defmodule TictactwoWeb.RoomControllerLive do
     updated_game =
       socket.assigns.game
       |> Games.play_gobbler({row, col})
-
-    socket =
-      socket
-      |> update(:move_timers, fn timers ->
-        Map.replace(
-          timers,
-          RoomView.toggle_player_turn(socket.assigns.game.player_turn),
-          @time_per_move
-        )
-      end)
 
     socket =
       socket
@@ -189,12 +184,6 @@ defmodule TictactwoWeb.RoomControllerLive do
     row = String.to_integer(row)
     col = String.to_integer(col)
 
-    socket =
-      socket
-      |> update(:move_timers, fn timers ->
-        Map.replace(timers, socket.assigns.game.player_turn, @time_per_move)
-      end)
-
     updated_game =
       socket.assigns.game
       |> Games.play_gobbler({row, col})
@@ -264,5 +253,9 @@ defmodule TictactwoWeb.RoomControllerLive do
     |> Presence.list()
     |> Map.values()
     |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
+  end
+
+  defp time_topic(game) do
+    @time_topic <> "#{game.slug}"
   end
 end
