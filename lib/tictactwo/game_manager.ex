@@ -69,8 +69,8 @@ defmodule Tictactwo.GameManager do
     GenServer.call(via(game_slug), :get_game)
   end
 
-  def update_game(new_game_state) do
-    GenServer.call(via(new_game_state.slug), {:update_game, new_game_state})
+  def update_game(new_game_state, opts \\ []) do
+    GenServer.call(via(new_game_state.slug), {:update_game, new_game_state, opts})
   end
 
   def end_game(updated_game) do
@@ -89,8 +89,13 @@ defmodule Tictactwo.GameManager do
     {:reply, game, game, @timeout}
   end
 
-  def handle_call({:update_game, new_game_state}, _from, _old_state) do
+  def handle_call({:update_game, new_game_state, opts}, _from, _old_state) do
     broadcast_game_update(new_game_state)
+
+    if Keyword.get(opts, :reset_timers) do
+      broadcast_time_reset(new_game_state)
+    end
+
     {:reply, new_game_state, new_game_state, @timeout}
   end
 
@@ -109,7 +114,7 @@ defmodule Tictactwo.GameManager do
   end
 
   def handle_info(:after_join, game) do
-    TictactwoWeb.Endpoint.subscribe(TimeKeeper.topic(game.slug))
+    TictactwoWeb.Endpoint.subscribe(TimeKeeper.timer_publish_topic(game.slug))
     {:noreply, game}
   end
 
@@ -151,6 +156,10 @@ defmodule Tictactwo.GameManager do
 
   defp broadcast_time_update(game, time_payload) do
     TictactwoWeb.Endpoint.broadcast(time_topic(game), "time-updated", time_payload)
+  end
+
+  defp broadcast_time_reset(game) do
+    TictactwoWeb.Endpoint.broadcast(TimeKeeper.timer_incoming_topic(game.slug), "reset-time", nil)
   end
 
   defp topic(game) do

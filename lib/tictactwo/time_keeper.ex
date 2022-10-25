@@ -33,6 +33,7 @@ defmodule Tictactwo.TimeKeeper do
   end
 
   def handle_info(:after_join, state) do
+    TictactwoWeb.Endpoint.subscribe(timer_incoming_topic(state.game_slug))
     {:ok, timerRef} = :timer.send_interval(1000, self(), :tick)
     {:noreply, Map.replace(state, :timerRef, timerRef)}
   end
@@ -52,13 +53,22 @@ defmodule Tictactwo.TimeKeeper do
     {:noreply, new_state}
   end
 
-  def topic(game_slug) do
-    "time-#{game_slug}"
+  def handle_info(%{event: "reset-time"}, state) do
+    new_state = Map.replace(state, :current_time, @time_per_move)
+    {:noreply, new_state}
+  end
+
+  def timer_publish_topic(game_slug) do
+    "timer-#{game_slug}-updates"
+  end
+
+  def timer_incoming_topic(game_slug) do
+    "timer-#{game_slug}-incoming"
   end
 
   defp publish_time_event(event, msg, game_slug) do
     TictactwoWeb.Endpoint.broadcast(
-      topic(game_slug),
+      timer_publish_topic(game_slug),
       event,
       msg
     )

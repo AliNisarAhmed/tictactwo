@@ -78,7 +78,7 @@ defmodule Tictactwo.Games do
 
     cond do
       updated_game.status in [:blue_won, :orange_won] -> GameManager.end_game(updated_game)
-      true -> GameManager.update_game(updated_game)
+      true -> GameManager.update_game(updated_game, reset_timers: true)
     end
 
     updated_game

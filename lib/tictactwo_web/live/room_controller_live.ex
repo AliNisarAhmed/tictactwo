@@ -26,10 +26,7 @@ defmodule TictactwoWeb.RoomControllerLive do
         user_type: user_type,
         game: game,
         spectator_count: 0,
-        move_timers: %{
-          blue: @time_per_move,
-          orange: @time_per_move
-        }
+        move_timers: default_move_timers()
       )
 
     {:ok, socket}
@@ -106,6 +103,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     socket =
       socket
       |> assign(:game, updated_game)
+      |> assign(:move_timers, default_move_timers())
 
     {:noreply, socket}
   end
@@ -184,11 +182,17 @@ defmodule TictactwoWeb.RoomControllerLive do
     row = String.to_integer(row)
     col = String.to_integer(col)
 
+    socket = 
+      socket
+      |> assign(:move_timers, default_move_timers())
+
     updated_game =
       socket.assigns.game
       |> Games.play_gobbler({row, col})
 
-    socket = assign(socket, :game, updated_game)
+    socket = 
+      socket 
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
@@ -257,5 +261,9 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   defp time_topic(game) do
     @time_topic <> "#{game.slug}"
+  end
+
+  defp default_move_timers() do 
+    %{blue: @time_per_move, orange: @time_per_move}
   end
 end
