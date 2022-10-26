@@ -25,8 +25,7 @@ defmodule TictactwoWeb.RoomControllerLive do
         current_user: current_user,
         user_type: user_type,
         game: game,
-        spectator_count: 0,
-        move_timers: default_move_timers()
+        spectator_count: 0
       )
 
     {:ok, socket}
@@ -77,19 +76,19 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   # time updated
-  def handle_info(%{event: "time-updated", payload: %{current_time: current_time}}, socket) do
-    socket =
-      socket
-      |> update(:move_timers, fn timers ->
-        Map.replace(
-          timers,
-          socket.assigns.game.player_turn,
-          current_time
-        )
-      end)
-
-    {:noreply, socket}
-  end
+  # def handle_info(%{event: "time-updated", payload: %{current_time: current_time}}, socket) do
+  #   socket =
+  #     socket
+  #     |> update(:move_timers, fn timers ->
+  #       Map.replace(
+  #         timers,
+  #         socket.assigns.game.player_turn,
+  #         current_time
+  #       )
+  #     end)
+  #
+  #   {:noreply, socket}
+  # end
 
   # gobbler-played
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
@@ -103,7 +102,8 @@ defmodule TictactwoWeb.RoomControllerLive do
     socket =
       socket
       |> assign(:game, updated_game)
-      |> assign(:move_timers, default_move_timers())
+
+    # |> assign(:move_timers, default_move_timers())
 
     {:noreply, socket}
   end
@@ -182,16 +182,16 @@ defmodule TictactwoWeb.RoomControllerLive do
     row = String.to_integer(row)
     col = String.to_integer(col)
 
-    socket = 
-      socket
-      |> assign(:move_timers, default_move_timers())
+    # socket = 
+    #   socket
+    #   |> assign(:move_timers, default_move_timers())
 
     updated_game =
       socket.assigns.game
       |> Games.play_gobbler({row, col})
 
-    socket = 
-      socket 
+    socket =
+      socket
       |> assign(:game, updated_game)
 
     {:noreply, socket}
@@ -261,9 +261,5 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   defp time_topic(game) do
     @time_topic <> "#{game.slug}"
-  end
-
-  defp default_move_timers() do 
-    %{blue: @time_per_move, orange: @time_per_move}
   end
 end

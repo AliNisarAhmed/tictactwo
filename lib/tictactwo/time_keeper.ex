@@ -58,7 +58,16 @@ defmodule Tictactwo.TimeKeeper do
     {:noreply, new_state}
   end
 
-  def timer_publish_topic(game_slug) do
+  def handle_info(%{event: "stop-time"}, state) do
+    if state.timerRef do
+      :timer.cancel(state.timerRef)
+    end
+
+    state = Map.replace(state, :timerRef, nil)
+    {:noreply, state}
+  end
+
+  def timer_updates_topic(game_slug) do
     "timer-#{game_slug}-updates"
   end
 
@@ -68,7 +77,7 @@ defmodule Tictactwo.TimeKeeper do
 
   defp publish_time_event(event, msg, game_slug) do
     TictactwoWeb.Endpoint.broadcast(
-      timer_publish_topic(game_slug),
+      timer_updates_topic(game_slug),
       event,
       msg
     )

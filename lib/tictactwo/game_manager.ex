@@ -1,6 +1,8 @@
 defmodule Tictactwo.GameManager do
   use GenServer
 
+  use Tictactwo.Types
+
   alias Tictactwo.{Games, Gobblers, CurrentGames, TimeKeeper, GameSupervisor}
 
   # 5 minutes
@@ -8,6 +10,7 @@ defmodule Tictactwo.GameManager do
   @timeout 60_000
   @room_topic "rooms:"
   @time_topic "time:"
+  @time_per_move 10
 
   def child_spec(game_slug) do
     %{
@@ -45,7 +48,8 @@ defmodule Tictactwo.GameManager do
       blue: new_gobblers,
       orange: new_gobblers,
       selected_gobbler: nil,
-      rematch_offered_by: nil
+      rematch_offered_by: nil,
+      timers: default_timers()
     }
 
     with {:ok, _} <-
@@ -114,20 +118,37 @@ defmodule Tictactwo.GameManager do
   end
 
   def handle_info(:after_join, game) do
-    TictactwoWeb.Endpoint.subscribe(TimeKeeper.timer_publish_topic(game.slug))
+    TictactwoWeb.Endpoint.subscribe(TimeKeeper.timer_updates_topic(game.slug))
     {:noreply, game}
   end
 
-  # handle timeout
+  # handle process message timeout
   def handle_info(:timeout, game) do
     DynamicSupervisor.terminate_child(Tictactwo.DynamicSupervisor, self())
     CurrentGames.remove_game(game.slug)
     {:stop, :timed_out, game}
   end
 
-  def handle_info(%{event: "tick", payload: payload}, game) do
-    broadcast_time_update(game, payload)
-    {:noreply, game}
+  # handle "tick" on each second
+  def handle_info(%{event: "tick"}, game) do
+    updated_timers = Map.update!(game.timers, game.player_turn, fn v -> v - 1 end)
+
+    if Map.get(updated_timers, game.player_turn) == 0 do
+      # player_turn lost the game, stop the timer and end the game
+      updated_game =
+        game
+        |> Map.replace(:timers, updated_timers)
+        |> Map.replace(:status, player_lost_on_time(game.player_turn))
+
+      broadcast_game_update(updated_game)
+      CurrentGames.remove_game(updated_game.slug)
+      broadcast_time_stop(updated_game)
+      {:noreply, updated_game}
+    else
+      updated_game = Map.replace(game, :timers, updated_timers)
+      broadcast_game_update(updated_game)
+      {:noreply, updated_game}
+    end
   end
 
   def handle_info(%{event: "time-ran-out", payload: payload}, game) do
@@ -162,6 +183,10 @@ defmodule Tictactwo.GameManager do
     TictactwoWeb.Endpoint.broadcast(TimeKeeper.timer_incoming_topic(game.slug), "reset-time", nil)
   end
 
+  defp broadcast_time_stop(game) do
+    TictactwoWeb.Endpoint.broadcast(TimeKeeper.timer_incoming_topic(game.slug), "stop-time", nil)
+  end
+
   defp topic(game) do
     @room_topic <> "#{game.slug}"
   end
@@ -169,4 +194,12 @@ defmodule Tictactwo.GameManager do
   defp time_topic(game) do
     @time_topic <> "#{game.slug}"
   end
+
+  defp default_timers() do
+    %{blue: @time_per_move, orange: @time_per_move}
+  end
+
+  @spec player_lost_on_time(player :: player()) :: game_status()
+  defp player_lost_on_time(:orange), do: :blue_won
+  defp player_lost_on_time(:blue), do: :orange_won
 end
