@@ -54,7 +54,14 @@ defmodule Tictactwo.TimeKeeper do
   end
 
   def handle_info(%{event: "reset-time"}, state) do
-    new_state = Map.replace(state, :current_time, @time_per_move)
+    :timer.cancel(state.timerRef)
+    {:ok, new_timer_ref} = :timer.send_interval(1000, self(), :tick)
+
+    new_state =
+      state
+      |> Map.replace(:current_time, @time_per_move)
+      |> Map.replace(:timerRef, new_timer_ref)
+
     {:noreply, new_state}
   end
 

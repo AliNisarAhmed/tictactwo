@@ -94,13 +94,15 @@ defmodule Tictactwo.GameManager do
   end
 
   def handle_call({:update_game, new_game_state, opts}, _from, _old_state) do
-    broadcast_game_update(new_game_state)
-
     if Keyword.get(opts, :reset_timers) do
+      new_game_state = %{new_game_state | timers: default_timers()}
       broadcast_time_reset(new_game_state)
+      broadcast_game_update(new_game_state)
+      {:reply, new_game_state, new_game_state, @timeout}
+    else
+      broadcast_game_update(new_game_state)
+      {:reply, new_game_state, new_game_state, @timeout}
     end
-
-    {:reply, new_game_state, new_game_state, @timeout}
   end
 
   def handle_call({:game_ended, updated_game}, _from, _old_state) do

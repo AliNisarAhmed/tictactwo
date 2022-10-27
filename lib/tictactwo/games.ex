@@ -12,11 +12,6 @@ defmodule Tictactwo.Games do
     end
   end
 
-  def time_ran_out(game) do
-    game
-    |> Map.replace(:status, player_lost_on_time(game.player_turn))
-  end
-
   @spec select_already_played_gobbler(
           game :: game(),
           gobbler_name :: gobbler_name(),
@@ -502,7 +497,4 @@ defmodule Tictactwo.Games do
     %{coords: {row, col}, gobblers: []}
   end
 
-  @spec player_lost_on_time(player :: player()) :: game_status()
-  defp player_lost_on_time(:orange), do: :blue_won
-  defp player_lost_on_time(:blue), do: :orange_won
 end

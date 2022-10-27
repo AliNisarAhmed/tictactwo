@@ -1,12 +1,10 @@
 defmodule TictactwoWeb.RoomControllerLive do
   @room_topic "rooms:"
   @time_topic "time:"
-  @time_per_move 25
 
   use TictactwoWeb, :live_view
 
   alias Tictactwo.{Presence, Games}
-  alias TictactwoWeb.RoomView
 
   def mount(params, session, socket) do
     if connected?(socket), do: send(self(), :after_join)
@@ -75,21 +73,6 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  # time updated
-  # def handle_info(%{event: "time-updated", payload: %{current_time: current_time}}, socket) do
-  #   socket =
-  #     socket
-  #     |> update(:move_timers, fn timers ->
-  #       Map.replace(
-  #         timers,
-  #         socket.assigns.game.player_turn,
-  #         current_time
-  #       )
-  #     end)
-  #
-  #   {:noreply, socket}
-  # end
-
   # gobbler-played
   def handle_info(%{event: "gobbler-played", payload: %{row: row, col: col}}, socket) do
     row = String.to_integer(row)
@@ -102,8 +85,6 @@ defmodule TictactwoWeb.RoomControllerLive do
     socket =
       socket
       |> assign(:game, updated_game)
-
-    # |> assign(:move_timers, default_move_timers())
 
     {:noreply, socket}
   end
@@ -181,10 +162,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   def handle_event("play-gobbler", %{"row" => row, "col" => col}, socket) do
     row = String.to_integer(row)
     col = String.to_integer(col)
-
-    # socket = 
-    #   socket
-    #   |> assign(:move_timers, default_move_timers())
 
     updated_game =
       socket.assigns.game
