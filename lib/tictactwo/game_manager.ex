@@ -107,6 +107,7 @@ defmodule Tictactwo.GameManager do
 
   def handle_call({:game_ended, updated_game}, _from, _old_state) do
     broadcast_game_update(updated_game)
+    broadcast_time_stop(updated_game)
     CurrentGames.remove_game(updated_game.slug)
     {:reply, updated_game, updated_game, @timeout}
   end
