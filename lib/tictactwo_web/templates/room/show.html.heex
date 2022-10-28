@@ -26,7 +26,11 @@
 
 <section class="grid grid-rows-[1fr_2fr_1fr]">
 
-	<View.play game={@game} user_type={@user_type} />
+	<View.play
+		game={@game}
+		user_type={@user_type}
+		move_timers={@game.timers}
+	/>
 
 </section>
 

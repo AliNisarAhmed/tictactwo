@@ -1,10 +1,10 @@
 defmodule TictactwoWeb.RoomControllerLive do
   @room_topic "rooms:"
+  @time_topic "time:"
 
   use TictactwoWeb, :live_view
 
-  alias Tictactwo.Presence
-  alias Tictactwo.Games
+  alias Tictactwo.{Presence, Games}
 
   def mount(params, session, socket) do
     if connected?(socket), do: send(self(), :after_join)
@@ -36,6 +36,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(topic(socket))
+    TictactwoWeb.Endpoint.subscribe(time_topic(socket.assigns.game))
 
     Presence.track(
       self(),
@@ -166,7 +167,9 @@ defmodule TictactwoWeb.RoomControllerLive do
       socket.assigns.game
       |> Games.play_gobbler({row, col})
 
-    socket = assign(socket, :game, updated_game)
+    socket =
+      socket
+      |> assign(:game, updated_game)
 
     {:noreply, socket}
   end
@@ -177,7 +180,6 @@ defmodule TictactwoWeb.RoomControllerLive do
         %{"username" => username, "color" => color} = _payload,
         socket
       ) do
-
     TictactwoWeb.Endpoint.broadcast(topic(socket), event, %{
       username: username,
       color: color
@@ -232,5 +234,9 @@ defmodule TictactwoWeb.RoomControllerLive do
     |> Presence.list()
     |> Map.values()
     |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
+  end
+
+  defp time_topic(game) do
+    @time_topic <> "#{game.slug}"
   end
 end

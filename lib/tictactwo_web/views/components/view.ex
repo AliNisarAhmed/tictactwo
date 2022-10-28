@@ -11,24 +11,31 @@ defmodule TictactwoWeb.Components.View do
         <.spectator 
           game={@game}
           user_type={@user_type}
+          move_timers={@move_timers}
         />
       <% else %> 
         <.player 
           game={@game}
           user_type={@user_type}
+          move_timers={@move_timers}
         />
       <% end %>
     """
   end
 
   def player(assigns) do
+    assigns = 
+      assigns 
+      |> assign(:opponent_type, toggle_user_type(assigns.user_type))
+
     ~H"""
 
     <Player.info
       game={@game}
       current_user={@user_type}
-      display_user={toggle_user_type(@user_type)}
-      color={get_current_user_color_type(toggle_user_type(@user_type))}
+      display_user={@opponent_type}
+      color={get_current_user_color_type(@opponent_type)}
+      move_timer={@move_timers[@opponent_type]}
       class="row-start-1 row-end-2"
     />
     <Board.draw_board 
@@ -41,6 +48,7 @@ defmodule TictactwoWeb.Components.View do
       current_user={@user_type}
       display_user={@user_type}
       color={get_current_user_color_type(@user_type)}
+      move_timer={@move_timers[@user_type]}
       class="row-start-3 row-end-4"
     />
     """
@@ -53,6 +61,7 @@ defmodule TictactwoWeb.Components.View do
       current_user={@user_type}
       display_user={:orange}
       color="orange"
+      move_timer={@move_timers.orange}
       class="row-start-1 row-end-2"
     />
     <Board.draw_board 
@@ -64,6 +73,7 @@ defmodule TictactwoWeb.Components.View do
     game={@game} 
     current_user={@user_type}
     display_user={:blue}
+    move_timer={@move_timers.blue}
     color="blue"
     class="row-start-3 row-end-4"
     />

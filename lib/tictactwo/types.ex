@@ -38,7 +38,11 @@ defmodule Tictactwo.Types do
               blue: [gobbler()],
               orange: [gobbler()],
               cells: [cell()],
-              selected_gobbler: selected_gobbler()
+              selected_gobbler: selected_gobbler(),
+              timers: %{
+                blue: pos_integer(),
+                orange: pos_integer()
+              }
             }
       @type viewer_type :: :blue | :orange | :spectator
       @type current_user :: %{username: String.t()}
