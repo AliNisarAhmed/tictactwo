@@ -9,7 +9,6 @@ defmodule Tictactwo.GameManager do
   # @timeout 300_000
   @timeout 60_000
   @room_topic "rooms:"
-  @time_topic "time:"
   @time_per_move 10
 
   def child_spec(game_slug) do
@@ -154,14 +153,6 @@ defmodule Tictactwo.GameManager do
     end
   end
 
-  def handle_info(%{event: "time-ran-out", payload: payload}, game) do
-    updated_game = Games.time_ran_out(game)
-    broadcast_time_update(updated_game, payload)
-    broadcast_game_update(updated_game)
-    CurrentGames.remove_game(game.slug)
-    {:noreply, updated_game}
-  end
-
   # -------------------------------------------------------------
 
   defp via(game_slug) do
@@ -178,10 +169,6 @@ defmodule Tictactwo.GameManager do
     TictactwoWeb.Endpoint.broadcast(topic(game), "game-updated", game)
   end
 
-  defp broadcast_time_update(game, time_payload) do
-    TictactwoWeb.Endpoint.broadcast(time_topic(game), "time-updated", time_payload)
-  end
-
   defp broadcast_time_reset(game) do
     TictactwoWeb.Endpoint.broadcast(TimeKeeper.timer_incoming_topic(game.slug), "reset-time", nil)
   end
@@ -192,10 +179,6 @@ defmodule Tictactwo.GameManager do
 
   defp topic(game) do
     @room_topic <> "#{game.slug}"
-  end
-
-  defp time_topic(game) do
-    @time_topic <> "#{game.slug}"
   end
 
   defp default_timers() do
