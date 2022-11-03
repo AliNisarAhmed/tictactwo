@@ -1,11 +1,14 @@
 defmodule TictactwoWeb.LobbyControllerLive do
   use TictactwoWeb, :live_view
 
-  @type status() :: :challenge_sent | nil
+  use Tictactwo.Types
 
   alias Tictactwo.{Presence, Games, CurrentGames}
 
+  # General lobby events like chats, presence tracking
   @lobby_topic "rooms:lobby"
+
+  # Used by each player in combination with their IDs to receive personal events
   @events_topic "event_bus:"
 
   def mount(_params, session, socket) do
@@ -22,6 +25,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
      )}
   end
 
+  # when a user clicks "challenge user" button
   def handle_event("challenge-user", %{"userid" => userid}, socket) do
     users =
       socket.assigns.users
@@ -38,6 +42,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, users: users)}
   end
 
+  # when a user accepts a challenge
   def handle_event(
         "accept-challenge",
         %{"challenger-username" => challenger_username, "challenger-id" => challenger_id},
@@ -97,21 +102,17 @@ defmodule TictactwoWeb.LobbyControllerLive do
         %{event: "challenge-accepted", payload: %{userid: userid, game_slug: game_slug}},
         socket
       ) do
-    # redirect owner to the game room
-    socket = push_redirect(socket, to: "/rooms/#{game_slug}")
-
     # send the other player an event to join the room
     TictactwoWeb.Endpoint.broadcast(@events_topic <> userid, "room-created", %{
       game_slug: game_slug
     })
 
-    {:noreply, socket}
+    # redirect the challenger to the game room
+    {:noreply, redirect_to_game(socket, game_slug)}
   end
 
   def handle_info(%{event: "room-created", payload: %{game_slug: game_slug}}, socket) do
-    socket = push_redirect(socket, to: "/rooms/#{game_slug}")
-
-    {:noreply, socket}
+    {:noreply, redirect_to_game(socket, game_slug)}
   end
 
   # Handle current games change event
@@ -128,7 +129,13 @@ defmodule TictactwoWeb.LobbyControllerLive do
     TictactwoWeb.LobbyView.render("show.html", assigns)
   end
 
-  @spec toggle_status(status()) :: status()
+  # ---------- PRIVATE -------------------
+
+  @spec toggle_status(challenge_status()) :: challenge_status()
   defp toggle_status(:challenge_sent), do: nil
   defp toggle_status(_), do: :challenge_sent
+
+  defp redirect_to_game(socket, game_slug) do
+    push_redirect(socket, to: "/rooms/#{game_slug}")
+  end
 end

@@ -46,6 +46,7 @@ defmodule Tictactwo.Types do
             }
       @type viewer_type :: :blue | :orange | :spectator
       @type current_user :: %{username: String.t()}
+      @type challenge_status :: :challenge_sent | nil
     end
   end
 end
