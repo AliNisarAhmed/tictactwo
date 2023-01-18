@@ -5,6 +5,13 @@ defmodule TictactwoWeb.Components.Player do
 
   alias TictactwoWeb.Components.Gobbler
 
+  attr :game, :map, required: true
+  attr :color, :string, required: true
+  attr :move_timer, :map, required: true
+  attr :current_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :display_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :class, :string, default: ""
+
   def info(assigns) do
     assigns =
       assigns
@@ -26,7 +33,7 @@ defmodule TictactwoWeb.Components.Player do
           current_user={@current_user}
           display_user={@display_user}
           color={@color}
-          class="row-start-1 row-end-2"
+          class={@class}
         />
       </div>
     """

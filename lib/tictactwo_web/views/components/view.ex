@@ -5,6 +5,10 @@ defmodule TictactwoWeb.Components.View do
   alias TictactwoWeb.Components.{Player, Board}
   alias PetalComponents.HeroiconsV1
 
+  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :game, :any, required: true
+  attr :move_timers, :map, required: true
+
   def play(assigns) do
     ~H"""
       <%= if @user_type == :spectator do %>
@@ -23,9 +27,13 @@ defmodule TictactwoWeb.Components.View do
     """
   end
 
+  attr :game, :map, required: true
+  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :move_timers, :map, required: true
+
   def player(assigns) do
-    assigns = 
-      assigns 
+    assigns =
+      assigns
       |> assign(:opponent_type, toggle_user_type(assigns.user_type))
 
     ~H"""

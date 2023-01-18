@@ -2,12 +2,15 @@ defmodule TictactwoWeb.Components.Board do
   use Phoenix.Component
 
   import TictactwoWeb.RoomView
-  alias Tictactwo.Games
   alias TictactwoWeb.Components.Gobbler
 
+  attr :class, :string, required: false, default: ""
+  attr :game, :any, required: true
+  attr :current_user, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def draw_board(assigns) do
-    assigns = 
-      assigns 
+    assigns =
+      assigns
       |> assign(:selected_gobbler, assigns.game.selected_gobbler)
 
     ~H"""
@@ -55,9 +58,9 @@ defmodule TictactwoWeb.Components.Board do
     """
   end
 
-  defp can_select_played_gobbler?(game, current_user, gobblers) do 
-    my_turn?(game, current_user) && 
-      can_select?(gobblers, current_user) && 
-        game_not_ended?(game)
+  defp can_select_played_gobbler?(game, current_user, gobblers) do
+    my_turn?(game, current_user) &&
+      can_select?(gobblers, current_user) &&
+      game_not_ended?(game)
   end
 end

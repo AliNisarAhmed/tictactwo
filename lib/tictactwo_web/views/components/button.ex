@@ -3,6 +3,9 @@ defmodule TictactwoWeb.Components.Button do
 
   import PetalComponents.Button
 
+  attr :user_id, :integer, required: true
+  attr :user_data, :map, required: true
+
   def challenge(assigns) do
     ~H"""
       <.button
@@ -21,6 +24,9 @@ defmodule TictactwoWeb.Components.Button do
     """
   end
 
+  attr :challenge, :map, required: true
+  attr :text, :string, required: true
+
   def accept_challenge(assigns) do
     ~H"""
       <.button
@@ -34,6 +40,9 @@ defmodule TictactwoWeb.Components.Button do
       </.button>
     """
   end
+
+  attr :challenge, :map, required: true
+  attr :text, :string, required: true
 
   def reject_challenge(assigns) do
     ~H"""
@@ -60,6 +69,9 @@ defmodule TictactwoWeb.Components.Button do
     """
   end
 
+  attr :current_user, :map, required: true
+  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def offer_rematch(assigns) do
     ~H"""
       <.button 
@@ -73,6 +85,8 @@ defmodule TictactwoWeb.Components.Button do
     """
   end
 
+  attr :current_user, :map, required: true
+
   def abort_game(assigns) do
     ~H"""
       <.button 
@@ -84,6 +98,8 @@ defmodule TictactwoWeb.Components.Button do
       </.button>
     """
   end
+
+  attr :current_user, :map, required: true
 
   def resign_game(assigns) do
     ~H"""

@@ -4,6 +4,9 @@ defmodule TictactwoWeb.Components.GameStatus do
   import TictactwoWeb.RoomView
   alias Tictactwo.Games
 
+  attr :game, :map, required: true
+  attr :current_user, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def show_for_player(assigns) do
     ~H"""
       <div>
@@ -19,6 +22,8 @@ defmodule TictactwoWeb.Components.GameStatus do
       </div>
     """
   end
+
+  attr :game, :map, required: true
 
   def show_for_spectator(assigns) do
     ~H"""

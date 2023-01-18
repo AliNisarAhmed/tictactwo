@@ -4,6 +4,12 @@ defmodule TictactwoWeb.Components.Gobbler do
   import TictactwoWeb.RoomView
   alias Tictactwo.Games
 
+  attr :game, :map, required: true
+  attr :current_user, :map, required: true
+  attr :display_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :color, :string, required: true
+  attr :class, :string, default: ""
+
   def list(assigns) do
     ~H"""
     <div class="flex flex-row w-screen max-w-screen-sm">
