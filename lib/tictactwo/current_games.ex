@@ -42,7 +42,7 @@ defmodule Tictactwo.CurrentGames do
     new_current_games =
       [game_info | current_games]
       |> Enum.take(@current_games_count)
-    
+
     new_state = {count + 1, new_current_games}
     broadcast_event(new_state)
     {:noreply, new_state}

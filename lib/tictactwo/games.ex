@@ -124,6 +124,7 @@ defmodule Tictactwo.Games do
     GameManager.fetch_players(slug)
   end
 
+  @spec get_game_by_slug!(slug :: String.t()) :: game()
   def get_game_by_slug!(slug) do
     GameManager.get_game_by_slug(slug)
   end
@@ -496,5 +497,4 @@ defmodule Tictactwo.Games do
   defp gen_empty_cell(row, col) do
     %{coords: {row, col}, gobblers: []}
   end
-
 end
