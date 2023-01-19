@@ -6,7 +6,7 @@ defmodule TictactwoWeb.Components.Board do
 
   attr :class, :string, required: false, default: ""
   attr :game, :any, required: true
-  attr :current_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
 
   def draw_board(assigns) do
     assigns =
@@ -22,7 +22,7 @@ defmodule TictactwoWeb.Components.Board do
 
         <%= if is_nil(@selected_gobbler) do %>
 
-          <%= if can_select_played_gobbler?(@game, @current_user, cell.gobblers) do %>
+          <%= if can_select_played_gobbler?(@game, @current_user_type, cell.gobblers) do %>
 
             <Gobbler.board_item 
               game={@game}
@@ -36,7 +36,6 @@ defmodule TictactwoWeb.Components.Board do
     				   <Gobbler.board_item 
                  game={@game}
                  cell={cell}
-                 on_click={nil}
                  disabled={true}
                 />
 
@@ -46,7 +45,7 @@ defmodule TictactwoWeb.Components.Board do
 
            <Gobbler.board_item_selected 
              game={@game}
-             current_user={@current_user}
+             current_user_type={@current_user_type}
              cell={cell}
            />
 

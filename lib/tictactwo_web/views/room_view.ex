@@ -118,7 +118,7 @@ defmodule TictactwoWeb.RoomView do
     end
   end
 
-  @spec is_player?(viewer_type) :: boolean()
+  @spec is_player?(viewer_type()) :: boolean()
   def is_player?(:spectator), do: false
   def is_player?(_), do: true
 

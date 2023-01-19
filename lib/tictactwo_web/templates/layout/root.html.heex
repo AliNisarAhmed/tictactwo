@@ -17,7 +17,7 @@
             <li><a href="/lobby"><h1 class="text-xl">Tic-Tac-Two</h1></a></li>
             <li>
 				      <p class="">Challenges</p>
-				      <p><%= length(assigns[:challenges]) %></p>
+				      <p><%= length(assigns[:challenges] || []) %></p>
             </li>
           </ul>
         </nav>

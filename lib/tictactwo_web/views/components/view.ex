@@ -28,7 +28,7 @@ defmodule TictactwoWeb.Components.View do
   end
 
   attr :game, :map, required: true
-  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :user_type, :atom, required: true, values: [:blue, :orange]
   attr :move_timers, :map, required: true
 
   def player(assigns) do
@@ -40,21 +40,21 @@ defmodule TictactwoWeb.Components.View do
 
     <Player.info
       game={@game}
-      current_user={@user_type}
-      display_user={@opponent_type}
+      current_user_type={@user_type}
+      displayed_user_type={@opponent_type}
       color={get_current_user_color_type(@opponent_type)}
       move_timer={@move_timers[@opponent_type]}
       class="row-start-1 row-end-2"
     />
     <Board.draw_board 
       game={@game} 
-      current_user={@user_type}
+      current_user_type={@user_type}
       class="row-start-2 row-end-3"
     />
     <Player.info
       game={@game} 
-      current_user={@user_type}
-      display_user={@user_type}
+      current_user_type={@user_type}
+      displayed_user_type={@user_type}
       color={get_current_user_color_type(@user_type)}
       move_timer={@move_timers[@user_type]}
       class="row-start-3 row-end-4"
@@ -62,25 +62,29 @@ defmodule TictactwoWeb.Components.View do
     """
   end
 
+  attr :game, :map, required: true
+  attr :user_type, :atom, required: true, values: [:spectator]
+  attr :move_timers, :map, required: true
+
   def spectator(assigns) do
     ~H"""
     <Player.info
       game={@game}
-      current_user={@user_type}
-      display_user={:orange}
+      current_user_type={@user_type}
+      displayed_user_type={:orange}
       color="orange"
       move_timer={@move_timers.orange}
       class="row-start-1 row-end-2"
     />
     <Board.draw_board 
       game={@game} 
-      current_user={@user_type}
+      current_user_type={@user_type}
       class="row-start-2 row-end-3"
     />
     <Player.info
     game={@game} 
-    current_user={@user_type}
-    display_user={:blue}
+    current_user_type={@user_type}
+    displayed_user_type={:blue}
     move_timer={@move_timers.blue}
     color="blue"
     class="row-start-3 row-end-4"

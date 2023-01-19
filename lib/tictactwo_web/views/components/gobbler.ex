@@ -5,8 +5,8 @@ defmodule TictactwoWeb.Components.Gobbler do
   alias Tictactwo.Games
 
   attr :game, :map, required: true
-  attr :current_user, :map, required: true
-  attr :display_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
   attr :color, :string, required: true
   attr :class, :string, default: ""
 
@@ -16,16 +16,16 @@ defmodule TictactwoWeb.Components.Gobbler do
     <div>
       <.selected
         game={@game}
-        current_user={@current_user}
-        display_user={@display_user}
+        current_user_type={@current_user_type}
+        displayed_user_type={@displayed_user_type}
         color={@color}
       />
     </div>
-    <%= for gobbler <- not_selected_gobblers(@game, @display_user) do %>
+    <%= for gobbler <- not_selected_gobblers(@game, @displayed_user_type) do %>
       <.list_item
         game={@game}
-        current_user={@current_user}
-        display_user={@display_user}
+        current_user_type={@current_user_type}
+        displayed_user_type={@displayed_user_type}
         gobbler={gobbler}
         color={@color}
         class={@class}
@@ -35,10 +35,17 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :game, :map, required: true
+  attr :gobbler, :map, required: true
+  attr :color, :string, required: true
+  attr :class, :string, default: ""
+
   def list_item(assigns) do
     ~H"""
       <button
-        disabled={is_button_disabled?(@game, @current_user, @display_user)}
+        disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type)}
         phx-click="select-gobbler"
         phx-value-gobbler={@gobbler.name} >
           <.gobbler_image name={@gobbler.name} color={@color} />
@@ -46,24 +53,34 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :game, :map, required: true
+  attr :color, :string, required: true
+
   def selected(assigns) do
     ~H"""
     <button 
       phx-click="deselect-gobbler"
-      disabled={is_selected_disabled?(@game, @current_user, @display_user)}
+      disabled={is_selected_disabled?(@game, @current_user_type, @displayed_user_type)}
      >
-       <%= if not is_nil(@game.selected_gobbler) and my_turn?(@game, @display_user) do %>
+       <%= if not is_nil(@game.selected_gobbler) and my_turn?(@game, @displayed_user_type) do %>
         <.gobbler_image name={@game.selected_gobbler.name} color={@color} />
        <% end %>
     </button>
     """
   end
 
+  attr :game, :map, required: true
+  attr :cell, :map, required: true
+  attr :on_click, :string, required: false, default: ""
+  attr :disabled, :boolean, required: false, default: false
+  attr :class, :string, required: false, default: ""
+
   def board_item(assigns) do
     assigns =
       assigns
       |> assign(:first_gobbler, first_gobbler(assigns.cell.gobblers))
-      |> assign_new(:class, fn -> "" end)
 
     ~H"""
     <%= if @first_gobbler do %>
@@ -83,10 +100,14 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
+  attr :game, :map, required: true
+  attr :cell, :map, required: true
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def board_item_selected(assigns) do
     assigns =
       assigns
-      |> assign(:my_turn, my_turn?(assigns.game, assigns.current_user))
+      |> assign(:my_turn, my_turn?(assigns.game, assigns.current_user_type))
       |> assign(:move_allowed, Games.move_allowed?(assigns.game, assigns.cell.gobblers))
       |> assign(:played_gobbler_color, played_gobbler_color(assigns.cell.gobblers))
       |> assign(:row_value, elem(assigns.cell.coords, 0))
@@ -142,6 +163,12 @@ defmodule TictactwoWeb.Components.Gobbler do
     """
   end
 
+  attr :row_value, :integer, required: true
+  attr :col_value, :integer, required: true
+  attr :disabled, :boolean, required: true
+  attr :class, :string, required: false, default: ""
+  slot(:inner_block, required: true)
+
   def item_selected_button(assigns) do
     ~H"""
     <button 
@@ -155,6 +182,9 @@ defmodule TictactwoWeb.Components.Gobbler do
     </button>
     """
   end
+
+  attr :name, :string, required: true
+  attr :color, :string, required: true
 
   def gobbler_image(assigns) do
     assigns =

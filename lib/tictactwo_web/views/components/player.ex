@@ -8,8 +8,8 @@ defmodule TictactwoWeb.Components.Player do
   attr :game, :map, required: true
   attr :color, :string, required: true
   attr :move_timer, :map, required: true
-  attr :current_user, :atom, required: true, values: [:blue, :orange, :spectator]
-  attr :display_user, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
   attr :class, :string, default: ""
 
   def info(assigns) do
@@ -30,8 +30,8 @@ defmodule TictactwoWeb.Components.Player do
         </div>
         <Gobbler.list
           game={@game}
-          current_user={@current_user}
-          display_user={@display_user}
+          current_user_type={@current_user_type}
+          displayed_user_type={@displayed_user_type}
           color={@color}
           class={@class}
         />

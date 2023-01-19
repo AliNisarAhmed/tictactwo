@@ -140,7 +140,7 @@ defmodule Tictactwo.Games do
     end
   end
 
-  @spec check_if_player_won?(game :: game(), player :: player()) :: boolean()
+  @spec check_if_player_won?(game :: game(), user_type :: viewer_type()) :: boolean()
   def check_if_player_won?(%{status: :blue_won}, :blue), do: true
   def check_if_player_won?(%{status: :orange_won}, :orange), do: true
   def check_if_player_won?(_game, _player), do: false
