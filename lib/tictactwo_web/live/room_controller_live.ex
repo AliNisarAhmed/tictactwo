@@ -225,6 +225,10 @@ defmodule TictactwoWeb.RoomControllerLive do
     @room_topic <> "#{socket.assigns.game_slug}"
   end
 
+  defp time_topic(game) do
+    @time_topic <> "#{game.slug}"
+  end
+
   defp redirect_to_lobby(socket) do
     {:noreply, push_redirect(socket, to: "/lobby")}
   end
@@ -234,9 +238,5 @@ defmodule TictactwoWeb.RoomControllerLive do
     |> Presence.list()
     |> Map.values()
     |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
-  end
-
-  defp time_topic(game) do
-    @time_topic <> "#{game.slug}"
   end
 end

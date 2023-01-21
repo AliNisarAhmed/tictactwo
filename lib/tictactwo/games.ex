@@ -4,8 +4,7 @@ defmodule Tictactwo.Games do
   alias Tictactwo.{Repo, Gobblers, GameManager}
   alias Tictactwo.Games.Game
 
-  @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) ::
-          String.t()
+  @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) :: slug()
   def new_game(player_turn, blue_username, orange_username) do
     with {:ok, game} <- GameManager.new_game(player_turn, blue_username, orange_username) do
       game.slug
@@ -124,6 +123,7 @@ defmodule Tictactwo.Games do
     GameManager.fetch_players(slug)
   end
 
+  @spec get_game_by_slug!(slug :: slug()) :: game()
   def get_game_by_slug!(slug) do
     GameManager.get_game_by_slug(slug)
   end
@@ -139,7 +139,7 @@ defmodule Tictactwo.Games do
     end
   end
 
-  @spec check_if_player_won?(game :: game(), player :: player()) :: boolean()
+  @spec check_if_player_won?(game :: game(), user_type :: viewer_type()) :: boolean()
   def check_if_player_won?(%{status: :blue_won}, :blue), do: true
   def check_if_player_won?(%{status: :orange_won}, :orange), do: true
   def check_if_player_won?(_game, _player), do: false
@@ -496,5 +496,4 @@ defmodule Tictactwo.Games do
   defp gen_empty_cell(row, col) do
     %{coords: {row, col}, gobblers: []}
   end
-
 end

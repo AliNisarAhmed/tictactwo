@@ -29,8 +29,9 @@ defmodule Tictactwo.Types do
                   name: gobbler_name(),
                   played?: coords() | nil
                 }
+      @type slug :: String.t()
       @type game :: %{
-              slug: String.t(),
+              slug: slug(),
               status: game_status(),
               player_turn: player(),
               blue_username: String.t(),
@@ -46,6 +47,7 @@ defmodule Tictactwo.Types do
             }
       @type viewer_type :: :blue | :orange | :spectator
       @type current_user :: %{username: String.t()}
+      @type challenge_status :: :challenge_sent | nil
     end
   end
 end

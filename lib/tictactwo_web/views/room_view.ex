@@ -19,13 +19,13 @@ defmodule TictactwoWeb.RoomView do
   end
 
   @spec game_not_ended?(game :: game()) :: boolean()
-  def game_not_ended?(game) do 
+  def game_not_ended?(game) do
     game_ready?(game) || game_in_play?(game)
   end
 
   @spec game_ended?(game :: game()) :: boolean()
-  def game_ended?(game) do 
-    not game_not_ended?(game) 
+  def game_ended?(game) do
+    not game_not_ended?(game)
   end
 
   @spec game_in_play?(game :: game()) :: boolean()
@@ -94,7 +94,7 @@ defmodule TictactwoWeb.RoomView do
     end)
   end
 
-  def first_gobbler_selected?(game, cell_coords) do 
+  def first_gobbler_selected?(game, cell_coords) do
     game.selected_gobbler.played? == cell_coords
   end
 
@@ -104,6 +104,7 @@ defmodule TictactwoWeb.RoomView do
   def toggle_player_turn(:blue), do: :orange
   def toggle_player_turn(:orange), do: :blue
 
+  @spec toggle_user_type(viewer_type()) :: viewer_type()
   def toggle_user_type(:spectator), do: :spectator
   def toggle_user_type(x), do: toggle_player_turn(x)
 
@@ -117,7 +118,7 @@ defmodule TictactwoWeb.RoomView do
     end
   end
 
-  @spec is_player?(viewer_type) :: boolean()
+  @spec is_player?(viewer_type()) :: boolean()
   def is_player?(:spectator), do: false
   def is_player?(_), do: true
 
@@ -135,5 +136,4 @@ defmodule TictactwoWeb.RoomView do
     user_type != :spectator and not is_nil(game.rematch_offered_by) and
       game.rematch_offered_by.username != current_user.username
   end
-
 end

@@ -5,6 +5,10 @@ defmodule TictactwoWeb.Components.Controls do
 
   alias TictactwoWeb.Components.Button
 
+  attr :game, :map, required: true
+  attr :current_user, :map, required: true
+  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def panel(assigns) do
     assigns =
       assigns

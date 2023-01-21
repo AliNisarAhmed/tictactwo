@@ -2,12 +2,15 @@ defmodule TictactwoWeb.Components.Board do
   use Phoenix.Component
 
   import TictactwoWeb.RoomView
-  alias Tictactwo.Games
   alias TictactwoWeb.Components.Gobbler
 
+  attr :class, :string, required: false, default: ""
+  attr :game, :any, required: true
+  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+
   def draw_board(assigns) do
-    assigns = 
-      assigns 
+    assigns =
+      assigns
       |> assign(:selected_gobbler, assigns.game.selected_gobbler)
 
     ~H"""
@@ -19,7 +22,7 @@ defmodule TictactwoWeb.Components.Board do
 
         <%= if is_nil(@selected_gobbler) do %>
 
-          <%= if can_select_played_gobbler?(@game, @current_user, cell.gobblers) do %>
+          <%= if can_select_played_gobbler?(@game, @current_user_type, cell.gobblers) do %>
 
             <Gobbler.board_item 
               game={@game}
@@ -33,7 +36,6 @@ defmodule TictactwoWeb.Components.Board do
     				   <Gobbler.board_item 
                  game={@game}
                  cell={cell}
-                 on_click={nil}
                  disabled={true}
                 />
 
@@ -43,7 +45,7 @@ defmodule TictactwoWeb.Components.Board do
 
            <Gobbler.board_item_selected 
              game={@game}
-             current_user={@current_user}
+             current_user_type={@current_user_type}
              cell={cell}
            />
 
@@ -55,9 +57,9 @@ defmodule TictactwoWeb.Components.Board do
     """
   end
 
-  defp can_select_played_gobbler?(game, current_user, gobblers) do 
-    my_turn?(game, current_user) && 
-      can_select?(gobblers, current_user) && 
-        game_not_ended?(game)
+  defp can_select_played_gobbler?(game, current_user, gobblers) do
+    my_turn?(game, current_user) &&
+      can_select?(gobblers, current_user) &&
+      game_not_ended?(game)
   end
 end

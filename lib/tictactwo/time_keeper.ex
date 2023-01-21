@@ -43,12 +43,7 @@ defmodule Tictactwo.TimeKeeper do
       state
       |> Map.update(:current_time, 0, fn prev -> prev - 1 end)
 
-    if new_state.current_time <= 0 do
-      :timer.cancel(state.timerRef)
-      publish_time_event("time-ran-out", %{current_time: 0}, state.game_slug)
-    else
-      publish_time_event("tick", %{current_time: new_state.current_time}, state.game_slug)
-    end
+    publish_time_event("tick", %{current_time: new_state.current_time}, state.game_slug)
 
     {:noreply, new_state}
   end

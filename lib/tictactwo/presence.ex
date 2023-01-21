@@ -6,11 +6,10 @@ defmodule Tictactwo.Presence do
   def list_presences(topic) do
     Presence.list(topic)
     |> Enum.reduce(%{}, fn {user_id, %{metas: [meta | _]}}, acc ->
-      acc
-      |> Map.put(
+      Map.put(
+        acc,
         user_id,
-        meta
-        |> Map.put(:status, nil)
+        Map.put(meta, :status, nil)
       )
     end)
   end
