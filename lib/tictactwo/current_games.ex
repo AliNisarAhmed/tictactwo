@@ -50,7 +50,7 @@ defmodule Tictactwo.CurrentGames do
 
   def handle_cast({:remove_game, game_slug}, {count, current_games} = _state) do
     new_current_games = Enum.filter(current_games, fn game -> game.slug != game_slug end)
-    new_state = {count - 1, new_current_games}
+    new_state = {max(0, count - 1), new_current_games}
     broadcast_event(new_state)
     {:noreply, new_state}
   end
