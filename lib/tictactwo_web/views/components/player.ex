@@ -2,11 +2,12 @@ defmodule TictactwoWeb.Components.Player do
   use Phoenix.Component
 
   import TictactwoWeb.RoomView
+  import PetalComponents.Badge
 
   alias TictactwoWeb.Components.Gobbler
 
   attr :game, :map, required: true
-  attr :color, :string, required: true
+  attr :color, :string, required: true, values: ["primary", "secondary"]
   attr :move_timer, :map, required: true
   attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
   attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
@@ -22,7 +23,10 @@ defmodule TictactwoWeb.Components.Player do
       <div>
         <div class="flex justify-between">
           <span>
-            <%= show_player_name(@game, @color) %> 
+            <%= show_player_name(@game, @displayed_user_type) %> 
+          <.badge color={get_current_user_color_type(@displayed_user_type)}>
+           <%= @displayed_user_type %>
+          </.badge>
           </span>
           <span>
             <%= @hours %>:<%= @minutes %>

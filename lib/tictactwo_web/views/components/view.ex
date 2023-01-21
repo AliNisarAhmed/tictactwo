@@ -72,7 +72,7 @@ defmodule TictactwoWeb.Components.View do
       game={@game}
       current_user_type={@user_type}
       displayed_user_type={:orange}
-      color="orange"
+      color={get_current_user_color_type(:orange)}
       move_timer={@move_timers.orange}
       class="row-start-1 row-end-2"
     />
@@ -86,7 +86,7 @@ defmodule TictactwoWeb.Components.View do
     current_user_type={@user_type}
     displayed_user_type={:blue}
     move_timer={@move_timers.blue}
-    color="blue"
+    color={get_current_user_color_type(:blue)}
     class="row-start-3 row-end-4"
     />
     """

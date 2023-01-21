@@ -3,11 +3,7 @@ defmodule TictactwoWeb.RoomView do
 
   use Tictactwo.Types
 
-  alias Tictactwo.Games
   alias TictactwoWeb.Components.GameStatus
-  alias TictactwoWeb.Components.Board
-  alias TictactwoWeb.Components.Gobbler
-  alias TictactwoWeb.Components.Player
   alias TictactwoWeb.Components.Controls
   alias TictactwoWeb.Components.View
 
@@ -30,6 +26,7 @@ defmodule TictactwoWeb.RoomView do
 
   @spec game_in_play?(game :: game()) :: boolean()
   def game_in_play?(%{status: :in_play}), do: true
+  def game_in_play?(%{status: :ready}), do: true
   def game_in_play?(_game), do: false
 
   @spec game_ready?(game :: game()) :: boolean()
@@ -122,9 +119,9 @@ defmodule TictactwoWeb.RoomView do
   def is_player?(:spectator), do: false
   def is_player?(_), do: true
 
-  @spec show_player_name(game :: game(), color :: String.t()) :: String.t()
-  def show_player_name(game, color) do
-    atom = "#{color}_username" |> String.to_atom()
+  @spec show_player_name(game :: game(), displayed_user :: viewer_type()) :: String.t()
+  def show_player_name(game, displayed_user) do
+    atom = "#{displayed_user}_username" |> String.to_atom()
     Map.get(game, atom)
   end
 

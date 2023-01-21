@@ -9,6 +9,14 @@ defmodule TictactwoWeb.Components.Controls do
   attr :current_user, :map, required: true
   attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
 
+  def panel(%{user_type: :spectator} = assigns) do
+    ~H"""
+    <div class="flex">
+      <Button.back_to_lobby />
+    </div>
+    """
+  end
+
   def panel(assigns) do
     assigns =
       assigns
@@ -19,13 +27,17 @@ defmodule TictactwoWeb.Components.Controls do
       )
 
     ~H"""
-      <div class="flex">
-        <Button.abort_game :if={game_ready?(@game)} current_user={@current_user} />
-        <Button.resign_game :if={game_in_play?(@game)} current_user={@current_user}/>
-        <Button.accept_rematch :if={@game_ended? && @rematch_offered?}/>
-        <Button.offer_rematch :if={@game_ended? and not @rematch_offered?} current_user={@current_user} user_type={@user_type}/>
-        <Button.back_to_lobby :if={@game_ended?}/>
-      </div>
+    <div class="flex">
+      <Button.abort_game :if={game_ready?(@game)} current_user={@current_user} />
+      <Button.resign_game :if={game_in_play?(@game)} current_user={@current_user} />
+      <Button.accept_rematch :if={@game_ended? && @rematch_offered?} />
+      <Button.offer_rematch
+        :if={@game_ended? and not @rematch_offered?}
+        current_user={@current_user}
+        user_type={@user_type}
+      />
+      <Button.back_to_lobby :if={@game_ended?} />
+    </div>
     """
   end
 end
