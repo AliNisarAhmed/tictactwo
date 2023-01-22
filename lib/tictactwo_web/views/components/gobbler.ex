@@ -11,19 +11,10 @@ defmodule TictactwoWeb.Components.Gobbler do
   attr :color, :string, required: true
   attr :class, :string, default: ""
 
-  # <div>
-  #   <.selected
-  #     game={@game}
-  #     current_user_type={@current_user_type}
-  #     displayed_user_type={@displayed_user_type}
-  #     color={@color}
-  #   />
-  # </div>
-
   def list(assigns) do
     ~H"""
     <div class="flex flex-row w-screen max-w-screen-sm">
-      <%= for gobbler <- not_selected_gobblers(@game, @displayed_user_type) do %>
+      <%= for gobbler <- get_gobblers_for_user(@game, @displayed_user_type) do %>
         <.list_item
           game={@game}
           current_user_type={@current_user_type}
@@ -71,24 +62,6 @@ defmodule TictactwoWeb.Components.Gobbler do
       phx-value-gobbler={@gobbler.name}
     >
       <.gobbler_image name={@gobbler.name} color={@color} />
-    </button>
-    """
-  end
-
-  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
-  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
-  attr :game, :map, required: true
-  attr :color, :string, required: true
-
-  def selected(assigns) do
-    ~H"""
-    <button
-      phx-click="deselect-gobbler"
-      disabled={is_selected_disabled?(@game, @current_user_type, @displayed_user_type)}
-    >
-      <%= if not is_nil(@game.selected_gobbler) and my_turn?(@game, @displayed_user_type) do %>
-        <.gobbler_image name={@game.selected_gobbler.name} color={@color} />
-      <% end %>
     </button>
     """
   end
@@ -219,13 +192,6 @@ defmodule TictactwoWeb.Components.Gobbler do
     not my_turn?(game, current_user_type) or
       (not is_nil(game.selected_gobbler) and game.selected_gobbler.name == gobbler.name) or
       current_user_type != displayed_user_type or
-      game_ended?(game)
-  end
-
-  defp is_selected_disabled?(game, current_user, display_user) do
-    not my_turn?(game, current_user) ||
-      is_nil(game.selected_gobbler) ||
-      current_user != display_user ||
       game_ended?(game)
   end
 end

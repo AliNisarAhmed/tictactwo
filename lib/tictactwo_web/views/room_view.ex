@@ -49,15 +49,13 @@ defmodule TictactwoWeb.RoomView do
     "w-20 h-10 py-2 px-4 border-2 border-#{color |> to_string()}-500 bg-#{color |> to_string()}-500"
   end
 
-  def not_selected_gobblers(game, :spectator) do
-    not_selected_gobblers(game, :blue)
+  def get_gobblers_for_user(game, :spectator) do
+    get_gobblers_for_user(game, :blue)
   end
 
-  def not_selected_gobblers(game, user_type) do
+  def get_gobblers_for_user(game, user_type) do
     game
     |> Map.get(user_type)
-
-    # |> Enum.filter(&(&1.status == :not_selected))
   end
 
   def played_gobbler_text(gobblers) do
