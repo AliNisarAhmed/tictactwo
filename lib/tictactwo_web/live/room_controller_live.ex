@@ -220,7 +220,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("key-event", %{"key" => "Escape"}, socket) do
-    IO.puts("key event esc")
     updated_game = Games.deselect_gobbler(socket.assigns.game)
 
     socket =
@@ -235,7 +234,6 @@ defmodule TictactwoWeb.RoomControllerLive do
   end
 
   def handle_event("outside-click", _, socket) do
-    IO.puts("outside click")
     updated_game = Games.deselect_gobbler(socket.assigns.game)
 
     socket =

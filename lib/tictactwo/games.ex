@@ -50,7 +50,6 @@ defmodule Tictactwo.Games do
 
   @spec deselect_gobbler(game :: game()) :: game()
   def deselect_gobbler(%{selected_gobbler: nil} = game) do
-    IO.puts("gobbler is nil")
     game
   end
 
@@ -372,8 +371,6 @@ defmodule Tictactwo.Games do
 
   @spec deselect_unplayed_gobbler(game :: game()) :: game()
   defp deselect_unplayed_gobbler(game) do
-    IO.puts("deselect unplated gobbler")
-
     game
     |> update_gobbler_status(game.selected_gobbler.name, :not_selected)
     |> set_selected_gobbler(nil)
