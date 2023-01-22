@@ -56,7 +56,8 @@ defmodule TictactwoWeb.RoomView do
   def not_selected_gobblers(game, user_type) do
     game
     |> Map.get(user_type)
-    |> Enum.filter(&(&1.status == :not_selected))
+
+    # |> Enum.filter(&(&1.status == :not_selected))
   end
 
   def played_gobbler_text(gobblers) do

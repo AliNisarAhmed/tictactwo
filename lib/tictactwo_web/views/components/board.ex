@@ -15,44 +15,30 @@ defmodule TictactwoWeb.Components.Board do
 
     ~H"""
     <div class={"#{@class} p-1 w-screen max-w-screen-sm"}>
-    <div class="grid grid-cols-3 grid-rows-3 w-full">
-
-    <%= for cell <- @game.cells do %>
-      <div class="border-2 w-full h-28">
-
-        <%= if is_nil(@selected_gobbler) do %>
-
-          <%= if can_select_played_gobbler?(@game, @current_user_type, cell.gobblers) do %>
-
-            <Gobbler.board_item 
-              game={@game}
-              cell={cell}
-              on_click="select-gobbler"
-              disabled={false}
-            />
-
-          <% else %> 
-
-    				   <Gobbler.board_item 
-                 game={@game}
-                 cell={cell}
-                 disabled={true}
+      <div class="grid grid-cols-3 grid-rows-3 w-full">
+        <%= for cell <- @game.cells do %>
+          <div class="border-2 w-full h-28">
+            <%= if is_nil(@selected_gobbler) do %>
+              <%= if can_select_played_gobbler?(@game, @current_user_type, cell.gobblers) do %>
+                <Gobbler.board_item
+                  game={@game}
+                  cell={cell}
+                  on_click="select-gobbler"
+                  disabled={false}
                 />
-
-          <% end %>
-
-        <% else %> 
-
-           <Gobbler.board_item_selected 
-             game={@game}
-             current_user_type={@current_user_type}
-             cell={cell}
-           />
-
+              <% else %>
+                <Gobbler.board_item game={@game} cell={cell} disabled={true} />
+              <% end %>
+            <% else %>
+              <Gobbler.board_item_selected
+                game={@game}
+                current_user_type={@current_user_type}
+                cell={cell}
+              />
+            <% end %>
+          </div>
         <% end %>
       </div>
-      <% end %>
-    </div>
     </div>
     """
   end

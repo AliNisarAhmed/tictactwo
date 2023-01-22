@@ -9,7 +9,7 @@ defmodule Tictactwo.GameManager do
   # @timeout 300_000
   @timeout 60_000
   @room_topic "rooms:"
-  @time_per_move 10
+  @time_per_move 200
 
   def child_spec(game_slug) do
     %{

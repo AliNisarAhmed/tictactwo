@@ -111,7 +111,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
 
-  # select gobbler
+  # select already played gobbler
   def handle_event(
         "select-gobbler",
         %{"gobbler" => gobbler_name_str, "row" => row, "col" => col},
@@ -132,7 +132,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  # Broadcast event for selecting unselected Gobbler
+  # select un-played gobbler
   def handle_event("select-gobbler", %{"gobbler" => gobbler_name_str}, socket) do
     gobbler_name = gobbler_name_str |> String.to_atom()
 
@@ -217,6 +217,32 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   def handle_event("back-to-lobby", _payload, socket) do
     redirect_to_lobby(socket)
+  end
+
+  def handle_event("key-event", %{"key" => "Escape"}, socket) do
+    IO.puts("key event esc")
+    updated_game = Games.deselect_gobbler(socket.assigns.game)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("key-event", _, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("outside-click", _, socket) do
+    IO.puts("outside click")
+    updated_game = Games.deselect_gobbler(socket.assigns.game)
+
+    socket =
+      socket
+      |> assign(:game, updated_game)
+
+    {:noreply, socket}
   end
 
   # ----------------------------------------------------------------------

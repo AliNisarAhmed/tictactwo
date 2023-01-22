@@ -1,39 +1,44 @@
+<section 
+	phx-window-keyup="key-event"
+	phx-click="outside-click"
+>
+	<%= if not is_player?(@user_type) do %>
+		<p>Welcome <%= @current_user.username %>, you are spectating</p>
+	<% end %>
 
-<%= if not is_player?(@user_type) do %>
-	<p>Welcome <%= @current_user.username %>, you are spectating</p>
-<% end %>
 
+	<%= if is_player?(@user_type) do %>
+		<GameStatus.show_for_player 
+			game={@game} 
+			user_type={@user_type}
+			current_user={@user_type}
+		/>
+	<% else %>
+		<GameStatus.show_for_spectator
+			game={@game}
+		/>
+	<% end %>
 
-<%= if is_player?(@user_type) do %>
-	<GameStatus.show_for_player 
-		game={@game} 
-		user_type={@user_type}
-		current_user={@user_type}
-	/>
-<% else %>
-	<GameStatus.show_for_spectator
-		game={@game}
-	/>
-<% end %>
+	<section class="grid grid-rows-[1fr_2fr_1fr]" >
 
-<section class="grid grid-rows-[1fr_2fr_1fr]">
+		<View.play
+			game={@game}
+			user_type={@user_type}
+			move_timers={@game.timers}
+		/>
 
-	<View.play
-		game={@game}
-		user_type={@user_type}
-		move_timers={@game.timers}
-	/>
+	</section>
 
-</section>
+	<section>
+		<Controls.panel 
+			game={@game} 
+			current_user={@current_user}
+			user_type={@user_type}
+		/>
+	</section>
 
-<section>
-	<Controls.panel 
-		game={@game} 
-		current_user={@current_user}
-		user_type={@user_type}
-	/>
-</section>
+	<section>
+		<View.spectator_count count={@spectator_count} />
+	</section>
 
-<section>
-	<View.spectator_count count={@spectator_count} />
 </section>
