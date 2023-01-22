@@ -1,5 +1,6 @@
 defmodule TictactwoWeb.Components.Gobbler do
   use Phoenix.Component
+  use Tictactwo.Types
 
   import TictactwoWeb.RoomView
   alias Tictactwo.Games
@@ -13,24 +14,16 @@ defmodule TictactwoWeb.Components.Gobbler do
   def list(assigns) do
     ~H"""
     <div class="flex flex-row w-screen max-w-screen-sm">
-    <div>
-      <.selected
-        game={@game}
-        current_user_type={@current_user_type}
-        displayed_user_type={@displayed_user_type}
-        color={@color}
-      />
-    </div>
-    <%= for gobbler <- not_selected_gobblers(@game, @displayed_user_type) do %>
-      <.list_item
-        game={@game}
-        current_user_type={@current_user_type}
-        displayed_user_type={@displayed_user_type}
-        gobbler={gobbler}
-        color={@color}
-        class={@class}
-      />
-    <% end %>
+      <%= for gobbler <- get_gobblers_for_user(@game, @displayed_user_type) do %>
+        <.list_item
+          game={@game}
+          current_user_type={@current_user_type}
+          displayed_user_type={@displayed_user_type}
+          gobbler={gobbler}
+          color={@color}
+          class={@class}
+        />
+      <% end %>
     </div>
     """
   end
@@ -42,31 +35,33 @@ defmodule TictactwoWeb.Components.Gobbler do
   attr :color, :string, required: true
   attr :class, :string, default: ""
 
-  def list_item(assigns) do
+  def list_item(%{gobbler: %{status: {:played, _}}} = assigns) do
     ~H"""
-      <button
-        disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type)}
-        phx-click="select-gobbler"
-        phx-value-gobbler={@gobbler.name} >
-          <.gobbler_image name={@gobbler.name} color={@color} />
-      </button>
+    <div class="h-full w-full border-2 border-sky-500"></div>
     """
   end
 
-  attr :current_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
-  attr :displayed_user_type, :atom, required: true, values: [:blue, :orange, :spectator]
-  attr :game, :map, required: true
-  attr :color, :string, required: true
-
-  def selected(assigns) do
+  def list_item(%{gobbler: %{status: :selected}} = assigns) do
     ~H"""
-    <button 
-      phx-click="deselect-gobbler"
-      disabled={is_selected_disabled?(@game, @current_user_type, @displayed_user_type)}
-     >
-       <%= if not is_nil(@game.selected_gobbler) and my_turn?(@game, @displayed_user_type) do %>
-        <.gobbler_image name={@game.selected_gobbler.name} color={@color} />
-       <% end %>
+    <button
+      disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type, @gobbler)}
+      phx-click="select-gobbler"
+      phx-value-gobbler={@gobbler.name}
+      class="border-2 border-yellow-500 rounded-lg"
+    >
+      <.gobbler_image name={@gobbler.name} color={@color} />
+    </button>
+    """
+  end
+
+  def list_item(assigns) do
+    ~H"""
+    <button
+      disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type, @gobbler)}
+      phx-click="select-gobbler"
+      phx-value-gobbler={@gobbler.name}
+    >
+      <.gobbler_image name={@gobbler.name} color={@color} />
     </button>
     """
   end
@@ -84,17 +79,18 @@ defmodule TictactwoWeb.Components.Gobbler do
 
     ~H"""
     <%= if @first_gobbler do %>
-      <button 
-          phx-click={@on_click}
-    		  phx-value-gobbler={@first_gobbler.name}
-    		  phx-value-row={elem(assigns.cell.coords, 0)}
-    		  phx-value-col={elem(assigns.cell.coords, 1)}
-    		  disabled={@disabled}
-    		  class={"w-full h-full #{@class}"}
-    	  >
-          <.gobbler_image 
-            name={@first_gobbler.name} 
-            color={get_current_user_color_type(@first_gobbler.color)} />
+      <button
+        phx-click={@on_click}
+        phx-value-gobbler={@first_gobbler.name}
+        phx-value-row={elem(assigns.cell.coords, 0)}
+        phx-value-col={elem(assigns.cell.coords, 1)}
+        disabled={@disabled}
+        class={"w-full h-full #{@class}"}
+      >
+        <.gobbler_image
+          name={@first_gobbler.name}
+          color={get_current_user_color_type(@first_gobbler.color)}
+        />
       </button>
     <% end %>
     """
@@ -122,44 +118,37 @@ defmodule TictactwoWeb.Components.Gobbler do
       )
 
     ~H"""
-      <%= if is_nil(@first_gobbler) do %> 
-
+    <%= if is_nil(@first_gobbler) do %>
+      <.item_selected_button
+        row_value={@row_value}
+        col_value={@col_value}
+        disabled={not @my_turn}
+        class={if @my_turn, do: "cursor-pointer"}
+      >
+      </.item_selected_button>
+    <% else %>
+      <%= if @first_gobbler_selected do %>
         <.item_selected_button
           row_value={@row_value}
           col_value={@col_value}
           disabled={not @my_turn}
-          class={if @my_turn, do: "cursor-pointer"}
-        ></.item_selected_button>
-          
-
-      <% else %> 
-
-          <%= if @first_gobbler_selected do %>
-
-            <.item_selected_button
-              row_value={@row_value}
-              col_value={@col_value}
-              disabled={not @my_turn}
-              class={"hidden #{if @my_turn, do: "cursor-pointer"}"}
-            ></.item_selected_button>
-
-          <% else %> 
-
-            <.item_selected_button
-              row_value={@row_value}
-              col_value={@col_value}
-              disabled={not @move_allowed}
-              class={if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
-            >
-              <.gobbler_image 
-                name={@first_gobbler.name}
-                color={get_current_user_color_type(@first_gobbler.color)}
-              />
-            </.item_selected_button>
-
-          <% end %>
-
-      <% end %> 
+          class={"hidden #{if @my_turn, do: "cursor-pointer"}"}
+        >
+        </.item_selected_button>
+      <% else %>
+        <.item_selected_button
+          row_value={@row_value}
+          col_value={@col_value}
+          disabled={not @move_allowed}
+          class={if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
+        >
+          <.gobbler_image
+            name={@first_gobbler.name}
+            color={get_current_user_color_type(@first_gobbler.color)}
+          />
+        </.item_selected_button>
+      <% end %>
+    <% end %>
     """
   end
 
@@ -171,7 +160,7 @@ defmodule TictactwoWeb.Components.Gobbler do
 
   def item_selected_button(assigns) do
     ~H"""
-    <button 
+    <button
       phx-click="play-gobbler"
       phx-value-row={@row_value}
       phx-value-col={@col_value}
@@ -192,21 +181,17 @@ defmodule TictactwoWeb.Components.Gobbler do
       |> assign(:gobbler_file, "#{assigns.name}-#{assigns.color}")
 
     ~H"""
-      <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file, class: "w-full h-full") %>
+    <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file,
+      class: "w-full h-full"
+    ) %>
     """
   end
 
-  defp is_button_disabled?(game, current_user, display_user) do
-    not my_turn?(game, current_user) ||
-      not is_nil(game.selected_gobbler) ||
-      current_user != display_user ||
-      game_ended?(game)
-  end
-
-  defp is_selected_disabled?(game, current_user, display_user) do
-    not my_turn?(game, current_user) ||
-      is_nil(game.selected_gobbler) ||
-      current_user != display_user ||
+  @spec is_button_disabled?(game(), viewer_type(), viewer_type(), gobbler()) :: boolean()
+  defp is_button_disabled?(game, current_user_type, displayed_user_type, gobbler) do
+    not my_turn?(game, current_user_type) or
+      (not is_nil(game.selected_gobbler) and game.selected_gobbler.name == gobbler.name) or
+      current_user_type != displayed_user_type or
       game_ended?(game)
   end
 end

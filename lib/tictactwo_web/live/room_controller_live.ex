@@ -111,7 +111,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     TictactwoWeb.RoomView.render("show.html", assigns)
   end
 
-  # select gobbler
+  # select already played gobbler
   def handle_event(
         "select-gobbler",
         %{"gobbler" => gobbler_name_str, "row" => row, "col" => col},
@@ -132,7 +132,7 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, socket}
   end
 
-  # Broadcast event for selecting unselected Gobbler
+  # select un-played gobbler
   def handle_event("select-gobbler", %{"gobbler" => gobbler_name_str}, socket) do
     gobbler_name = gobbler_name_str |> String.to_atom()
 
@@ -149,11 +149,7 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   # Broadcast event: deselect Gobbler
   def handle_event("deselect-gobbler", _, socket) do
-    updated_game = Games.deselect_gobbler(socket.assigns.game)
-
-    socket =
-      socket
-      |> assign(:game, updated_game)
+    socket = deselect_gobbler(socket)
 
     {:noreply, socket}
   end
@@ -219,6 +215,22 @@ defmodule TictactwoWeb.RoomControllerLive do
     redirect_to_lobby(socket)
   end
 
+  def handle_event("key-event", %{"key" => "Escape"}, socket) do
+    socket = deselect_gobbler(socket)
+
+    {:noreply, socket}
+  end
+
+  def handle_event("key-event", _, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("outside-click", _, socket) do
+    socket = deselect_gobbler(socket)
+
+    {:noreply, socket}
+  end
+
   # ----------------------------------------------------------------------
 
   defp topic(socket) do
@@ -238,5 +250,11 @@ defmodule TictactwoWeb.RoomControllerLive do
     |> Presence.list()
     |> Map.values()
     |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
+  end
+
+  defp deselect_gobbler(socket) do
+    updated_game = Games.deselect_gobbler(socket.assigns.game)
+
+    assign(socket, :game, updated_game)
   end
 end

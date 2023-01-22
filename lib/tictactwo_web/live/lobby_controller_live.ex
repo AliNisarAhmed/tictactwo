@@ -58,6 +58,14 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, socket}
   end
 
+  def handle_event("outside-click", _, socket) do
+    {:noreply, socket}
+  end
+
+  def handle_event("key-event", _, socket) do
+    {:noreply, socket}
+  end
+
   # -------- Handle Info -----------
 
   def handle_info(:after_join, socket) do

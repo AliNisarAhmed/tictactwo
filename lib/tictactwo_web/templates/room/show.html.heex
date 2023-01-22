@@ -1,8 +1,6 @@
-
 <%= if not is_player?(@user_type) do %>
 	<p>Welcome <%= @current_user.username %>, you are spectating</p>
 <% end %>
-
 
 <%= if is_player?(@user_type) do %>
 	<GameStatus.show_for_player 
@@ -16,7 +14,7 @@
 	/>
 <% end %>
 
-<section class="grid grid-rows-[1fr_2fr_1fr]">
+<section class="grid grid-rows-[1fr_2fr_1fr]" >
 
 	<View.play
 		game={@game}
@@ -37,3 +35,4 @@
 <section>
 	<View.spectator_count count={@spectator_count} />
 </section>
+

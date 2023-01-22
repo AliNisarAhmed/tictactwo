@@ -24,6 +24,7 @@ defmodule Tictactwo.Games do
 
     updated_game =
       game
+      |> deselect_gobbler()
       |> pop_first_gobbler_from_cell({row, col})
       |> set_selected_gobbler(selected_gobbler)
       |> update_gobbler_status(gobbler_name, :selected)
@@ -40,6 +41,7 @@ defmodule Tictactwo.Games do
 
     updated_game =
       game
+      |> deselect_gobbler()
       |> set_selected_gobbler(selected_gobbler)
       |> update_gobbler_status(gobbler_name, :selected)
 
@@ -47,6 +49,10 @@ defmodule Tictactwo.Games do
   end
 
   @spec deselect_gobbler(game :: game()) :: game()
+  def deselect_gobbler(%{selected_gobbler: nil} = game) do
+    game
+  end
+
   def deselect_gobbler(game) do
     updated_game =
       case game.selected_gobbler.played? do
