@@ -23,15 +23,18 @@ defmodule TictactwoWeb.RoomControllerLive do
         current_user: current_user,
         user_type: user_type,
         game: game,
-        spectator_count: 0
+        spectator_count: 0,
+        online_status: %{blue: false, orange: false}
       )
 
     {:ok, socket}
   end
 
-  def terminate(reason, _socket) do
+  def terminate(reason, socket) do
     # TODO: Handle users leaving the room 
     # Close the game once both players leave
+    TictactwoWeb.Endpoint.unsubscribe(topic(socket))
+    TictactwoWeb.Endpoint.unsubscribe(time_topic(socket.assigns.game))
   end
 
   def handle_info(:after_join, socket) do
@@ -45,7 +48,8 @@ defmodule TictactwoWeb.RoomControllerLive do
       %{
         id: socket.assigns.current_user.id,
         username: socket.assigns.current_user.username,
-        user_type: socket.assigns.user_type
+        user_type: socket.assigns.user_type,
+        online_at: inspect(System.system_time(:second))
       }
     )
 
@@ -54,11 +58,22 @@ defmodule TictactwoWeb.RoomControllerLive do
 
   # presence diff
   def handle_info(%{event: "presence_diff", payload: _payload}, %{assigns: _assigns} = socket) do
+    presence_list = Presence.list(topic(socket))
+
+    online_status = %{
+      blue: user_online(presence_list, :blue),
+      orange: user_online(presence_list, :orange)
+    }
+
     socket =
-      assign(
-        socket,
+      socket
+      |> assign(
         :spectator_count,
-        spectator_count(topic(socket))
+        spectator_count(presence_list)
+      )
+      |> assign(
+        :online_status,
+        online_status
       )
 
     {:noreply, socket}
@@ -245,11 +260,16 @@ defmodule TictactwoWeb.RoomControllerLive do
     {:noreply, push_redirect(socket, to: "/lobby")}
   end
 
-  defp spectator_count(topic) do
-    topic
-    |> Presence.list()
+  defp spectator_count(presence_list) do
+    presence_list
     |> Map.values()
     |> Enum.count(fn map -> List.first(map.metas).user_type == :spectator end)
+  end
+
+  defp user_online(presence_list, user_type) do
+    presence_list
+    |> Map.values()
+    |> Enum.any?(fn map -> List.first(map.metas).user_type == user_type end)
   end
 
   defp deselect_gobbler(socket) do

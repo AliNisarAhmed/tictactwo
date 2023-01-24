@@ -132,4 +132,8 @@ defmodule TictactwoWeb.RoomView do
     user_type != :spectator and not is_nil(game.rematch_offered_by) and
       game.rematch_offered_by.username != current_user.username
   end
+
+  def get_user_status(online_status, user_type) do
+    Map.get(online_status, user_type, false)
+  end
 end
