@@ -1,3 +1,5 @@
+# https://fly.io/phoenix-files/tabs-with-js-commands/
+
 defmodule TictactwoWeb.LobbyControllerLive do
   use TictactwoWeb, :live_view
 
@@ -21,7 +23,8 @@ defmodule TictactwoWeb.LobbyControllerLive do
        users: %{},
        challenges: [],
        current_games_count: 0,
-       current_games: []
+       current_games: [],
+       tab: "one"
      )}
   end
 
@@ -64,6 +67,10 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   def handle_event("key-event", _, socket) do
     {:noreply, socket}
+  end
+
+  def handle_event("switch-tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, :tab, tab)}
   end
 
   # -------- Handle Info -----------

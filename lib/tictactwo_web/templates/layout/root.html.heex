@@ -17,8 +17,9 @@
     <header>
       <section class="container">
         <nav>
-          <ul class="flex">
+          <ul class="flex justify-between">
             <li><a href="/lobby"><h1 class="text-xl">Tic-Tac-Two</h1></a></li>
+            <li><span class="text-lg"><%= @conn.assigns.current_user.username %></span></li>
           </ul>
         </nav>
       </section>
