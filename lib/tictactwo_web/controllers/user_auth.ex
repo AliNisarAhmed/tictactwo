@@ -9,7 +9,10 @@ defmodule TictactwoWeb.UserAuth do
       conn
     else
       current_user = generate_random_user()
-      conn |> put_session("current_user", current_user)
+
+      conn
+      |> put_session("current_user", current_user)
+      |> assign(:current_user, current_user)
     end
   end
 

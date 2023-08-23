@@ -1,15 +1,20 @@
+# https://fly.io/phoenix-files/tabs-with-js-commands/
+
 defmodule TictactwoWeb.LobbyControllerLive do
   use TictactwoWeb, :live_view
 
   use Tictactwo.Types
 
-  alias Tictactwo.{Presence, Games, CurrentGames}
+  alias Tictactwo.{Presence, Games, CurrentGames, Tables}
 
   # General lobby events like chats, presence tracking
   @lobby_topic "rooms:lobby"
 
   # Used by each player in combination with their IDs to receive personal events
   @events_topic "event_bus:"
+
+  # Used for broadcasting events like table created, table deleted
+  @tables_topic "tables_topic"
 
   def mount(_params, session, socket) do
     send(self(), :after_join)
@@ -21,7 +26,9 @@ defmodule TictactwoWeb.LobbyControllerLive do
        users: %{},
        challenges: [],
        current_games_count: 0,
-       current_games: []
+       current_games: [],
+       tab: "one",
+       tables: []
      )}
   end
 
@@ -58,6 +65,35 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, socket}
   end
 
+  # when a user rejects a challenge
+  def handle_event(
+        "reject-challenge",
+        %{"challenger-username" => _challenger_username, "challenger-id" => challenger_id},
+        socket
+      ) do
+    users =
+      socket.assigns.users
+      |> Map.update!(challenger_id, fn prev ->
+        prev
+        |> Map.update!(:status, &toggle_status/1)
+      end)
+
+    challenges =
+      socket.assigns.challenges
+      |> Enum.filter(&(&1.id != challenger_id))
+
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> challenger_id, "challenge-rejected", %{
+      userid: socket.assigns.current_user.id
+    })
+
+    {:noreply, assign(socket, users: users, challenges: challenges)}
+  end
+
+  def handle_event("create-table", %{"games" => games}, socket) do
+    Tables.create_table(games, socket.assigns.current_user.username, :blue)
+    {:noreply, socket}
+  end
+
   def handle_event("outside-click", _, socket) do
     {:noreply, socket}
   end
@@ -66,12 +102,17 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, socket}
   end
 
+  def handle_event("switch-tab", %{"tab" => tab}, socket) do
+    {:noreply, assign(socket, :tab, tab)}
+  end
+
   # -------- Handle Info -----------
 
   def handle_info(:after_join, socket) do
     TictactwoWeb.Endpoint.subscribe(@lobby_topic)
     TictactwoWeb.Endpoint.subscribe(@events_topic <> socket.assigns.current_user.id)
     TictactwoWeb.Endpoint.subscribe(CurrentGames.topic())
+    TictactwoWeb.Endpoint.subscribe(@tables_topic)
 
     Presence.track(
       self(),
@@ -84,12 +125,14 @@ defmodule TictactwoWeb.LobbyControllerLive do
     )
 
     {count, current_games} = CurrentGames.get_current_games()
+    tables = Tables.get_current_tables()
 
     {:noreply,
      assign(socket,
        loading: false,
        current_games_count: count,
-       current_games: current_games
+       current_games: current_games,
+       tables: tables
      )}
   end
 
@@ -119,6 +162,24 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, redirect_to_game(socket, game_slug)}
   end
 
+  def handle_info(
+        %{event: "challenge-rejected", payload: %{userid: userid}},
+        socket
+      ) do
+    users =
+      socket.assigns.users
+      |> Map.update!(userid, fn prev ->
+        prev
+        |> Map.update!(:status, &toggle_status/1)
+      end)
+
+    socket =
+      socket
+      |> assign(:users, users)
+
+    {:noreply, socket}
+  end
+
   def handle_info(%{event: "room-created", payload: %{game_slug: game_slug}}, socket) do
     {:noreply, redirect_to_game(socket, game_slug)}
   end
@@ -131,6 +192,12 @@ defmodule TictactwoWeb.LobbyControllerLive do
       |> assign(:current_games_count, count)
 
     {:noreply, socket}
+  end
+
+  # Handle table update event 
+  def handle_info(%{event: "tables_updated", payload: tables}, socket) do
+    dbg(tables)
+    {:noreply, assign(socket, :tables, tables)}
   end
 
   def render(assigns) do

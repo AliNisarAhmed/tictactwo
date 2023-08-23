@@ -1,50 +1,87 @@
-<div class="h-full grid grid-cols-lobby-desktop grid-rows-1">
+<.tabs>
+	<.tab 
+		to="/"
+		underline 
+		is_active={@tab == "one"} 
+		link_type="button" 
+		phx-click={show_active_content("one")}
+	>Quick Start</.tab>
+	<.tab 
+		to="/"
+		underline 
+		is_active={@tab == "two"} 
+		link_type="button" 
+		phx-click={show_active_content("two")}
+		number={@current_games_count}
+	>Current Games</.tab>
+	<.tab 
+		to="/" 
+		underline 
+		is_active={@tab == "three"} 
+		link_type="button" 
+		phx-click={show_active_content("three")}
+		number={map_size(@users)}
+	>Players Online</.tab>
+	<.tab 
+		to="/" 
+		underline 
+		is_active={@tab == "four"} 
+		link_type="button" 
+		phx-click={show_active_content("four")}
+		number={length(@challenges)}
+	>Challenges</.tab>
+</.tabs>
+
+<div class="h-full w-full">
 	<%= if @loading do %>
 		<h2>Loading...</h2>
 	<% else %>
-		<div class="bg-black-700">
-			<h2>Welcome <span class="text-xl"><%= @current_user.username %> </span></h2>
 
-			<p>You are in Lobby</p>
-		</div>
-
-		<div class="container grid grid-cols-3 mx-auto max-w-6xl">
-			<div class="flex flex-col h-full">
-				<h3 class="text-lg border-2 border-black-300 text-center">
-					Current Online users: <%= map_size(@users) %>
-				</h3>
-
-				<ul class="my-4 grow">
-					<%= for {user_id, user_data} <- filter_self(@users, @current_user.username) do %>
-							<li class="flex my-2 items-center">
-								<p class="mx-4 b-2 b-blue-300 grow"><%= user_data.username %></p>
-								<Button.challenge user_data={user_data} user_id={user_id} />
+	  	
+			<div id="content-tab-one" class="tab-content flex flex-col h-full">
+				<div class="flex">
+					<.button 
+						variant="outline" 
+						phx-click="create-table" 
+						phx-value-games="1" 
+						disabled={player_has_table?(@tables, @current_user.username)} 
+					>
+						<.card variant="outline">
+							<.card_content heading="Best of 1">
+							</.card_content>
+						</.card>
+					</.button>
+					<.card variant="outline">
+						<.card_content heading="Best of 3">
+						</.card_content>
+					</.card>
+					<.card variant="outline">
+						<.card_content heading="Best of 5">
+						</.card_content>
+					</.card>
+				</div>
+				<div>
+					or choose from the open tables below:
+					<ul>
+						<%= for table <- @tables do %>
+							<li>
+								<div class="flex">
+									<p>Best of <%= table.num_games %> </p>
+									<%= table.blue_player.username %> : Blue vs 
+									<%= if player_owns_table?(table, @current_user.username) do %>
+										<.button>Cancel!</.button>
+									<% else %>
+										<.button>Join!</.button>
+									<% end %>
+								</div>
 							</li>
-					<% end %>
-				</ul>
-			</div>
-
-			<div>
-				<h3 class="text-lg border-2 border-black-300 text-center">Challenges</h3>
-				<ul>
-					<%= if Enum.empty?(@challenges) do %>
-					  <p class="text-center grow italic">None</p>
-					<% else %>
-						<%= for challenge <- @challenges do %>
-							<div class="flex border-2 border-black-200 items-center my-2">
-								<p class="grow"><%= challenge.username %> challenges you!</p>
-								<Button.accept_challenge text="Accept" challenge={challenge} />
-								<Button.reject_challenge text="Reject" challenge={challenge} />
-							</div>
 						<% end %>
-					<% end %>
-				</ul>
+					</ul>
+				</div>
 			</div>
 
-			<div class="h-full">
-				<h3 class="text-lg border-2 border-black-300 text-center">
-					Current games (<%= @current_games_count %>)
-				</h3>
+
+			<div id="content-tab-two" class="tab-content hidden">
 				<%= if Enum.empty?(@current_games) do %>
 					<p class="text-center grow italic">None</p>
 				<% else %>
@@ -59,6 +96,32 @@
 				<% end %>
 			</div>
 
-		</div>
+			<div id="content-tab-three" class="tab-content h-full w-full hidden">
+					<ul>
+						<li class="flex my-2 items-center"><p><%= @current_user.username %> (You) </p></li>
+						<%= for {user_id, user_data} <- filter_self(@users, @current_user.username) do %>
+								<li class="flex my-2 items-center">
+									<p class="mx-4 b-2 b-blue-300 grow"><%= user_data.username %></p>
+									<Button.challenge user_data={user_data} user_id={user_id} />
+								</li>
+						<% end %>
+					</ul>
+			</div>
+
+			<div id="content-tab-four" class="tab-content hidden">
+				<%= if Enum.empty?(@challenges) do %>
+					<p class="text-center grow italic">None</p>
+				<% else %>
+					<%= for challenge <- @challenges do %>
+						<div class="flex border-2 border-black-200 items-center my-2">
+							<p class="grow"><%= challenge.username %> challenges you!</p>
+							<Button.accept_challenge text="Accept" challenge={challenge} />
+							<Button.reject_challenge text="Reject" challenge={challenge} />
+						</div>
+					<% end %>
+				<% end %>
+			</div>
 	<% end %>
+
+
 </div>
