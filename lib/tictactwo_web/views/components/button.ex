@@ -50,8 +50,8 @@ defmodule TictactwoWeb.Components.Button do
           color="danger"
           variant="outline"
           phx-click="reject-challenge"
-          phx-value-challenger_username={@challenge.username}
-          phx-value-challenger_id={@challenge.id}
+          phx-value-challenger-username={@challenge.username}
+          phx-value-challenger-id={@challenge.id}
       >
         <%= @text %>
       </.button>

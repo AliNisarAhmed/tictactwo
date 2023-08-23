@@ -28,6 +28,7 @@
 		is_active={@tab == "four"} 
 		link_type="button" 
 		phx-click={show_active_content("four")}
+		number={length(@challenges)}
 	>Challenges</.tab>
 </.tabs>
 
@@ -38,6 +39,45 @@
 
 	  	
 			<div id="content-tab-one" class="tab-content flex flex-col h-full">
+				<div class="flex">
+					<.button 
+						variant="outline" 
+						phx-click="create-table" 
+						phx-value-games="1" 
+						disabled={player_has_table?(@tables, @current_user.username)} 
+					>
+						<.card variant="outline">
+							<.card_content heading="Best of 1">
+							</.card_content>
+						</.card>
+					</.button>
+					<.card variant="outline">
+						<.card_content heading="Best of 3">
+						</.card_content>
+					</.card>
+					<.card variant="outline">
+						<.card_content heading="Best of 5">
+						</.card_content>
+					</.card>
+				</div>
+				<div>
+					or choose from the open tables below:
+					<ul>
+						<%= for table <- @tables do %>
+							<li>
+								<div class="flex">
+									<p>Best of <%= table.num_games %> </p>
+									<%= table.blue_player.username %> : Blue vs 
+									<%= if player_owns_table?(table, @current_user.username) do %>
+										<.button>Cancel!</.button>
+									<% else %>
+										<.button>Join!</.button>
+									<% end %>
+								</div>
+							</li>
+						<% end %>
+					</ul>
+				</div>
 			</div>
 
 

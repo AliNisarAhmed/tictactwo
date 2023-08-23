@@ -23,7 +23,8 @@ defmodule Tictactwo.Application do
       # {Registry, [name: Tictactwo.Registry.GameManager, keys: :unique]},
       {Tictactwo.GameRegistry, [name: Tictactwo.GameRegistry, keys: :unique]},
       {DynamicSupervisor, [name: Tictactwo.DynamicSupervisor, strategy: :one_for_one]},
-      Tictactwo.CurrentGames
+      Tictactwo.CurrentGames,
+      Tictactwo.TableManager
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
