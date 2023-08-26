@@ -46,8 +46,17 @@ defmodule Tictactwo.Types do
               }
             }
       @type viewer_type :: :blue | :orange | :spectator
-      @type current_user :: %{username: String.t()}
+      @type current_user :: %{
+              username: String.t(),
+              id: String.t()
+            }
       @type challenge_status :: :challenge_sent | nil
+      @type table :: %{
+              num_games: pos_integer(),
+              owner: String.t(),
+              owner_id: String.t(),
+              owner_color: player(),
+            }
     end
   end
 end

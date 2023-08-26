@@ -21,10 +21,7 @@ defmodule TictactwoWeb.LobbyView do
 
   def player_has_table?(tables, username) do
     tables
-    |> Enum.any?(fn table ->
-      (table.blue_player != nil and table.blue_player.username == username) or
-        (table.orange_player != nil and table.orange_player.username == username)
-    end)
+    |> Enum.any?(fn table -> table.owner == username end)
   end
 
   def player_owns_table?(table, username) do

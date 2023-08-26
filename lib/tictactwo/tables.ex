@@ -3,12 +3,17 @@ defmodule Tictactwo.Tables do
 
   @tables_topic "tables_topic"
 
-  def create_table(num_games, username, color) do
-    with {:ok, tables} <- TableManager.create_table(num_games, username, color) do
-      # Broadcast here
+  def create_table(num_games, current_user, color) do
+    with {:ok, tables} <- TableManager.create_table(num_games, current_user, color) do
       broadcast_event(tables)
     else
       error -> {:error, error}
+    end
+  end
+
+  def cancel_table(owner) do
+    with {:ok, tables} <- TableManager.cancel_table(owner) do
+      broadcast_event(tables)
     end
   end
 

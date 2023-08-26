@@ -37,8 +37,7 @@
 		<h2>Loading...</h2>
 	<% else %>
 
-	  	
-			<div id="content-tab-one" class="tab-content flex flex-col h-full">
+			<div id="content-tab-one" class="max-w-xl tab-content flex flex-col h-full justify-items-center">
 				<div class="flex">
 					<.button 
 						variant="outline" 
@@ -60,24 +59,22 @@
 						</.card_content>
 					</.card>
 				</div>
-				<div>
-					or choose from the open tables below:
-					<ul>
-						<%= for table <- @tables do %>
-							<li>
-								<div class="flex">
-									<p>Best of <%= table.num_games %> </p>
-									<%= table.blue_player.username %> : Blue vs 
-									<%= if player_owns_table?(table, @current_user.username) do %>
-										<.button>Cancel!</.button>
-									<% else %>
-										<.button>Join!</.button>
-									<% end %>
-								</div>
-							</li>
-						<% end %>
-					</ul>
-				</div>
+					<p>Or choose from the open tables below</p>
+				<.table class="max-w-lg">
+					<%= for table <- @tables do %>
+						<.tr
+							class="flex cursor-pointer"
+							phx-click={if player_owns_table?(table, @current_user.username) do "cancel-table" else "join-table" end}
+							phx-value-owner={table.owner}
+							phx-value-owner-id={table.owner_id}
+							phx-value-owner-color={table.owner_color}
+							title={if player_owns_table?(table, @current_user.username) do "Cancel" else "Join" end}
+						>
+								<.td><%= table.owner %></.td>	
+								<.td>Best of <%= table.num_games %> </.td>
+							</.tr>
+					<% end %>
+				</.table>
 			</div>
 
 

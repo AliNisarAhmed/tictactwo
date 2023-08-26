@@ -89,9 +89,32 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, users: users, challenges: challenges)}
   end
 
-  def handle_event("create-table", %{"games" => games}, socket) do
-    Tables.create_table(games, socket.assigns.current_user.username, :blue)
+  def handle_event("create-table", %{"games" => num_games}, socket) do
+    Tables.create_table(num_games, socket.assigns.current_user, :blue)
     {:noreply, socket}
+  end
+
+  def handle_event("cancel-table", %{"owner" => owner}, socket) do
+    Tables.cancel_table(owner)
+    {:noreply, socket}
+  end
+
+  def handle_event(
+        "join-table",
+        %{"owner" => owner, "owner-id" => owner_id, "owner-color" => "blue"},
+        socket
+      ) do
+
+    game_slug = Games.new_game(:blue, owner, socket.assigns.current_user.username)
+  
+    TictactwoWeb.Endpoint.broadcast(@events_topic <> owner_id, "room-created", %{
+      game_slug: game_slug
+    })
+
+    Tables.cancel_table(owner)
+    Tables.cancel_table(socket.assigns.current_user.username)
+
+    {:noreply, redirect_to_game(socket, game_slug)}
   end
 
   def handle_event("outside-click", _, socket) do
