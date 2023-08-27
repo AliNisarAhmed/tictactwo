@@ -33,7 +33,7 @@ defmodule Tictactwo.GameManager do
     {:ok, game, @timeout}
   end
 
-  def new_game(player_turn, blue_username, orange_username) do
+  def new_game(player_turn, blue_username, orange_username, num_games) do
     game_slug = generate_slug()
 
     new_gobblers = Gobblers.new_gobblers()
@@ -49,7 +49,14 @@ defmodule Tictactwo.GameManager do
       orange: new_gobblers,
       selected_gobbler: nil,
       rematch_offered_by: nil,
-      timers: default_timers()
+      timers: default_timers(),
+      match: %{
+        num_games: num_games,
+        scores: %{
+          blue_username => 0,
+          orange_username => 0
+        }
+      }
     }
 
     with {:ok, _} <-

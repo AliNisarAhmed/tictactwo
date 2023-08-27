@@ -24,12 +24,15 @@ defmodule TictactwoWeb.Components.Player do
     ~H"""
     <div>
       <div class="flex justify-between">
-        <div class="flex items-baseline">
+        <div class="flex items-baseline dbg">
           <UserStatus.show user_online?={@user_online?} />
           <%= show_player_name(@game, @displayed_user_type) %>
           <.badge color={get_current_user_color_type(@displayed_user_type)}>
             <%= @displayed_user_type %>
           </.badge>
+          <p class="justify-self-end">
+            <%= Map.get(@game.match.scores, show_player_name(@game, @displayed_user_type)) %>
+          </p>
         </div>
         <span>
           <%= @hours %>:<%= @minutes %>

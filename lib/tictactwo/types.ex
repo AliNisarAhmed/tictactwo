@@ -43,6 +43,13 @@ defmodule Tictactwo.Types do
               timers: %{
                 blue: pos_integer(),
                 orange: pos_integer()
+              },
+              match: match()
+            }
+      @type match :: %{
+              num_games: pos_integer(),
+              scores: %{
+                String.t() => pos_integer()
               }
             }
       @type viewer_type :: :blue | :orange | :spectator
@@ -55,7 +62,7 @@ defmodule Tictactwo.Types do
               num_games: pos_integer(),
               owner: String.t(),
               owner_id: String.t(),
-              owner_color: player(),
+              owner_color: player()
             }
     end
   end

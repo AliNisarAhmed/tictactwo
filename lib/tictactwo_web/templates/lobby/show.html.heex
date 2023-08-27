@@ -39,24 +39,40 @@
 
 			<div id="content-tab-one" class="max-w-xl tab-content flex flex-col h-full justify-items-center">
 				<div class="flex">
-					<.button 
-						variant="outline" 
-						phx-click="create-table" 
-						phx-value-games="1" 
-						disabled={player_has_table?(@tables, @current_user.username)} 
-					>
-						<.card variant="outline">
-							<.card_content heading="Best of 1">
-							</.card_content>
-						</.card>
-					</.button>
 					<.card variant="outline">
-						<.card_content heading="Best of 3">
-						</.card_content>
+					    <.button 
+						    variant="outline" 
+						    phx-click="create-table" 
+						    phx-value-games="1" 
+						    disabled={player_has_table?(@tables, @current_user.username)} 
+					    >
+							  <.card_content heading="Best of 1">
+							  </.card_content>
+					    </.button>
 					</.card>
 					<.card variant="outline">
-						<.card_content heading="Best of 5">
-						</.card_content>
+				    <.button 
+					    variant="outline" 
+					    phx-click="create-table" 
+					    phx-value-games="3" 
+					    disabled={player_has_table?(@tables, @current_user.username)} 
+				    >
+						  <.card_content 
+						    heading="Best of 3" 
+						  >
+						  </.card_content>
+						</.button>
+					</.card>
+					<.card variant="outline">
+				    <.button 
+					    variant="outline" 
+					    phx-click="create-table" 
+					    phx-value-games="5" 
+					    disabled={player_has_table?(@tables, @current_user.username)} 
+				    >
+						  <.card_content heading="Best of 5">
+						  </.card_content>
+						</.button>
 					</.card>
 				</div>
 					<p>Or choose from the open tables below</p>

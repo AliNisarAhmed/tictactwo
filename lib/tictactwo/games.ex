@@ -4,9 +4,15 @@ defmodule Tictactwo.Games do
   alias Tictactwo.{Repo, Gobblers, GameManager}
   alias Tictactwo.Games.Game
 
-  @spec new_game(player(), blue_username :: String.t(), orange_username :: String.t()) :: slug()
-  def new_game(player_turn, blue_username, orange_username) do
-    with {:ok, game} <- GameManager.new_game(player_turn, blue_username, orange_username) do
+  @spec new_game(
+          player(),
+          blue_username :: String.t(),
+          orange_username :: String.t(),
+          num_games :: pos_integer()
+        ) :: slug()
+  def new_game(player_turn, blue_username, orange_username, num_games \\ 1) do
+    with {:ok, game} <-
+           GameManager.new_game(player_turn, blue_username, orange_username, num_games) do
       game.slug
     end
   end
