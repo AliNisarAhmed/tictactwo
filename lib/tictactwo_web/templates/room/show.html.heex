@@ -2,6 +2,13 @@
 	<p>Welcome <%= @current_user.username %>, you are spectating</p>
 <% end %>
 
+<section class="game_info_box">
+  <p> 180 seconds per move</p>
+  <p>Best of <%= @game.match.num_games %></p>
+  <p>Blue: <%= @game.blue_username %>, score: <%= get_player_score(@game, @game.blue_username) %></p>
+  <p>Orange: <%= @game.orange_username %>, score: <%= get_player_score(@game, @game.orange_username) %></p>
+</section>
+
 <%= if is_player?(@user_type) do %>
 	<GameStatus.show_for_player 
 		game={@game} 

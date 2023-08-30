@@ -80,6 +80,7 @@ defmodule Tictactwo.Games do
       |> update_gobbler_status(gobbler_name, {:played, coords})
       |> set_selected_gobbler(nil)
       |> update_game_status()
+      |> update_match_score()
       |> toggle_player_turn()
 
     cond do
@@ -88,6 +89,63 @@ defmodule Tictactwo.Games do
     end
 
     updated_game
+  end
+
+  @spec update_match_score(game :: game()) :: game()
+  def update_match_score(game) do
+    blue_score = Map.get(game.match.scores, game.blue_username, 0)
+    orange_score = Map.get(game.match.scores, game.orange_username, 0)
+
+    sum_scores = blue_score + orange_score + 1
+
+    cond do
+      game.status == :blue_won and sum_scores < game.match.num_games ->
+        %{
+          game
+          | match: %{
+              game.match
+              | scores: %{game.match.scores | game.blue_username => blue_score + 1}
+            }
+        }
+
+      game.status == :blue_won and sum_scores >= game.match.num_games ->
+        %{
+          game
+          | match: %{
+              game.match
+              | scores: %{
+                  game.match.scores
+                  | game.blue_username => blue_score + 1,
+                    :status => :match_over
+                }
+            }
+        }
+
+      game.status == :orange_won and sum_scores < game.match.num_games ->
+        %{
+          game
+          | match: %{
+              game.match
+              | scores: %{game.match.scores | game.orange_username => orange_score + 1}
+            }
+        }
+
+      game.status == :orange_won and sum_scores >= game.match.num_games ->
+        %{
+          game
+          | match: %{
+              game.match
+              | scores: %{
+                  game.match.scores
+                  | game.orange_username => orange_score + 1,
+                    :status => :match_over
+                }
+            }
+        }
+
+      true ->
+        game
+    end
   end
 
   @spec get_player_gobblers(game :: game(), player :: player()) :: [gobbler()]

@@ -84,6 +84,7 @@
 							phx-value-owner={table.owner}
 							phx-value-owner-id={table.owner_id}
 							phx-value-owner-color={table.owner_color}
+							phx-value-num-games={table.num_games}
 							title={if player_owns_table?(table, @current_user.username) do "Cancel" else "Join" end}
 						>
 								<.td><%= table.owner %></.td>	

@@ -47,11 +47,14 @@ defmodule Tictactwo.Types do
               match: match()
             }
       @type match :: %{
+              status: match_status(),
+              time_per_move: pos_integer(),
               num_games: pos_integer(),
               scores: %{
                 String.t() => pos_integer()
               }
             }
+      @type match_status :: :in_play | :transition | :match_over
       @type viewer_type :: :blue | :orange | :spectator
       @type current_user :: %{
               username: String.t(),

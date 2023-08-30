@@ -101,12 +101,22 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   def handle_event(
         "join-table",
-        %{"owner" => owner, "owner-id" => owner_id, "owner-color" => "blue"},
+        %{
+          "owner" => owner,
+          "owner-id" => owner_id,
+          "owner-color" => "blue",
+          "num-games" => num_games
+        },
         socket
       ) do
+    game_slug =
+      Games.new_game(
+        :blue,
+        owner,
+        socket.assigns.current_user.username,
+        String.to_integer(num_games)
+      )
 
-    game_slug = Games.new_game(:blue, owner, socket.assigns.current_user.username)
-  
     TictactwoWeb.Endpoint.broadcast(@events_topic <> owner_id, "room-created", %{
       game_slug: game_slug
     })

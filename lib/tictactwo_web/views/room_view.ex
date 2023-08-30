@@ -136,4 +136,8 @@ defmodule TictactwoWeb.RoomView do
   def get_user_status(online_status, user_type) do
     Map.get(online_status, user_type, false)
   end
+
+  def get_player_score(game, player_username) do 
+    Map.get(game.match.scores, player_username, 0)
+  end
 end

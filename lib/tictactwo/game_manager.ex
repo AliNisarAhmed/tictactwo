@@ -51,6 +51,7 @@ defmodule Tictactwo.GameManager do
       rematch_offered_by: nil,
       timers: default_timers(),
       match: %{
+        time_per_move: @time_per_move,
         num_games: num_games,
         scores: %{
           blue_username => 0,

@@ -30,9 +30,6 @@ defmodule TictactwoWeb.Components.Player do
           <.badge color={get_current_user_color_type(@displayed_user_type)}>
             <%= @displayed_user_type %>
           </.badge>
-          <p class="justify-self-end">
-            <%= Map.get(@game.match.scores, show_player_name(@game, @displayed_user_type)) %>
-          </p>
         </div>
         <span>
           <%= @hours %>:<%= @minutes %>
