@@ -49,7 +49,6 @@ defmodule Tictactwo.Types do
       @type match :: %{
               status: match_status(),
               time_per_move: pos_integer(),
-              num_games: pos_integer(),
               scores: %{
                 String.t() => pos_integer()
               }
@@ -62,7 +61,6 @@ defmodule Tictactwo.Types do
             }
       @type challenge_status :: :challenge_sent | nil
       @type table :: %{
-              num_games: pos_integer(),
               owner: String.t(),
               owner_id: String.t(),
               owner_color: player()

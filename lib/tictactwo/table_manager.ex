@@ -5,7 +5,7 @@ defmodule Tictactwo.TableManager do
     Agent.start_link(fn -> initial_val end, name: __MODULE__)
   end
 
-  def create_table(num_games, current_user, :blue) do
+  def create_table(current_user, :blue) do
     # TODO: Validate here
     tables = current_tables()
 
@@ -16,7 +16,6 @@ defmodule Tictactwo.TableManager do
       {:error, "Player already has a table"}
     else
       new_table = %{
-        num_games: num_games,
         owner: current_user.username,
         owner_id: current_user.id,
         owner_color: :blue
@@ -27,10 +26,9 @@ defmodule Tictactwo.TableManager do
     end
   end
 
-  def create_table(num_games, current_user, :orange) do
+  def create_table(current_user, :orange) do
     # TODO: Validate here
     new_table = %{
-      num_games: num_games,
       owner: current_user.username,
       owner_id: current_user.id,
       owner_color: :orange

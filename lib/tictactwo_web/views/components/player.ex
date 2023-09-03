@@ -24,7 +24,7 @@ defmodule TictactwoWeb.Components.Player do
     ~H"""
     <div>
       <div class="flex justify-between">
-        <div class="flex items-baseline dbg">
+        <div class="flex items-baseline">
           <UserStatus.show user_online?={@user_online?} />
           <%= show_player_name(@game, @displayed_user_type) %>
           <.badge color={get_current_user_color_type(@displayed_user_type)}>

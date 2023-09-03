@@ -40,37 +40,12 @@
 			<div id="content-tab-one" class="max-w-xl tab-content flex flex-col h-full justify-items-center">
 				<div class="flex">
 					<.card variant="outline">
-					    <.button 
-						    variant="outline" 
-						    phx-click="create-table" 
-						    phx-value-games="1" 
-						    disabled={player_has_table?(@tables, @current_user.username)} 
-					    >
-							  <.card_content heading="Best of 1">
-							  </.card_content>
-					    </.button>
-					</.card>
-					<.card variant="outline">
 				    <.button 
 					    variant="outline" 
 					    phx-click="create-table" 
-					    phx-value-games="3" 
 					    disabled={player_has_table?(@tables, @current_user.username)} 
 				    >
-						  <.card_content 
-						    heading="Best of 3" 
-						  >
-						  </.card_content>
-						</.button>
-					</.card>
-					<.card variant="outline">
-				    <.button 
-					    variant="outline" 
-					    phx-click="create-table" 
-					    phx-value-games="5" 
-					    disabled={player_has_table?(@tables, @current_user.username)} 
-				    >
-						  <.card_content heading="Best of 5">
+						  <.card_content heading="Create table">
 						  </.card_content>
 						</.button>
 					</.card>
@@ -84,11 +59,9 @@
 							phx-value-owner={table.owner}
 							phx-value-owner-id={table.owner_id}
 							phx-value-owner-color={table.owner_color}
-							phx-value-num-games={table.num_games}
 							title={if player_owns_table?(table, @current_user.username) do "Cancel" else "Join" end}
 						>
 								<.td><%= table.owner %></.td>	
-								<.td>Best of <%= table.num_games %> </.td>
 							</.tr>
 					<% end %>
 				</.table>

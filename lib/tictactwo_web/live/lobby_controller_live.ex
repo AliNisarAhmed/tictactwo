@@ -89,8 +89,8 @@ defmodule TictactwoWeb.LobbyControllerLive do
     {:noreply, assign(socket, users: users, challenges: challenges)}
   end
 
-  def handle_event("create-table", %{"games" => num_games}, socket) do
-    Tables.create_table(num_games, socket.assigns.current_user, :blue)
+  def handle_event("create-table", _payload, socket) do
+    Tables.create_table(socket.assigns.current_user, :blue)
     {:noreply, socket}
   end
 
@@ -104,8 +104,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
         %{
           "owner" => owner,
           "owner-id" => owner_id,
-          "owner-color" => "blue",
-          "num-games" => num_games
+          "owner-color" => "blue"
         },
         socket
       ) do
@@ -113,8 +112,7 @@ defmodule TictactwoWeb.LobbyControllerLive do
       Games.new_game(
         :blue,
         owner,
-        socket.assigns.current_user.username,
-        String.to_integer(num_games)
+        socket.assigns.current_user.username
       )
 
     TictactwoWeb.Endpoint.broadcast(@events_topic <> owner_id, "room-created", %{
@@ -229,7 +227,6 @@ defmodule TictactwoWeb.LobbyControllerLive do
 
   # Handle table update event 
   def handle_info(%{event: "tables_updated", payload: tables}, socket) do
-    dbg(tables)
     {:noreply, assign(socket, :tables, tables)}
   end
 

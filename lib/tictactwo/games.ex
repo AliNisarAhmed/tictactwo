@@ -4,15 +4,19 @@ defmodule Tictactwo.Games do
   alias Tictactwo.{Repo, Gobblers, GameManager}
   alias Tictactwo.Games.Game
 
+  @starting_score %{
+    blue: 0,
+    orange: 0
+  }
+
   @spec new_game(
           player(),
           blue_username :: String.t(),
-          orange_username :: String.t(),
-          num_games :: pos_integer()
+          orange_username :: String.t()
         ) :: slug()
-  def new_game(player_turn, blue_username, orange_username, num_games \\ 1) do
+  def new_game(player_turn, blue_username, orange_username, score \\ @starting_score) do
     with {:ok, game} <-
-           GameManager.new_game(player_turn, blue_username, orange_username, num_games) do
+           GameManager.new_game(player_turn, blue_username, orange_username, score) do
       game.slug
     end
   end
@@ -96,56 +100,36 @@ defmodule Tictactwo.Games do
     blue_score = Map.get(game.match.scores, game.blue_username, 0)
     orange_score = Map.get(game.match.scores, game.orange_username, 0)
 
-    sum_scores = blue_score + orange_score + 1
-
     cond do
-      game.status == :blue_won and sum_scores < game.match.num_games ->
-        %{
-          game
-          | match: %{
-              game.match
-              | scores: %{game.match.scores | game.blue_username => blue_score + 1}
-            }
-        }
+      game.status == :blue_won or game.status == {:resigned, game.orange_username} ->
+        update_blue_score(game, blue_score)
 
-      game.status == :blue_won and sum_scores >= game.match.num_games ->
-        %{
-          game
-          | match: %{
-              game.match
-              | scores: %{
-                  game.match.scores
-                  | game.blue_username => blue_score + 1,
-                    :status => :match_over
-                }
-            }
-        }
-
-      game.status == :orange_won and sum_scores < game.match.num_games ->
-        %{
-          game
-          | match: %{
-              game.match
-              | scores: %{game.match.scores | game.orange_username => orange_score + 1}
-            }
-        }
-
-      game.status == :orange_won and sum_scores >= game.match.num_games ->
-        %{
-          game
-          | match: %{
-              game.match
-              | scores: %{
-                  game.match.scores
-                  | game.orange_username => orange_score + 1,
-                    :status => :match_over
-                }
-            }
-        }
+      game.status == :orange_won or game.status == {:resigned, game.blue_username} ->
+        update_orange_score(game, orange_score)
 
       true ->
         game
     end
+  end
+
+  defp update_blue_score(game, current_score) do
+    %{
+      game
+      | match: %{
+          game.match
+          | scores: %{game.match.scores | game.blue_username => current_score + 1}
+        }
+    }
+  end
+
+  defp update_orange_score(game, current_score) do
+    %{
+      game
+      | match: %{
+          game.match
+          | scores: %{game.match.scores | game.orange_username => current_score + 1}
+        }
+    }
   end
 
   @spec get_player_gobblers(game :: game(), player :: player()) :: [gobbler()]
@@ -180,13 +164,18 @@ defmodule Tictactwo.Games do
   def rematch_accepted(game) do
     player_turn = :blue
 
+    score = %{
+      blue: Map.get(game.match.scores, game.orange_username),
+      orange: Map.get(game.match.scores, game.blue_username)
+    }
+
     {blue_username, orange_username} =
       case game.rematch_offered_by.color do
         "blue" -> {game.orange_username, game.rematch_offered_by.username}
         "orange" -> {game.rematch_offered_by.username, game.blue_username}
       end
 
-    new_game(player_turn, blue_username, orange_username)
+    new_game(player_turn, blue_username, orange_username, score)
   end
 
   def fetch_players(slug) do
@@ -259,6 +248,7 @@ defmodule Tictactwo.Games do
     updated_game =
       game
       |> Map.put(:status, {:resigned, username})
+      |> update_match_score()
 
     GameManager.end_game(updated_game)
 
@@ -482,7 +472,7 @@ defmodule Tictactwo.Games do
       |> Enum.filter(fn
         %{coords: {2, 0}} -> true
         %{coords: {0, 2}} -> true
-        %{coords: {2, 2}} -> true
+        %{coords: {1, 1}} -> true
         _ -> false
       end)
 
