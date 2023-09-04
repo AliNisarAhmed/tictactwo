@@ -48,6 +48,7 @@ defmodule TictactwoWeb.Components.View do
       move_timer={@move_timers[@opponent_type]}
       user_online?={get_user_status(@online_status, @opponent_type)}
       class="row-start-1 row-end-2"
+      bottom={false}
     />
     <Board.draw_board game={@game} current_user_type={@user_type} class="row-start-2 row-end-3" />
     <Player.info
@@ -58,6 +59,7 @@ defmodule TictactwoWeb.Components.View do
       move_timer={@move_timers[@user_type]}
       user_online?={get_user_status(@online_status, @user_type)}
       class="row-start-3 row-end-4"
+      bottom={true}
     />
     """
   end

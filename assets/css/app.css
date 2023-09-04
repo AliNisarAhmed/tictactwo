@@ -3,7 +3,7 @@
 @import "tailwindcss/utilities";
 
 @layer utilities {
-  .debug {
+  .dbg {
     border: 1px solid red;
   }
 }

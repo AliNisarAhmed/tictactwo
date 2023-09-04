@@ -14,9 +14,9 @@
     phx-click="outside-click"
     phx-window-keyup="key-event"
   >
-    <header>
-      <section class="container">
-        <nav>
+    <header class="container bg-gray-500 text-white box-shadow-lg">
+      <section class="">
+        <nav class="my-1 mx-4">
           <ul class="flex justify-between">
             <li><a href="/lobby"><h1 class="text-xl">Tic-Tac-Two</h1></a></li>
             <li><span class="text-lg"><%= @conn.assigns.current_user.username %></span></li>
@@ -24,8 +24,8 @@
         </nav>
       </section>
     </header>
-    <.container class="my-10">
+    <main>
       <%= @inner_content %>
-    </.container>
+    </main>
   </body>
 </html>

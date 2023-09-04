@@ -3,6 +3,8 @@ defmodule TictactwoWeb.Components.Gobbler do
   use Tictactwo.Types
 
   import TictactwoWeb.RoomView
+  import PetalComponents.Badge
+
   alias Tictactwo.Games
 
   attr :game, :map, required: true
@@ -13,7 +15,7 @@ defmodule TictactwoWeb.Components.Gobbler do
 
   def list(assigns) do
     ~H"""
-    <div class="flex flex-row w-screen max-w-screen-sm">
+    <div class="grid grid-rows-1 grid-cols-6 gap-x-1 w-screen max-w-screen-sm py-1">
       <%= for gobbler <- get_gobblers_for_user(@game, @displayed_user_type) do %>
         <.list_item
           game={@game}
@@ -37,7 +39,7 @@ defmodule TictactwoWeb.Components.Gobbler do
 
   def list_item(%{gobbler: %{status: {:played, _}}} = assigns) do
     ~H"""
-    <div class="h-full w-full border-2 border-sky-500"></div>
+    <div class="h-full w-full"></div>
     """
   end
 
@@ -60,6 +62,7 @@ defmodule TictactwoWeb.Components.Gobbler do
       disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type, @gobbler)}
       phx-click="select-gobbler"
       phx-value-gobbler={@gobbler.name}
+      class="border border-gray-300 bg-gray-200 rounded-lg"
     >
       <.gobbler_image name={@gobbler.name} color={@color} />
     </button>
@@ -181,9 +184,12 @@ defmodule TictactwoWeb.Components.Gobbler do
       |> assign(:gobbler_file, "#{assigns.name}-#{assigns.color}")
 
     ~H"""
-    <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file,
-      class: "w-full h-full"
-    ) %>
+    <span>
+      <.badge color={"#{@color}"}><%= @name %></.badge>
+      <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file,
+        class: ""
+      ) %>
+    </span>
     """
   end
 
