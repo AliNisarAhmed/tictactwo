@@ -72,7 +72,7 @@ defmodule TictactwoWeb.Components.Player do
 
   def player_info(assigns) do
     ~H"""
-    <div class="flex justify-between bg-gray-700 text-white">
+    <div class="flex justify-between bg-gray-800 text-white">
       <div class="flex items-baseline pl-2">
         <UserStatus.show user_online?={@user_online?} />
         <p class="mx-0.5">
@@ -82,7 +82,7 @@ defmodule TictactwoWeb.Components.Player do
           <%= @displayed_user_type %>
         </.badge>
       </div>
-      <div class="text-2xl border-black-500 bg-gray-500 text-white px-2">
+      <div class={"text-2xl border-black-500 bg-gray-500 text-white px-2"}>
         <span><%= @hours %>:</span><span><%= @minutes %></span>
       </div>
     </div>

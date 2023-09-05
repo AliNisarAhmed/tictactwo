@@ -15,9 +15,12 @@ defmodule TictactwoWeb.Components.Board do
 
     ~H"""
     <div class={"#{@class} p-1 w-screen max-w-screen-sm"}>
-      <div class="grid grid-cols-3 grid-rows-3 w-full">
+      <div class={"grid grid-cols-3 grid-rows-3 w-full bg-gradient-to-br from-#{@game.player_turn}-100 to-white-200"}>
         <%= for cell <- @game.cells do %>
-          <div class="border-2 w-full h-28">
+          <div class={"w-full h-28
+             #{if elem(cell.coords, 1) != 2, do: "border-r-8 border-r-blue-400"}
+             #{if elem(cell.coords, 0) != 2, do: "border-b-8 border-b-orange-500"}
+             "}>
             <%= if is_nil(@selected_gobbler) do %>
               <%= if can_select_played_gobbler?(@game, @current_user_type, cell.gobblers) do %>
                 <Gobbler.board_item
@@ -30,11 +33,11 @@ defmodule TictactwoWeb.Components.Board do
                 <Gobbler.board_item game={@game} cell={cell} disabled={true} />
               <% end %>
             <% else %>
-              <Gobbler.board_item_selected
-                game={@game}
-                current_user_type={@current_user_type}
-                cell={cell}
-              />
+                <Gobbler.board_item_selected
+                  game={@game}
+                  current_user_type={@current_user_type}
+                  cell={cell}
+                />
             <% end %>
           </div>
         <% end %>

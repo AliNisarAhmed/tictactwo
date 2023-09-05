@@ -62,7 +62,6 @@ defmodule TictactwoWeb.Components.Gobbler do
       disabled={is_button_disabled?(@game, @current_user_type, @displayed_user_type, @gobbler)}
       phx-click="select-gobbler"
       phx-value-gobbler={@gobbler.name}
-      class="border border-gray-300 bg-gray-200 rounded-lg"
     >
       <.gobbler_image name={@gobbler.name} color={@color} />
     </button>
@@ -81,21 +80,23 @@ defmodule TictactwoWeb.Components.Gobbler do
       |> assign(:first_gobbler, first_gobbler(assigns.cell.gobblers))
 
     ~H"""
-    <%= if @first_gobbler do %>
-      <button
-        phx-click={@on_click}
-        phx-value-gobbler={@first_gobbler.name}
-        phx-value-row={elem(assigns.cell.coords, 0)}
-        phx-value-col={elem(assigns.cell.coords, 1)}
-        disabled={@disabled}
-        class={"w-full h-full #{@class}"}
-      >
-        <.gobbler_image
-          name={@first_gobbler.name}
-          color={get_current_user_color_type(@first_gobbler.color)}
-        />
-      </button>
-    <% end %>
+    <div class="board-item-1 flex justify-center align-center m-2">
+      <%= if @first_gobbler do %>
+        <button
+          phx-click={@on_click}
+          phx-value-gobbler={@first_gobbler.name}
+          phx-value-row={elem(assigns.cell.coords, 0)}
+          phx-value-col={elem(assigns.cell.coords, 1)}
+          disabled={@disabled}
+          class="h-2/5 w-3/5"
+        >
+          <.gobbler_image
+            name={@first_gobbler.name}
+            color={get_current_user_color_type(@first_gobbler.color)}
+          />
+        </button>
+      <% end %>
+    </div>
     """
   end
 
@@ -126,7 +127,10 @@ defmodule TictactwoWeb.Components.Gobbler do
         row_value={@row_value}
         col_value={@col_value}
         disabled={not @my_turn}
-        class={if @my_turn, do: "cursor-pointer"}
+        class={"
+          #{if @my_turn, do: "cursor-pointer"}
+          h-full w-full 
+        "}
       >
       </.item_selected_button>
     <% else %>
@@ -139,17 +143,22 @@ defmodule TictactwoWeb.Components.Gobbler do
         >
         </.item_selected_button>
       <% else %>
-        <.item_selected_button
-          row_value={@row_value}
-          col_value={@col_value}
-          disabled={not @move_allowed}
-          class={if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
-        >
-          <.gobbler_image
-            name={@first_gobbler.name}
-            color={get_current_user_color_type(@first_gobbler.color)}
-          />
-        </.item_selected_button>
+        <div class="flex justify-center align-center m-2">
+          <.item_selected_button
+            row_value={@row_value}
+            col_value={@col_value}
+            disabled={not @move_allowed}
+            class={"
+              #{if @my_turn and @move_allowed, do: "cursor-pointer", else: "cursor-not-allowed"}
+              h-2/5 w-3/5
+              "}
+          >
+            <.gobbler_image
+              name={@first_gobbler.name}
+              color={get_current_user_color_type(@first_gobbler.color)}
+            />
+          </.item_selected_button>
+        </div>
       <% end %>
     <% end %>
     """
@@ -168,7 +177,7 @@ defmodule TictactwoWeb.Components.Gobbler do
       phx-value-row={@row_value}
       phx-value-col={@col_value}
       disabled={@disabled}
-      class={"w-full h-full #{@class}"}
+      class={"#{@class}"}
     >
       <%= render_slot(@inner_block) %>
     </button>
@@ -177,6 +186,7 @@ defmodule TictactwoWeb.Components.Gobbler do
 
   attr :name, :string, required: true
   attr :color, :string, required: true
+  attr :class, :string, required: false, default: ""
 
   def gobbler_image(assigns) do
     assigns =
@@ -184,12 +194,12 @@ defmodule TictactwoWeb.Components.Gobbler do
       |> assign(:gobbler_file, "#{assigns.name}-#{assigns.color}")
 
     ~H"""
-    <span>
-      <.badge color={"#{@color}"}><%= @name %></.badge>
-      <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file,
-        class: ""
-      ) %>
-    </span>
+    <div class={
+      "flex flex-col border border-gray-300 bg-gray-200 rounded-lg max-h-24 min-h-20 max-w-18 min-w-14 #{@class}"
+      }>
+      <.badge class="w-full justify-self-start" color={"#{@color}"}><%= @name %></.badge>
+      <%= PhoenixInlineSvg.Helpers.svg_image(TictactwoWeb.Endpoint, @gobbler_file, class: "h-auto max-h-20") %>
+    </div>
     """
   end
 

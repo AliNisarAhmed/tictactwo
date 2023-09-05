@@ -1,13 +1,13 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
-const colors = require('tailwindcss/colors');
+const colors = require("tailwindcss/colors");
 
 module.exports = {
   content: [
-    './js/**/*.js',
-    '../lib/tictactwo_web.ex',
-    '../lib/tictactwo_web/**/*.*ex',
-    '../deps/petal_components/**/*.*ex'
+    "./js/**/*.js",
+    "../lib/tictactwo_web.ex",
+    "../lib/tictactwo_web/**/*.*ex",
+    "../deps/petal_components/**/*.*ex",
   ],
   theme: {
     extend: {
@@ -15,14 +15,13 @@ module.exports = {
         primary: colors.blue,
         secondary: colors.orange,
         blue: colors.blue,
-        orange: colors.orange
+        orange: colors.orange,
+        turn: "#51634f",
       },
       gridTemplateColumns: {
-        'lobby-desktop': '1fr 6fr'
-      }
+        "lobby-desktop": "1fr 6fr",
+      },
     },
   },
-  plugins: [
-    require('@tailwindcss/forms')
-  ]
-}
+  plugins: [require("@tailwindcss/forms")],
+};
