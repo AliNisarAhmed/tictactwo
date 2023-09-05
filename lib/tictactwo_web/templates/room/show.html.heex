@@ -1,5 +1,5 @@
 <%= if not is_player?(@user_type) do %>
-	<p>Welcome <%= @current_user.username %>, you are spectating</p>
+	<.alert color="warning">Welcome <%= @current_user.username %>, you are spectating</.alert>
 <% end %>
 
 
@@ -26,7 +26,7 @@
 
 </section>
 
-<section>
+<section class="flex justify-center my-2">
 	<Controls.panel 
 		game={@game} 
 		current_user={@current_user}
