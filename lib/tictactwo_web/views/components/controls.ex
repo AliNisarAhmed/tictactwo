@@ -5,9 +5,9 @@ defmodule TictactwoWeb.Components.Controls do
 
   alias TictactwoWeb.Components.Button
 
-  attr :game, :map, required: true
-  attr :current_user, :map, required: true
-  attr :user_type, :atom, required: true, values: [:blue, :orange, :spectator]
+  attr(:game, :map, required: true)
+  attr(:current_user, :map, required: true)
+  attr(:user_type, :atom, required: true, values: [:blue, :orange, :spectator])
 
   def panel(%{user_type: :spectator} = assigns) do
     ~H"""
@@ -27,10 +27,10 @@ defmodule TictactwoWeb.Components.Controls do
       )
 
     ~H"""
-    <div class="flex">
+    <div class="flex justify-center gap-x-2 w-full">
       <Button.abort_game :if={game_ready?(@game)} current_user={@current_user} />
       <Button.resign_game :if={game_in_play?(@game)} current_user={@current_user} />
-      <Button.accept_rematch :if={@game_ended? && @rematch_offered?} />
+      <Button.accept_rematch :if={@game_ended? and @rematch_offered?} />
       <Button.offer_rematch
         :if={@game_ended? and not @rematch_offered?}
         current_user={@current_user}

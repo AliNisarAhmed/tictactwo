@@ -63,7 +63,7 @@ defmodule TictactwoWeb.Components.Button do
   def accept_rematch(assigns) do
     ~H"""
     <.button color="success" phx-click="rematch-accepted">
-      Accept Rematch
+      Accept Rematch?
     </.button>
     """
   end
@@ -74,13 +74,42 @@ defmodule TictactwoWeb.Components.Button do
   def offer_rematch(assigns) do
     ~H"""
     <.button
+      id="offer-rematch"
       color="primary"
+      variant="outline"
+      class="border-none"
       phx-click="offer-rematch"
+      phx-click={
+        JS.hide(to: "#offer-rematch")
+        |> JS.show(to: "#rematch-offered")
+        |> JS.push("offer-rematch",
+          value: %{
+            "username" => @current_user.username,
+            "color" => @user_type
+          }
+        )
+      }
       phx-value-username={@current_user.username}
       phx-value-color={@user_type}
+      title="Offer Rematch"
     >
-      Rematch
+      <Heroicons.arrow_path class="w-6 h-6 stroke-green-600" />
     </.button>
+    <.button
+      color="primary"
+      variant="outline"
+      class="hidden border-none"
+      id="rematch-offered"
+      phx-click={JS.hide() |> JS.show(to: "#offer-rematch")}
+    >
+      <Heroicons.arrow_path class="w-6 h-6 stroke-green-400 animate-spin" />
+    </.button>
+    """
+  end
+
+  def rematch_offered(assigns) do
+    ~H"""
+
     """
   end
 
@@ -94,7 +123,7 @@ defmodule TictactwoWeb.Components.Button do
       variant="outline"
       phx-click={JS.hide() |> JS.show(to: "#abort-button")}
       phx-value-username={@current_user.username}
-      class="border-0"
+      class="border-none"
     >
       <HeroiconsV1.Outline.x class="w-6 h-6" />
     </.button>
@@ -105,7 +134,7 @@ defmodule TictactwoWeb.Components.Button do
       phx-click="abort-game"
       phx-click-away={JS.hide() |> JS.show(to: "#abort-button-client")}
       phx-value-username={@current_user.username}
-      class="hidden border-0 bg-orange-500"
+      class="hidden border-none bg-orange-500"
     >
       <HeroiconsV1.Outline.x class="w-6 h-6 fill-orange stroke-white" />
     </.button>
@@ -124,7 +153,7 @@ defmodule TictactwoWeb.Components.Button do
         JS.hide()
         |> JS.show(to: "#resign-button")
       }
-      class="border-0"
+      class="border-none"
     >
       <HeroiconsV1.Outline.flag id="resign-icon" class="w-6 h-6" />
     </.button>
@@ -135,7 +164,7 @@ defmodule TictactwoWeb.Components.Button do
       phx-click="resign-game"
       phx-click-away={JS.hide() |> JS.show(to: "#resign-button-client")}
       phx-value-username={@current_user.username}
-      class="hidden border-0 bg-orange-500"
+      class="hidden border-none bg-orange-500"
     >
       <HeroiconsV1.Outline.flag id="resign-icon-full" class="w-6 h-6 fill-orange stroke-white" />
     </.button>
@@ -144,8 +173,14 @@ defmodule TictactwoWeb.Components.Button do
 
   def back_to_lobby(assigns) do
     ~H"""
-    <.button color="info" phx-click="back-to-lobby">
-      Back to Lobby
+    <.button
+      title="Back to Lobby"
+      color="warning"
+      variant="outline"
+      class="border-none"
+      phx-click="back-to-lobby"
+    >
+      <Heroicons.arrow_right_on_rectangle class="w-6 h-6 stroke-orange-600" />
     </.button>
     """
   end
