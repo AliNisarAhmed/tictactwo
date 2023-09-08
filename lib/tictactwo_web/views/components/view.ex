@@ -33,6 +33,7 @@ defmodule TictactwoWeb.Components.View do
   attr :game, :map, required: true
   attr :user_type, :atom, required: true, values: [:blue, :orange]
   attr :move_timers, :map, required: true
+  attr :online_status, :map, required: true
 
   def player(assigns) do
     assigns =
@@ -67,6 +68,7 @@ defmodule TictactwoWeb.Components.View do
   attr :game, :map, required: true
   attr :user_type, :atom, required: true, values: [:spectator]
   attr :move_timers, :map, required: true
+  attr :online_status, :map, required: true
 
   def spectator(assigns) do
     ~H"""
@@ -94,9 +96,9 @@ defmodule TictactwoWeb.Components.View do
 
   def spectator_count(assigns) do
     ~H"""
-    <div :if={@count > 0} class="flex">
-      <HeroiconsV1.Outline.user class="w-6 h-6" />
-      <span><%= @count %></span>
+    <div :if={@count > 0} title="Spectators" class="flex">
+      <HeroiconsV1.Outline.user class="w-4 h-4" />
+      <span class="text-sm"><%= @count %></span>
     </div>
     """
   end

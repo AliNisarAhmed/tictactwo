@@ -4,6 +4,7 @@ defmodule TictactwoWeb.RoomView do
   use Tictactwo.Types
 
   alias TictactwoWeb.Components.GameStatus
+  alias TictactwoWeb.Components.UserStatus
   alias TictactwoWeb.Components.Controls
   alias TictactwoWeb.Components.View
 
