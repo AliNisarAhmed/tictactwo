@@ -11,12 +11,14 @@ defmodule Tictactwo.Application do
       TictactwoWeb.Telemetry,
       {DNSCluster, query: Application.get_env(:tictactwo, :dns_cluster_query) || :ignore},
       {Phoenix.PubSub, name: Tictactwo.PubSub},
-      # Start the Finch HTTP client for sending emails
-      {Finch, name: Tictactwo.Finch},
       # Start a worker by calling: Tictactwo.Worker.start_link(arg)
       # {Tictactwo.Worker, arg},
-      # Start to serve requests, typically the last entry
-      TictactwoWeb.Endpoint
+      Tictactwo.Presence,
+      TictactwoWeb.Endpoint,
+      {Tictactwo.GameRegistry, [name: Tictactwo.GameRegistry, keys: :unique]},
+      {DynamicSupervisor, [name: Tictactwo.DynamicSupervisor, strategy: :one_for_one]},
+      Tictactwo.CurrentGames,
+      Tictactwo.TableManager
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
