@@ -1,5 +1,7 @@
 defmodule TictactwoWeb.Router do
   use TictactwoWeb, :router
+  
+  import TictactwoWeb.UserAuth
 
   pipeline :browser do
     plug :accepts, ["html"]
@@ -15,9 +17,10 @@ defmodule TictactwoWeb.Router do
   end
 
   scope "/", TictactwoWeb do
-    pipe_through :browser
+    pipe_through [:browser, :populate_current_user]
 
     get "/", PageController, :home
+    live "/lobby", LobbyControllerLive, :show
   end
 
   # Other scopes may use custom stacks.

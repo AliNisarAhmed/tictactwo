@@ -1,7 +1,8 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
-const plugin = require("tailwindcss/plugin")
+const colors = require("tailwindcss/colors");
+const plugin = require("tailwindcss/plugin");
 const fs = require("fs")
 const path = require("path")
 
@@ -9,12 +10,20 @@ module.exports = {
   content: [
     "./js/**/*.js",
     "../lib/tictactwo_web.ex",
-    "../lib/tictactwo_web/**/*.*ex"
+    "../lib/tictactwo_web/**/*.*ex",
+    "../deps/petal_components/**/*.ex",
   ],
   theme: {
     extend: {
       colors: {
         brand: "#FD4F00",
+        primary: colors.blue,
+        secondary: colors.pink,
+        success: colors.green,
+        danger: colors.red,
+        warning: colors.yellow,
+        info: colors.sky,
+        gray: colors.gray,
       }
     },
   },

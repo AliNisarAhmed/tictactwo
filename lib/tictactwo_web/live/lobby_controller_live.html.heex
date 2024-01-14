@@ -1,0 +1,114 @@
+<.tabs>
+	<.tab 
+		to="/"
+		underline 
+		is_active={@tab == "one"} 
+		link_type="button" 
+		phx-click={show_active_content("one")}
+	>Quick Start</.tab>
+	<.tab 
+		to="/"
+		underline 
+		is_active={@tab == "two"} 
+		link_type="button" 
+		phx-click={show_active_content("two")}
+		number={@current_games_count}
+	>Current Games</.tab>
+	<.tab 
+		to="/" 
+		underline 
+		is_active={@tab == "three"} 
+		link_type="button" 
+		phx-click={show_active_content("three")}
+		number={map_size(@users)}
+	>Players Online</.tab>
+	<.tab 
+		to="/" 
+		underline 
+		is_active={@tab == "four"} 
+		link_type="button" 
+		phx-click={show_active_content("four")}
+		number={length(@challenges)}
+	>Challenges</.tab>
+</.tabs>
+
+<div class="h-full w-full">
+	<%= if @loading do %>
+		<h2>Loading...</h2>
+	<% else %>
+
+			<div id="content-tab-one" class="max-w-xl tab-content flex flex-col h-full justify-items-center">
+				<div class="flex">
+					<.card variant="outline">
+				    <.button 
+					    variant="outline" 
+					    phx-click="create-table" 
+					    disabled={player_has_table?(@tables, @current_user.username)} 
+				    >
+						  <.card_content heading="Create table">
+						  </.card_content>
+						</.button>
+					</.card>
+				</div>
+					<p>Or choose from the open tables below</p>
+				<.table class="max-w-lg">
+					<%= for table <- @tables do %>
+						<.tr
+							class="flex cursor-pointer"
+							phx-click={if player_owns_table?(table, @current_user.username) do "cancel-table" else "join-table" end}
+							phx-value-owner={table.owner}
+							phx-value-owner-id={table.owner_id}
+							phx-value-owner-color={table.owner_color}
+							title={if player_owns_table?(table, @current_user.username) do "Cancel" else "Join" end}
+						>
+								<.td><%= table.owner %></.td>	
+							</.tr>
+					<% end %>
+				</.table>
+			</div>
+
+
+			<div id="content-tab-two" class="tab-content hidden">
+				<%= if Enum.empty?(@current_games) do %>
+					<p class="text-center grow italic">None</p>
+				<% else %>
+
+					<%= for game <- @current_games do %>
+						<.link href={"/rooms/#{game.slug}"}>
+							<span><%= game.blue_username %></span><.badge color="primary">blue</.badge> vs 
+							<span><%= game.orange_username %></span><.badge color="secondary">orange</.badge>
+						</.link>
+					<% end %>
+
+				<% end %>
+			</div>
+
+			<div id="content-tab-three" class="tab-content h-full w-full hidden">
+					<ul>
+						<li class="flex my-2 items-center"><p><%= @current_user.username %> (You) </p></li>
+						<%= for {user_id, user_data} <- filter_self(@users, @current_user.username) do %>
+								<li class="flex my-2 items-center">
+									<p class="mx-4 b-2 b-blue-300 grow"><%= user_data.username %></p>
+									<Button.challenge user_data={user_data} user_id={user_id} />
+								</li>
+						<% end %>
+					</ul>
+			</div>
+
+			<div id="content-tab-four" class="tab-content hidden">
+				<%= if Enum.empty?(@challenges) do %>
+					<p class="text-center grow italic">None</p>
+				<% else %>
+					<%= for challenge <- @challenges do %>
+						<div class="flex border-2 border-black-200 items-center my-2">
+							<p class="grow"><%= challenge.username %> challenges you!</p>
+							<Button.accept_challenge text="Accept" challenge={challenge} />
+							<Button.reject_challenge text="Reject" challenge={challenge} />
+						</div>
+					<% end %>
+				<% end %>
+			</div>
+	<% end %>
+
+
+</div>
