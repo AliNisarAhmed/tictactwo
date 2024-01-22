@@ -23,10 +23,11 @@ defmodule TictactwoWeb.Router do
     live "/lobby", LobbyControllerLive, :show
   end
 
-  # Other scopes may use custom stacks.
-  # scope "/api", TictactwoWeb do
-  #   pipe_through :api
-  # end
+  scope "/rooms", TictactwoWeb do
+    pipe_through [:browser, :populate_current_user]
+
+    live "/:game_slug", RoomControllerLive
+  end
 
   # Enable LiveDashboard and Swoosh mailbox preview in development
   if Application.compile_env(:tictactwo, :dev_routes) do

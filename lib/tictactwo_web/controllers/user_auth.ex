@@ -20,8 +20,13 @@ defmodule TictactwoWeb.UserAuth do
 
     %{
       id: id,
-      username:
-        "Anonymous_#{Faker.Person.first_name()}_#{Faker.Random.Elixir.random_between(10_000, 999_999)}"
+      username: "Anon_#{Faker.Person.first_name()}_#{generate_number()}"
     }
+  end
+
+  defp generate_number() do
+    Faker.Random.Elixir.random_between(1, 999)
+    |> Integer.to_string()
+    |> String.pad_leading(3, "00")
   end
 end

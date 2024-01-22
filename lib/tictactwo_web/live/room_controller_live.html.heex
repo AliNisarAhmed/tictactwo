@@ -1,0 +1,47 @@
+<%= if not is_player?(@user_type) do %>
+  <.alert color="warning">Welcome <%= @current_user.username %>, you are spectating</.alert>
+<% end %>
+
+<%= if is_player?(@user_type) do %>
+  <GameStatus.show_for_player game={@game} user_type={@user_type} current_user={@user_type} />
+<% else %>
+  <GameStatus.show_for_spectator game={@game} />
+<% end %>
+
+<section class="flex flex-col">
+  <View.play
+    game={@game}
+    user_type={@user_type}
+    move_timers={@game.timers}
+    online_status={@online_status}
+  />
+</section>
+
+<section class="flex justify-center my-2">
+  <Controls.panel game={@game} current_user={@current_user} user_type={@user_type} />
+</section>
+
+<section class="border-2 p-2 text-sm grid grid-rows-1 grid-cols-2">
+  <div class="flex flex-col justify-between">
+    <p class="k">180 seconds per move</p>
+    <section>
+      <View.spectator_count count={@spectator_count} />
+    </section>
+  </div>
+  <div class="justify-self-end">
+    <div class="flex items-center justify-start">
+      <UserStatus.show user_online?={true} class="bg-blue-500" />
+      <span class="grow"><%= @game.blue_username %></span>
+      <span class="justify-self-end ml-4 text-base">
+        <%= get_player_score(@game, @game.blue_username) %>
+      </span>
+    </div>
+    <div class="flex items-center justify-start">
+      <UserStatus.show user_online?={true} class="bg-orange-600" />
+      <span class="grow"><%= @game.orange_username %></span>
+      <span class="justify-self-end ml-4 text-base">
+        <%= get_player_score(@game, @game.orange_username) %>
+      </span>
+    </div>
+  </div>
+</section>
