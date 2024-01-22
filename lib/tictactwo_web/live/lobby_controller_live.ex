@@ -28,7 +28,8 @@ defmodule TictactwoWeb.LobbyControllerLive do
        current_games_count: 0,
        current_games: [],
        tab: "one",
-       tables: []
+       tables: [],
+       page_title: "Lobby - Tictactwo"
      )}
   end
 

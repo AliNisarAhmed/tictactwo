@@ -1,6 +1,5 @@
 defmodule TictactwoWeb.UserAuth do
   import Plug.Conn
-  alias Faker.Internet
 
   def populate_current_user(conn, _opts) do
     current_user = get_session(conn, "current_user")
@@ -21,7 +20,8 @@ defmodule TictactwoWeb.UserAuth do
 
     %{
       id: id,
-      username: Internet.user_name()
+      username:
+        "Anonymous_#{Faker.Person.first_name()}_#{Faker.Random.Elixir.random_between(10_000, 999_999)}"
     }
   end
 end
